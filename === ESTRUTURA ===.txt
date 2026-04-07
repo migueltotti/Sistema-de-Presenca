@@ -1,0 +1,44 @@
+=== ESTRUTURA ===
+
+Introdução
+Referencias
+Material e Metodos
+	-> Escrever os materiais a serem usados e de que forma vamos utiliza-los
+Resultado e Discução
+Conclusão
+
+---------------------------------------------------------------------------------------
+
+USAR TEMPLATE REVISTA SINERGIA - PDF BASE DISPONIVEL NO GRUPO DO TELEGRAM
+
+USAR GOOGLE ACADEMIC - palavras chaves
+
+PERIODICOS CAPES - logar via if
+
+IEEE - acessar apenas no IF
+
+---------------------------------------------------------------------------------------
+
+Placa LED LCD1602: https://docs.wokwi.com/parts/wokwi-lcd1602
+
+- Primeiros 4 bits baixos (D7,D6,D5,D4)
+- Faço uma rotação a direita, passando os bits para (D3,D2,D1,D0)
+- Passo os proximos 4 bits
+
+| | | |
+7 6 5 4 3 2 1 0
+0 1 0 1 x x x x
+
+> > > >
+	| | | |
+7 6 5 4 3 2 1 0
+x x x x 0 1 0 1
+
+7 6 5 4 3 2 1 0
+0 0 1 1 0 1 0 1
+
+Pino RW com nivel lógico baixo serve para escrever dados na placa, nivel alto lê da placa
+
+Pino V0 serve para opacidade e funciona mto bem com potenciometro
+
+Pinos A e K são para back-light
