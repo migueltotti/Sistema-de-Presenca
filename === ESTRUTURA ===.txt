@@ -42,3 +42,16 @@ Pino RW com nivel lógico baixo serve para escrever dados na placa, nivel alto l
 Pino V0 serve para opacidade e funciona mto bem com potenciometro
 
 Pinos A e K são para back-light
+
+---------------------------------------------------------------------------------------
+NVS (Non-Volatil Storage) para armazenar o id da relação Disciplina-Aluno em casos de falta de energia ou algo do tipo, para não resetar tudo.
+
+Libs <WiFi.h>, <HTTPClient.h> para fazer requisições http inseguras. Usar <WiFiClientSecure.h> em conjunto das 2 anteriores para https. <ArduinoJson.h> para desserializar a resposta da API (se retornar json) e acessar como se fosse um dicionário.
+
+Libs nativas do ESP32:
+<WiFi.h>
+<HTTPClient.h>
+<WiFiClientSecure.h>
+
+Libs instaladas no Library Manager:
+<ArduinoJson.h>
