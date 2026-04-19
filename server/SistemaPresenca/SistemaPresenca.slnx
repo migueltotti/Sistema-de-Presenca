@@ -1,1 +1,8 @@
-<Solution />
+<Solution>
+  <Project Path="SistemaPresenca.Api/SistemaPresenca.Api.csproj" Id="b8820531-1cd5-4915-9c73-970ebb556f6a" />
+  <Project Path="SistemaPresenca.Application/SistemaPresenca.Application.csproj" Id="88a8e828-82d5-4eb5-af2a-b82663f69417" />
+  <Project Path="SistemaPresenca.CrossCutting/SistemaPresenca.CrossCutting.csproj" Id="84105ab3-1b2f-4a62-98ad-859ee6dc2234" />
+  <Project Path="SistemaPresenca.Domain/SistemaPresenca.Domain.csproj" Id="bc2bc58f-7bde-4e64-8a02-efdc30c4ccf4" />
+  <Project Path="SistemaPresenca.Infrastructure/SistemaPresenca.Infrastructure.csproj" Id="62219a36-26de-4e18-9262-5d613472a8b3" />
+  <Project Path="SistemaPresenca.Test/SistemaPresenca.Test.csproj" Id="2884d901-e474-400f-9292-5ff49574653b" />
+</Solution>
