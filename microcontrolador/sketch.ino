@@ -31,7 +31,9 @@ enum AccessState {
 
 int cont = 0;
 
-void showApproachTagMessage(){
+// ====== begin: Display Print Methods ======
+
+void showApproachTagMessageToDisplay(){
   lcd.clear();
   lcd.setCursor(0, 0);
   lcd.print("Aproxime uma tag");
@@ -41,7 +43,7 @@ void showApproachTagMessage(){
   lcd.print("<<");
 }
 
-void showStartupMessage() {
+void showStartupMessageToDisplay() {
   lcd.setCursor(2, 0);
   lcd.print("Iniciando...");
   delay(1000);
@@ -63,32 +65,12 @@ void showStartupMessage() {
 
   delay(3000);
 
-  showApproachTagMessage();
+  showApproachTagMessageToDisplay();
 
   delay(500);
 }
 
-String getUuidFromRfidReader(){
-  String uid = "";
-  for (byte i = 0; i < rfid.uid.size; i++) {
-    if (rfid.uid.uidByte[i] < 0x10) {
-      uid += "0"; // Adiciona zero à esquerda para bytes menores que 0x10
-    }
-    uid += String(rfid.uid.uidByte[i], HEX);
-    if (i < rfid.uid.size - 1) uid += ":"; // Separador opcional
-  }
-  uid.toUpperCase();
-
-  return uid;
-}
-
-void printTagUuidToConsole(){
-  Serial.print("UID:");
-  Serial.println(getUuidFromRfidReader());
-  Serial.println();
-}
-
-void printTagUuidToLcd(){
+void printTagUuidToDisplay(){
   String uid = getUuidFromRfidReader();
 
   lcd.clear();
@@ -98,7 +80,7 @@ void printTagUuidToLcd(){
   lcd.print(uid);
 }
 
-void printConsultingServerToLcd(){
+void printConsultingServerToDisplay(){
   lcd.clear();
   lcd.setCursor(2, 0);
   lcd.print("Consultando");
@@ -106,7 +88,7 @@ void printConsultingServerToLcd(){
   lcd.print("Servidor");
 }
 
-void printAccessGrantedToLcd(){
+void printAccessGrantedToDisplay(){
   lcd.clear();
   lcd.setCursor(5, 0);
   lcd.print("Acesso");
@@ -114,21 +96,23 @@ void printAccessGrantedToLcd(){
   lcd.print("Liberado");
 }
 
-void printAccessDeniedToLcd(){
+void printAccessDeniedToDisplay(){
   lcd.clear();
   lcd.setCursor(5, 0);
   lcd.print("Acesso");
   lcd.setCursor(5, 1);
   lcd.print("Negado");
 }
+// ====== end: Display Print Methods ======
 
+// ====== begin: LEDs Methods ======
 void turnOfAllLeds() {
   digitalWrite(LED_BLUE, LOW);
   digitalWrite(LED_GREEN, LOW);
   digitalWrite(LED_RED, LOW);
 }
 
-void indicateState(AccessState state){
+void indicateStateWithLEDS(AccessState state){
   turnOfAllLeds();
 
   switch (state) {
@@ -145,6 +129,22 @@ void indicateState(AccessState state){
       break;
   }
 }
+// ====== end: LEDs Methods ======
+
+// ====== begin: Utils Methods ======
+String getUuidFromRfidReader(){
+  String uid = "";
+  for (byte i = 0; i < rfid.uid.size; i++) {
+    if (rfid.uid.uidByte[i] < 0x10) {
+      uid += "0"; // Adiciona zero à esquerda para bytes menores que 0x10
+    }
+    uid += String(rfid.uid.uidByte[i], HEX);
+    if (i < rfid.uid.size - 1) uid += ":"; // Separador opcional
+  }
+  uid.toUpperCase();
+
+  return uid;
+}
 
 bool isButtonPressed(int btn) {
   return digitalRead(btn) == LOW;
@@ -160,22 +160,31 @@ void validateTagUuid(){
   // apresenta no LCD
 
   delay(500);
-  printConsultingServerToLcd();
+  printConsultingServerToDisplay();
 
   delay(1500);
 
   if (cont % 2 == 0){
-    indicateState(GRANTED);
-    printAccessGrantedToLcd();
+    indicateStateWithLEDS(GRANTED);
+    printAccessGrantedToDisplay();
   }
   else{
-    indicateState(DENIED);
-    printAccessDeniedToLcd();
+    indicateStateWithLEDS(DENIED);
+    printAccessDeniedToDisplay();
   }
 
   delay(1000);
   cont++;
 }
+// ====== end: Utils Methods ======
+
+// ====== begin: Console Print Methods ======
+void printTagUuidToConsole(){
+  Serial.print("UID:");
+  Serial.println(getUuidFromRfidReader());
+  Serial.println();
+}
+// ====== end: Console Print Methods ======
 
 void setup() {
   pinMode(LED_BLUE, OUTPUT);
@@ -202,7 +211,7 @@ void setup() {
   rfid.PCD_Init();
   Serial.println("MFRC522 Ready");
 
-  showStartupMessage();
+  showStartupMessageToDisplay();
 }
 
 void loop() {
@@ -217,7 +226,7 @@ void loop() {
     }
   }
 
-  // verifica se o botão CONFIRMAR não foi pressionado
+  // verifica se o botão CANCELAR não foi pressionado
   if(isButtonPressed(BTN_CANCEL)){
     delay(10);
     if(isButtonPressed(BTN_CANCEL)){
@@ -226,7 +235,7 @@ void loop() {
     }
   }
 
-  // verifica se o botão CONFIRMAR não foi pressionado
+  // verifica se o botão ↑ não foi pressionado
   if(isButtonPressed(BTN_UP)){
     delay(10);
     if(isButtonPressed(BTN_UP)){
@@ -235,7 +244,7 @@ void loop() {
     }
   }
 
-  // verifica se o botão CONFIRMAR não foi pressionado
+  // verifica se o botão ↓ não foi pressionado
   if(isButtonPressed(BTN_DOWN)){
     delay(10);
     if(isButtonPressed(BTN_DOWN)){
@@ -249,20 +258,20 @@ void loop() {
     return;
   }
 
-  indicateState(VALIDATING);
+  indicateStateWithLEDS(VALIDATING);
 
   lcd.clear();
   lcd.setCursor(2, 0);
   lcd.print("Lendo tag...");
 
   printTagUuidToConsole();
-  printTagUuidToLcd();
+  printTagUuidToDisplay();
 
   validateTagUuid();
 
   rfid.PICC_HaltA();
   delay(1000);
 
-  showApproachTagMessage();
+  showApproachTagMessageToDisplay();
   turnOfAllLeds();
 }
