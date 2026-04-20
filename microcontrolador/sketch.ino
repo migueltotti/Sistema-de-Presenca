@@ -1,21 +1,24 @@
-#include <LiquidCrystal.h>
+#include <LiquidCrystal_I2C.h>
 #include <SPI.h>
 #include <MFRC522.h>
 
 #define SS_PIN  32
 #define RST_PIN 33
 
-#define BTN_UP 35
-#define BTN_DOWN 34
-#define BTN_CONFIRM 13
-#define BTN_CANCEL 21
+#define BTN_UP 17
+#define BTN_DOWN 16
+#define BTN_CONFIRM 18
+#define BTN_CANCEL 19
 
 #define LED_BLUE 0
 #define LED_GREEN 2
 #define LED_RED 4
 
+#define I2C_ADDR 0x27
+#define LCD_COLUMNS 16
+#define LCD_LINES 2
 /* Display */
-LiquidCrystal lcd(23, 22, 19, 18, 17, 16);
+LiquidCrystal_I2C lcd(I2C_ADDR, LCD_COLUMNS, LCD_LINES);
 
 /* Leitor RFID */
 MFRC522 rfid(SS_PIN, RST_PIN);
@@ -188,7 +191,9 @@ void setup() {
 
   turnOfAllLeds();
 
-  lcd.begin(16, 2);
+  //lcd.begin(16, 2);
+  lcd.init();
+  lcd.backlight();
 
   Serial.begin(115200);
   Serial.println("Hello, ESP32!");
