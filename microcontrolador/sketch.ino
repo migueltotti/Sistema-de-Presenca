@@ -1,6 +1,9 @@
 #include <LiquidCrystal_I2C.h>
 #include <SPI.h>
 #include <MFRC522.h>
+#include <WiFi.h>
+#include <HTTPClient.h>
+#include <ArduinoJson.h> 
 
 #define SS_PIN  32
 #define RST_PIN 33
@@ -29,9 +32,45 @@ enum AccessState {
   DENIED
 };
 
-int cont = 0;
+struct Subject {
+  String id;
+  String name;
+};
+
+const int MAX_SUBJECTS = 20; // mudar para dinamico depois
+Subject subjects[MAX_SUBJECTS];
+int totalSubjects = 0;
+
+const char* ssid     = "Wokwi-GUEST";  // rede virtual do Wokwi
+const char* password = "";              // sem senha
+
+const char* apiUrl = "https://jsonplaceholder.typicode.com/todos/1";
+
+bool classStarted = false;
 
 // ====== begin: Display Print Methods ======
+
+void showStartOrContinueClassMessageToDisplay(){
+  lcd.clear();
+  lcd.setCursor(0, 0);
+  lcd.print(" Aproxime a tag ");
+  lcd.setCursor(0, 1);
+  lcd.print("  de professor  ");
+
+  delay(1500);
+  
+  lcd.clear();
+  lcd.setCursor(0, 0);
+  lcd.print("       OU       ");
+
+  delay(1500);
+  
+  lcd.clear();
+  lcd.setCursor(0, 0);
+  lcd.print("Press. Confirmar");
+  lcd.setCursor(0, 1);
+  lcd.print(" continuar aula ");
+}
 
 void showApproachTagMessageToDisplay(){
   lcd.clear();
@@ -64,10 +103,6 @@ void showStartupMessageToDisplay() {
   }
 
   delay(3000);
-
-  showApproachTagMessageToDisplay();
-
-  delay(500);
 }
 
 void printTagUuidToDisplay(){
@@ -102,6 +137,88 @@ void printAccessDeniedToDisplay(){
   lcd.print("Acesso");
   lcd.setCursor(5, 1);
   lcd.print("Negado");
+}
+
+void showProfessorNotFoundErrorMessageToDisplay(){
+  lcd.clear();
+  lcd.setCursor(0, 0);
+  lcd.print(" Professor não  ");
+  lcd.setCursor(0, 1);
+  lcd.print("   encontrado   ");
+
+  delay(1500);
+  
+  lcd.clear();
+  lcd.setCursor(0, 0);
+  lcd.print("Tente novamente ");
+}
+
+Subject getProfessorSubjectSelection(){
+  lcd.clear();
+  lcd.setCursor(0, 0);
+  lcd.print("  Selecione uma ");
+  lcd.setCursor(0, 1);
+  lcd.print("   disciplina   ");
+
+  delay(500);
+
+  lcd.clear();
+  lcd.setCursor(0, 0);
+  lcd.print("  Utilizando os ");
+  lcd.setCursor(0, 1);
+  lcd.print("     botões     ");
+
+  delay(500);
+
+  lcd.clear();
+  lcd.setCursor(0, 0);
+  lcd.print(" >>   ↑  ↓   << ");
+  lcd.setCursor(0, 1);
+  lcd.print("Confim. / Cancel");
+
+  delay(500);
+  
+  int index = 0;
+  Subject selectedSubject;
+  while (index < totalSubjects) {
+    String subjectName = subjects[index].name.c_str();
+    lcd.clear();
+    lcd.setCursor(0, 0);
+    lcd.print("Disciplina:");
+    lcd.setCursor(0, 1);
+    lcd.print(subjectName);
+
+    while (!isButtonPressed(BTN_CONFIRM) && !isButtonPressed(BTN_CANCEL) && !isButtonPressed(BTN_UP) && !isButtonPressed(BTN_DOWN)) {}
+      // espera o usuário pressionar um botão para navegar ou confirmar a seleção}
+
+    if (isButtonPressed(BTN_CONFIRM)) {
+      // lógica para confirmar a seleção da disciplina
+      selectedSubject = subjects[index];
+
+      Serial.println("Disciplina selecionada: " + subjectName);
+      delay(200);
+      break;
+    }
+
+    if (isButtonPressed(BTN_CANCEL)) {
+      // lógica para cancelar escolha e voltar ao inicio de tudo.
+      Serial.println("Operação cancelada. Voltando ao início.");
+      delay(200);
+      break;
+    }
+
+    if (isButtonPressed(BTN_UP)) {
+      index = (index - 1 + totalSubjects) % totalSubjects; // navegação para cima
+      delay(200);
+    }
+
+    if (isButtonPressed(BTN_DOWN)) {
+      index = (index + 1) % totalSubjects; // navegação para baixo
+      delay(200);
+    }
+  }
+
+  return selectedSubject;
 }
 // ====== end: Display Print Methods ======
 
@@ -149,34 +266,153 @@ String getUuidFromRfidReader(){
 bool isButtonPressed(int btn) {
   return digitalRead(btn) == LOW;
 }
+// ====== end: Utils Methods ======
 
-void validateTagUuid(){
+// ====== begin: Wifi Methods ======
+void connectToWifi() {
+  // Conecta ao Wi-Fi virtual
+  WiFi.begin(ssid, password);
+  Serial.print("Conectando ao Wi-Fi");
+  while (WiFi.status() != WL_CONNECTED) {
+    delay(500);
+    Serial.print(".");
+  }
+  Serial.println("\nConectado! IP: " + WiFi.localIP().toString());
+}
+
+bool isWifiConnected(){
+  if (WiFi.status() != WL_CONNECTED) {
+    Serial.println("Wi-Fi desconectado");
+    return false;
+  }
+  return true;
+}
+// ====== end: Wifi Methods ======
+
+// ====== begin: API Methods ======
+void getProfessorSubjects(String uuid){
+  if (!isWifiConnected()) return;
+
+  HTTPClient http;
+  http.begin(apiUrl);
+
+  int httpResponseCode = http.GET();
+
+  if (httpResponseCode > 0) {
+    Serial.printf("HTTP Status: %d\n", httpCode);
+
+    if (httpCode == HTTP_CODE_OK) {
+      String payload = http.getString();
+      Serial.println("Resposta:");
+      Serial.println(payload);
+
+      DeserializationError erro = deserializeJson(doc, payload);
+      if (erro) {
+        Serial.print("Erro ao parsear JSON: ");
+        Serial.println(erro.c_str());
+        http.end();
+        return;
+      }
+
+      JsonArray arr = doc["subjects"].as<JsonArray>();
+      totalSubjects = 0;
+
+      // carrega a lista de matérias do professor no array global de matérias
+      for (JsonObject subject : arr) {
+        if (totalSubjects >= MAX_SUBJECTS) break;  // evita overflow
+
+        subjects[totalSubjects].id   = subject["id"].as<String>();
+        subjects[totalSubjects].name = subject["Name"].as<String>();
+        totalSubjects++;
+      }
+
+      Serial.printf("%d subjects carregados.\n", totalSubjects);
+    }
+  } else {
+    Serial.println("Erro na requisição: " + String(httpResponseCode));
+  }
+
+  http.end();
+}
+
+bool startClass(String professorUuid, String subjectUuid){
+  if (!isWifiConnected()) return;
+
+  HTTPClient http;
+  http.begin(apiUrl);
+  http.addHeader("Content-Type", "application/json");
+
+  JsonDocument doc;
+  doc["professorId"] = professorUuid;
+  doc["subjectId"]  = subjectUuid;
+  doc["active"] = true;
+
+  String body;
+  serializeJson(doc, body);  // converte para string JSON
+  
+  int httpCode = http.POST(body);
+
+  if (httpResponseCode > 0) {
+    Serial.printf("HTTP Status: %d\n", httpCode);
+
+    if (httpCode == HTTP_CODE_OK) {
+      String payload = http.getString();
+      Serial.println("Resposta:");
+      Serial.println(payload);
+    }
+    else if(httpCode == HTTP_CODE_BADREQUEST){
+      Serial.println("Requisição inválida. Verifique os dados enviados.");
+
+      http.end();
+      return false;
+    }
+  } else {
+    Serial.println("Erro na requisição: " + String(httpResponseCode));
+  }
+
+  http.end();
+  return true;
+}
+// ====== end: API Methods ======
+
+// ====== begin: UseCase Methods ======
+void startNewClass(){
   // Trocar nome
 
   // pega uuid
-  String uuid = getUuidFromRfidReader();
-  // faz requisição pro servidor passando o uuid
-  // retorna um true ou false (sucesso ou falha)
+  String professorUuid = getUuidFromRfidReader();
   // apresenta no LCD
 
-  delay(500);
   printConsultingServerToDisplay();
+  indicateStateWithLEDS(VALIDATING);  
+  // faz requisição pro servidor passando o uuid e pega as matérias do professor
 
-  delay(1500);
+  // JsonArray subjects = getProfessorSubjects(professorUuid);
+  // if (totalSubjects == 0) {
+  //   // apresentar mensagem de erro no LCD e voltar para tela inicial
+  //   indicateStateWithLEDS(DENIED);  
+  //   showProfessorNotFoundErrorMessageToDisplay();
+  //   return;
+  // }
 
-  if (cont % 2 == 0){
-    indicateStateWithLEDS(GRANTED);
-    printAccessGrantedToDisplay();
+  delay(1500); // simulando tempo de resposta do servidor
+
+  // apresenta as matérias no LCD e retorna escolha
+  Subject selectedSubject = getProfessorSubjectSelection();
+
+  if (selectedSubject == null) {
+    indicateStateWithLEDS(DENIED);  
+    return; // professor cancelou a escolha da matéria
   }
-  else{
-    indicateStateWithLEDS(DENIED);
-    printAccessDeniedToDisplay();
-  }
 
-  delay(1000);
-  cont++;
+  bool result = startClass(professorUuid, selectedSubject.id.c_str());
+
+  if (result){
+    classStarted = true;
+    indicateStateWithLEDS(GRANTED);  
+  }
 }
-// ====== end: Utils Methods ======
+// ====== end: UseCase Methods ======
 
 // ====== begin: Console Print Methods ======
 void printTagUuidToConsole(){
@@ -211,6 +447,8 @@ void setup() {
   rfid.PCD_Init();
   Serial.println("MFRC522 Ready");
 
+  connectToWifi();
+
   showStartupMessageToDisplay();
 }
 
@@ -218,42 +456,67 @@ void loop() {
   delay(10);
 
   // verifica se o botão CONFIRMAR não foi pressionado
-  if(isButtonPressed(BTN_CONFIRM)){
-    delay(10);
-    if(isButtonPressed(BTN_CONFIRM)){
-      while(isButtonPressed(BTN_CONFIRM)){}
-      Serial.println("Botão CONFIRMAR Pressionado!");
+  // if(isButtonPressed(BTN_CONFIRM)){
+  //   delay(10);
+  //   if(isButtonPressed(BTN_CONFIRM)){
+  //     while(isButtonPressed(BTN_CONFIRM)){}
+  //     Serial.println("Botão CONFIRMAR Pressionado!");
+  //   }
+  // }
+
+  // // verifica se o botão CANCELAR não foi pressionado
+  // if(isButtonPressed(BTN_CANCEL)){
+  //   delay(10);
+  //   if(isButtonPressed(BTN_CANCEL)){
+  //     while(isButtonPressed(BTN_CANCEL)){}
+  //     Serial.println("Botão CANCELAR Pressionado!");
+  //   }
+  // }
+
+  // // verifica se o botão ↑ não foi pressionado
+  // if(isButtonPressed(BTN_UP)){
+  //   delay(10);
+  //   if(isButtonPressed(BTN_UP)){
+  //     while(isButtonPressed(BTN_UP)){}
+  //     Serial.println("Botão ↑ Pressionado!");
+  //   }
+  // }
+
+  // // verifica se o botão ↓ não foi pressionado
+  // if(isButtonPressed(BTN_DOWN)){
+  //   delay(10);
+  //   if(isButtonPressed(BTN_DOWN)){
+  //     while(isButtonPressed(BTN_DOWN)){}
+  //     Serial.println("Botão ↓ Pressionado!");
+  //   }
+  // }
+
+  // processo que inicia aula se não existir uma ativa no microcontrolador.
+  if (!classStarted){
+    showStartOrContinueClassMessageToDisplay();
+
+    // incluir rotina de apertar botão para continuar aula.
+
+    // tag ainda não aproximada do leitor, volta para mostrar a messagem de aproximação
+    if (!rfid.PICC_IsNewCardPresent() || !rfid.PICC_ReadCardSerial()) {
+      return;
     }
+
+    indicateStateWithLEDS(VALIDATING);
+
+    lcd.clear();
+    lcd.setCursor(2, 0);
+    lcd.print("Lendo tag...");
+    printTagUuidToConsole();
+
+    startNewClass();
   }
 
-  // verifica se o botão CANCELAR não foi pressionado
-  if(isButtonPressed(BTN_CANCEL)){
-    delay(10);
-    if(isButtonPressed(BTN_CANCEL)){
-      while(isButtonPressed(BTN_CANCEL)){}
-      Serial.println("Botão CANCELAR Pressionado!");
-    }
-  }
+  // verifica se quer terminar a aula pressionando botão CONFIRM
 
-  // verifica se o botão ↑ não foi pressionado
-  if(isButtonPressed(BTN_UP)){
-    delay(10);
-    if(isButtonPressed(BTN_UP)){
-      while(isButtonPressed(BTN_UP)){}
-      Serial.println("Botão ↑ Pressionado!");
-    }
-  }
+  // verifica se quer cancelar a aula pressionando botão CANCEL
 
-  // verifica se o botão ↓ não foi pressionado
-  if(isButtonPressed(BTN_DOWN)){
-    delay(10);
-    if(isButtonPressed(BTN_DOWN)){
-      while(isButtonPressed(BTN_DOWN)){}
-      Serial.println("Botão ↓ Pressionado!");
-    }
-  }
-
-  // tentar ler a tag
+  // tentar ler a tag do aluno
   if (!rfid.PICC_IsNewCardPresent() || !rfid.PICC_ReadCardSerial()) {
     return;
   }
@@ -267,11 +530,9 @@ void loop() {
   printTagUuidToConsole();
   printTagUuidToDisplay();
 
-  validateTagUuid();
-
   rfid.PICC_HaltA();
   delay(1000);
 
-  showApproachTagMessageToDisplay();
+  //showApproachTagMessageToDisplay();
   turnOfAllLeds();
 }
