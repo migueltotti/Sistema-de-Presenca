@@ -3,7 +3,8 @@
 
 #include <Preferences.h>
 
-void saveClassIdToNVS(String classId);
 String getClassIdFromNVS();
+void saveClassIdToNVS(String classId);
+void removeClassIdToNVS();
 
 #endif
