@@ -84,8 +84,8 @@ bool fetchSubjects(const char* baseUrl, const String& professorUuid){
     }
 }
 
-bool startClassWithProfessorAndSubject(const char* baseUrl, const String& professorUuid, const String& subjectUuid){
-    if (!isWifiConnected()) return false;
+String startClassWithProfessorAndSubject(const char* baseUrl, const String& professorUuid, const String& subjectUuid){
+    if (!isWifiConnected()) return "";
 
     char url[150];
     snprintf(url, sizeof(url), "%s/class", baseUrl);
@@ -111,28 +111,33 @@ bool startClassWithProfessorAndSubject(const char* baseUrl, const String& profes
             Serial.println("Resposta:");
             Serial.println(payload);
 
+            JsonDocument doc;
+            DeserializationError erro = deserializeJson(doc, payload);
+
+            String classId = doc["classId"].as<String>();
+
             http.end();
-            return true;
+            return classId;
         }
         else if(httpResponseCode == HTTP_CODE_NOT_FOUND){
             Serial.println("Disciplinas não encontradas para o professor.");
             http.end();
-            return false;
+            return "";
         }
         else if(httpResponseCode == HTTP_CODE_BAD_REQUEST){
             Serial.println("Requisição inválida. Verifique os dados enviados.");
             http.end();
-            return false;
+            return "";
         }
         else {
             Serial.println("Erro na requisição: " + String(httpResponseCode));
             http.end();
-            return false;
+            return "";
         }
     } else {
         Serial.println("Erro na requisição: " + String(httpResponseCode));
         http.end();
-        return false;
+        return "";
     }
 }
 

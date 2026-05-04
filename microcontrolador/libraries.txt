@@ -5,3 +5,4 @@ MFRC522
 LiquidCrystal I2C
 HttpClient
 ArduinoJson
+Preferences

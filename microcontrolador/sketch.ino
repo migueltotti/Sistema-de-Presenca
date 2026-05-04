@@ -1,5 +1,6 @@
 #include "lcd_display.h"
 #include "http_client.h"
+#include "nvs_storage.h"
 #include <SPI.h>
 #include <MFRC522.h>
 
@@ -164,10 +165,11 @@ void startNewClass(){
 
   Subject selectedSubject = subjects[selectedIndex];
 
-  bool startClassResult = startClassWithProfessorAndSubject(apiUrl, professorUuid, selectedSubject.id.c_str());
+  String classId = startClassWithProfessorAndSubject(apiUrl, professorUuid, selectedSubject.id.c_str());
 
-  if (startClassResult){
+  if (classId != ""){
     classStarted = true;
+    saveClassIdToNVS(classId);
     indicateStateWithLEDS(GRANTED);
     delay(1500);
     turnOfAllLeds();
