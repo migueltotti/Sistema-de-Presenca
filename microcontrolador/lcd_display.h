@@ -17,6 +17,7 @@ void showProfessorNotFoundErrorMessageToDisplay();
 void showSubjectNotFoundErrorMessageToDisplay();
 void printSubjectNameToDisplay(String subjectName);
 void showConfirmActionMessageToDisplay();
+void showClassContinuedSuccessfullyMessageToDisplay();
 void showWifiNotConnectedErrorMessageToDisplay();
 void showRequestErrorMessageToDisplay();
 void showClassNotFoundErrorMessageToDisplay();

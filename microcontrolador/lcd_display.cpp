@@ -4,7 +4,17 @@
 #define LCD_COLUMNS 16
 #define LCD_LINES 2
 
+enum DisplayMsgState {
+  MSG_APPROACH_TAG,
+  MSG_OR,
+  MSG_PRESS_CONFIRM
+};
+
 LiquidCrystal_I2C lcd(I2C_ADDR, LCD_COLUMNS, LCD_LINES);
+
+DisplayMsgState currentMsgState = MSG_APPROACH_TAG;
+unsigned long lastMsgChange = 0;
+const unsigned long MSG_INTERVAL = 1500;
 
 void lcdInit() {
     lcd.init();
@@ -35,27 +45,37 @@ void showStartupMessageToDisplay() {
 }
 
 void showStartOrContinueClassMessageToDisplay() {
-    lcd.clear();
-    lcd.setCursor(0, 0);
-    lcd.print(" Aproxime a tag ");
-    lcd.setCursor(0, 1);
-    lcd.print("  de professor  ");
+    unsigned long now = millis();
 
-    delay(1500);
+    if (now - lastMsgChange < MSG_INTERVAL) return; // ainda não é hora de trocar
+    lastMsgChange = now;
 
-    lcd.clear();
-    lcd.setCursor(0, 0);
-    lcd.print("       OU       ");
+    switch (currentMsgState) {
+        case MSG_APPROACH_TAG:
+            lcd.clear();
+            lcd.setCursor(0, 0);
+            lcd.print(" Aproxime a tag ");
+            lcd.setCursor(0, 1);
+            lcd.print("  de professor  ");
+            currentMsgState = MSG_OR;
+            break;
 
-    delay(1500);
+        case MSG_OR:
+            lcd.clear();
+            lcd.setCursor(0, 0);
+            lcd.print("       OU       ");
+            currentMsgState = MSG_PRESS_CONFIRM;
+            break;
 
-    lcd.clear();
-    lcd.setCursor(0, 0);
-    lcd.print("Press. Confirmar");
-    lcd.setCursor(0, 1);
-    lcd.print(" continuar aula ");
-
-    delay(1500);
+        case MSG_PRESS_CONFIRM:
+            lcd.clear();
+            lcd.setCursor(0, 0);
+            lcd.print("Press. Confirmar");
+            lcd.setCursor(0, 1);
+            lcd.print(" continuar aula ");
+            currentMsgState = MSG_APPROACH_TAG;
+            break;
+    }
 }
 
 void showApproachTagMessageToDisplay() {
@@ -180,6 +200,16 @@ void showConfirmActionMessageToDisplay() {
     lcd.print("     aula ?     ");
 }
 
+void showClassContinuedSuccessfullyMessageToDisplay() {
+    lcd.clear();
+    lcd.setCursor(0, 0);
+    lcd.print("Aula continuada");
+    lcd.setCursor(0, 1);
+    lcd.print(" com sucesso ");
+
+    delay(1500);
+}
+
 void showWifiNotConnectedErrorMessageToDisplay() {
     lcd.clear();
     lcd.setCursor(0, 0);
@@ -190,6 +220,8 @@ void showWifiNotConnectedErrorMessageToDisplay() {
     lcd.clear();
     lcd.setCursor(0, 0);
     lcd.print("Tente novamente ");
+
+    delay(1500);
 }
 
 void showRequestErrorMessageToDisplay() {

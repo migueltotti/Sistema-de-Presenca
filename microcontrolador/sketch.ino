@@ -271,7 +271,7 @@ void continueClass() {
     if (continueClassResponse.isSuccess) {
       classStarted = true;
       indicateStateWithLEDS(GRANTED);
-      delay(1500);
+      showClassContinuedSuccessfullyMessageToDisplay();
       turnOfAllLeds();
       return;
     }
@@ -281,37 +281,31 @@ void continueClass() {
 
       if (continueClassResponse.errorCode == WIFI_NOT_CONNECTED_ERROR) {
         showWifiNotConnectedErrorMessageToDisplay();
-        delay(1500);
         turnOfAllLeds();
         return; // volta para o loop inicial
       }
       else if (continueClassResponse.errorCode == REQUEST_ERROR) {
         showRequestErrorMessageToDisplay();
-        delay(1500);
         turnOfAllLeds();
         return; // volta para o loop inicial
       }
       else if (continueClassResponse.errorCode == "ClassErrors.NotFound"){ // Aula não encontrada - volta para o loop inicial
         showClassNotFoundErrorMessageToDisplay();
-        delay(1500);
         turnOfAllLeds();
         return; // volta para o loop inicial
       }
       else if (continueClassResponse.errorCode == "ProfessorErrors.NotFound"){ // Professor não encontrado - aguarda tag novamente e mostra mensagem de erro no LCD
         showProfessorNotFoundErrorMessageToDisplay();
-        delay(1500);
         turnOfAllLeds();
         // aguarda tag novamente e mostra mensagem de erro no LCD
       }
       else if (continueClassResponse.errorCode == "ClassErrors.ProfessorMismatch"){ // Professor não iniciou a aula - aguarda tag novamente e mostra mensagem de erro no LCD
         showClassProfessorMismatchErrorMessageToDisplay();
-        delay(1500);
         turnOfAllLeds();
         // aguarda tag novamente e mostra mensagem de erro no LCD
       }
       else if (continueClassResponse.errorCode == "ClassErrors.AlreadyFinished"){ // Aula já finalizada - volta para o loop inicial
         showClassAlreadyFinishedErrorMessageToDisplay();
-        delay(1500);
         turnOfAllLeds();
         return;// volta para o loop inicial
       }
@@ -351,17 +345,20 @@ void setup() {
 void loop() {
   delay(10);
 
+  bool confirmPressed = isButtonPressed(BTN_CONFIRM);
+  bool newCard = rfid.PICC_IsNewCardPresent() && rfid.PICC_ReadCardSerial();
+
   // processo que inicia aula se não existir uma ativa no microcontrolador.
   if (!classStarted){
     showStartOrContinueClassMessageToDisplay();
 
     // incluir rotina de apertar botão para continuar aula.
-    if (hasClassStartedBefore() && isButtonPressed(BTN_CONFIRM)){
+    if (hasClassStartedBefore() && confirmPressed){
       continueClass();
     }
 
     // tag aproximada do leitor para iniciar nova aula
-    if (rfid.PICC_IsNewCardPresent() && rfid.PICC_ReadCardSerial()) {
+    if (newCard) {
       startNewClass();
     }
 
