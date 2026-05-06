@@ -34,7 +34,7 @@ void showStartupMessageToDisplay() {
     delay(3000);
 }
 
-void showStartOrContinueClassMessageToDisplay(){
+void showStartOrContinueClassMessageToDisplay() {
     lcd.clear();
     lcd.setCursor(0, 0);
     lcd.print(" Aproxime a tag ");
@@ -58,7 +58,7 @@ void showStartOrContinueClassMessageToDisplay(){
     delay(1500);
 }
 
-void showApproachTagMessageToDisplay(){
+void showApproachTagMessageToDisplay() {
     lcd.clear();
     lcd.setCursor(0, 0);
     lcd.print("Aproxime uma tag");
@@ -68,13 +68,13 @@ void showApproachTagMessageToDisplay(){
     lcd.print("<<");
 }
 
-void showReadingTagMessageToDisplay(){
+void showReadingTagMessageToDisplay() {
     lcd.clear();
     lcd.setCursor(2, 0);
     lcd.print("Lendo tag...");
 }
 
-void printTagUuidToDisplay(String uuid){
+void printTagUuidToDisplay(String uuid) {
     lcd.clear();
     lcd.setCursor(0, 0);
     lcd.print("UUID detectado:");
@@ -82,7 +82,7 @@ void printTagUuidToDisplay(String uuid){
     lcd.print(uuid);
 }
 
-void printConsultingServerToDisplay(){
+void printConsultingServerToDisplay() {
     lcd.clear();
     lcd.setCursor(2, 0);
     lcd.print("Consultando");
@@ -90,7 +90,7 @@ void printConsultingServerToDisplay(){
     lcd.print("Servidor");
 }
 
-void printAccessGrantedToDisplay(){
+void printAccessGrantedToDisplay() {
     lcd.clear();
     lcd.setCursor(5, 0);
     lcd.print("Acesso");
@@ -98,7 +98,7 @@ void printAccessGrantedToDisplay(){
     lcd.print("Liberado");
 }
 
-void printAccessDeniedToDisplay(){
+void printAccessDeniedToDisplay() {
     lcd.clear();
     lcd.setCursor(5, 0);
     lcd.print("Acesso");
@@ -106,7 +106,7 @@ void printAccessDeniedToDisplay(){
     lcd.print("Negado");
 }
 
-void showSelectionMethodsMessageToDisplay(){
+void showSelectionMethodsMessageToDisplay() {
     lcd.clear();
     lcd.setCursor(0, 0);
     lcd.print("  Selecione uma ");
@@ -132,7 +132,7 @@ void showSelectionMethodsMessageToDisplay(){
     delay(1500);
 }
 
-void showProfessorNotFoundErrorMessageToDisplay(){
+void showProfessorNotFoundErrorMessageToDisplay() {
     lcd.clear();
     lcd.setCursor(0, 0);
     lcd.print(" Professor não  ");
@@ -148,7 +148,7 @@ void showProfessorNotFoundErrorMessageToDisplay(){
     delay(1500);
 }
 
-void showSubjectNotFoundErrorMessageToDisplay(){
+void showSubjectNotFoundErrorMessageToDisplay() {
     lcd.clear();
     lcd.setCursor(0, 0);
     lcd.print(" Disciplina não ");
@@ -164,7 +164,7 @@ void showSubjectNotFoundErrorMessageToDisplay(){
     delay(1500);
 }
 
-void printSubjectNameToDisplay(String subjectName){
+void printSubjectNameToDisplay(String subjectName) {
     lcd.clear();
     lcd.setCursor(0, 0);
     lcd.print("Disciplina:");
@@ -186,6 +186,10 @@ void showWifiNotConnectedErrorMessageToDisplay() {
     lcd.print("   ERROR: Wifi  ");
     lcd.setCursor(0, 1);
     lcd.print("  NAO CONECTADO ");
+
+    lcd.clear();
+    lcd.setCursor(0, 0);
+    lcd.print("Tente novamente ");
 }
 
 void showRequestErrorMessageToDisplay() {
@@ -194,36 +198,52 @@ void showRequestErrorMessageToDisplay() {
     lcd.print(" ERROR: Request ");
     lcd.setCursor(0, 1);
     lcd.print("     falhou     ");
+
+    lcd.clear();
+    lcd.setCursor(0, 0);
+    lcd.print("Tente novamente ");
+
+    delay(1500);
 }
 
-void showClassNotFoundErrorMessageToDisplay(){
+void showClassNotFoundErrorMessageToDisplay() {
     lcd.clear();
     lcd.setCursor(0, 0);
     lcd.print("    Aula não    ");
     lcd.setCursor(0, 1);
     lcd.print("   encontrada   ");
-}
 
-void showProfessorNotFoundErrorMessageToDisplay(){
     lcd.clear();
     lcd.setCursor(0, 0);
-    lcd.print(" Professor não  ");
-    lcd.setCursor(0, 1);
-    lcd.print("   encontrado   ");
+    lcd.print("Tente novamente ");
+
+    delay(1500);
 }
 
-void showClassProfessorMismatchErrorMessageToDisplay(){
+void showClassProfessorMismatchErrorMessageToDisplay() {
     lcd.clear();
     lcd.setCursor(0, 0);
     lcd.print(" Professor não  ");
     lcd.setCursor(0, 1);
     lcd.print(" iniciou a aula ");
+
+    lcd.clear();
+    lcd.setCursor(0, 0);
+    lcd.print("Tente novamente ");
+
+    delay(1500);
 }
 
-void showClassAlreadyFinishedErrorMessageToDisplay(){
+void showClassAlreadyFinishedErrorMessageToDisplay() {
     lcd.clear();
     lcd.setCursor(0, 0);
     lcd.print("    Aula já     ");
     lcd.setCursor(0, 1);
     lcd.print("   terminada    ");
+
+    lcd.clear();
+    lcd.setCursor(0, 0);
+    lcd.print("Tente novamente ");
+
+    delay(1500);
 }

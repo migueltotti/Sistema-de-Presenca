@@ -138,11 +138,11 @@ StartClassResponse startClassWithProfessorAndSubject(const char* baseUrl, const 
     }
 }
 
-ContinueClassResponse continueClassByProfessor(const char* baseUrl, const String& classUuid, const String& professorUuid){    
+ContinueClassResponse continueClassByProfessor(const char* baseUrl, const String& classId, const String& professorUuid){    
     if (!isWifiConnected()) return ContinueClassResponse{false, WIFI_NOT_CONNECTED_ERROR};
 
     char url[150];
-    snprintf(url, sizeof(url), "%s/class/%s/continue", baseUrl, classUuid.c_str());
+    snprintf(url, sizeof(url), "%s/class/%s/continue", baseUrl, classId.c_str());
 
     HTTPClient http;
     http.begin(url);

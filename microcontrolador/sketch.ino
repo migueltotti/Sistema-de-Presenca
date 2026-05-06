@@ -183,6 +183,7 @@ void startNewClass(){
   int selectedIndex = getProfessorSubjectSelection();
 
   if (selectedIndex == -1) {
+    turnOfAllLeds();
     return; // professor cancelou a escolha da matéria
   }
 
