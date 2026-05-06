@@ -171,3 +171,59 @@ void printSubjectNameToDisplay(String subjectName){
     lcd.setCursor(0, 1);
     lcd.print(subjectName);
 }
+
+void showConfirmActionMessageToDisplay() {
+    lcd.clear();
+    lcd.setCursor(0, 0);
+    lcd.print("Deseja continuar");
+    lcd.setCursor(0, 1);
+    lcd.print("     aula ?     ");
+}
+
+void showWifiNotConnectedErrorMessageToDisplay() {
+    lcd.clear();
+    lcd.setCursor(0, 0);
+    lcd.print("   ERROR: Wifi  ");
+    lcd.setCursor(0, 1);
+    lcd.print("  NAO CONECTADO ");
+}
+
+void showRequestErrorMessageToDisplay() {
+    lcd.clear();
+    lcd.setCursor(0, 0);
+    lcd.print(" ERROR: Request ");
+    lcd.setCursor(0, 1);
+    lcd.print("     falhou     ");
+}
+
+void showClassNotFoundErrorMessageToDisplay(){
+    lcd.clear();
+    lcd.setCursor(0, 0);
+    lcd.print("    Aula não    ");
+    lcd.setCursor(0, 1);
+    lcd.print("   encontrada   ");
+}
+
+void showProfessorNotFoundErrorMessageToDisplay(){
+    lcd.clear();
+    lcd.setCursor(0, 0);
+    lcd.print(" Professor não  ");
+    lcd.setCursor(0, 1);
+    lcd.print("   encontrado   ");
+}
+
+void showClassProfessorMismatchErrorMessageToDisplay(){
+    lcd.clear();
+    lcd.setCursor(0, 0);
+    lcd.print(" Professor não  ");
+    lcd.setCursor(0, 1);
+    lcd.print(" iniciou a aula ");
+}
+
+void showClassAlreadyFinishedErrorMessageToDisplay(){
+    lcd.clear();
+    lcd.setCursor(0, 0);
+    lcd.print("    Aula já     ");
+    lcd.setCursor(0, 1);
+    lcd.print("   terminada    ");
+}

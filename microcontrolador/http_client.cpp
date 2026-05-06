@@ -5,6 +5,9 @@ const int MAX_SUBJECTS = 20;
 Subject subjects[MAX_SUBJECTS];
 int totalSubjects = 0;
 
+const String WIFI_NOT_CONNECTED_ERROR = "WIFI_NOT_CONNECTED";
+const String REQUEST_ERROR = "REQUEST_ERROR";
+
 void httpInit(const char* ssid, const char* password){
     WiFi.begin(ssid, password);
     Serial.print("Conectando ao Wi-Fi");
@@ -84,8 +87,8 @@ bool fetchSubjects(const char* baseUrl, const String& professorUuid){
     }
 }
 
-String startClassWithProfessorAndSubject(const char* baseUrl, const String& professorUuid, const String& subjectUuid){
-    if (!isWifiConnected()) return "";
+StartClassResponse startClassWithProfessorAndSubject(const char* baseUrl, const String& professorUuid, const String& subjectUuid){
+    if (!isWifiConnected()) return StartClassResponse{false, "", REQUEST_ERROR};
 
     char url[150];
     snprintf(url, sizeof(url), "%s/class", baseUrl);
@@ -106,38 +109,79 @@ String startClassWithProfessorAndSubject(const char* baseUrl, const String& prof
     if (httpResponseCode > 0) {
         Serial.printf("HTTP Status: %d\n", httpResponseCode);
 
+        String payload = http.getString();
+        Serial.println("Resposta:");
+        Serial.println(payload);
+
+        JsonDocument doc;
+        DeserializationError erro = deserializeJson(doc, payload);
+
         if (httpResponseCode == HTTP_CODE_CREATED) {
-            String payload = http.getString();
-            Serial.println("Resposta:");
-            Serial.println(payload);
-
-            JsonDocument doc;
-            DeserializationError erro = deserializeJson(doc, payload);
-
             String classId = doc["classId"].as<String>();
 
             http.end();
-            return classId;
-        }
-        else if(httpResponseCode == HTTP_CODE_NOT_FOUND){
-            Serial.println("Disciplinas não encontradas para o professor.");
-            http.end();
-            return "";
-        }
-        else if(httpResponseCode == HTTP_CODE_BAD_REQUEST){
-            Serial.println("Requisição inválida. Verifique os dados enviados.");
-            http.end();
-            return "";
+            return StartClassResponse{true, classId, ""};
         }
         else {
-            Serial.println("Erro na requisição: " + String(httpResponseCode));
+            String errorCode = errorDoc["code"].as<String>();
+            String errorMessage = errorDoc["description"].as<String>();
+
+            Serial.println(errorMessage);
+
             http.end();
-            return "";
+            return StartClassResponse{false, "", errorCode};
         }
     } else {
         Serial.println("Erro na requisição: " + String(httpResponseCode));
         http.end();
-        return "";
+        return StartClassResponse{false, "", REQUEST_ERROR};
     }
 }
 
+ContinueClassResponse continueClassByProfessor(const char* baseUrl, const String& classUuid, const String& professorUuid){    
+    if (!isWifiConnected()) return ContinueClassResponse{false, WIFI_NOT_CONNECTED_ERROR};
+
+    char url[150];
+    snprintf(url, sizeof(url), "%s/class/%s/continue", baseUrl, classUuid.c_str());
+
+    HTTPClient http;
+    http.begin(url);
+    http.addHeader("Content-Type", "application/json");
+
+    JsonDocument doc;
+    doc["professorId"] = professorUuid;
+
+    String body;
+    serializeJson(doc, body);  // converte para string JSON
+    
+    int httpResponseCode = http.POST(body);
+
+    if (httpResponseCode > 0) {
+        Serial.printf("HTTP Status: %d\n", httpResponseCode);
+
+        if (httpResponseCode == HTTP_CODE_OK) {
+            String payload = http.getString();
+            Serial.println("Resposta:");
+            Serial.println(payload);
+
+            http.end();
+            return ContinueClassResponse{true, ""};
+        }
+        else{
+            JsonDocument errorDoc;
+            DeserializationError erro = deserializeJson(doc, payload);
+
+            String errorCode = errorDoc["code"].as<String>();
+            String errorMessage = errorDoc["description"].as<String>();
+
+            Serial.println(errorMessage);
+
+            http.end();
+            return ContinueClassResponse{false, errorCode};
+        }
+    } else {
+        Serial.println("Erro na requisição: " + String(httpResponseCode));
+        http.end();
+        return ContinueClassResponse{false, REQUEST_ERROR};
+    }
+}

@@ -30,6 +30,7 @@ const char* password = "";              // sem senha
 const char* apiUrl = "https://jsonplaceholder.typicode.com/todos/1";
 
 bool classStarted = false;
+String classId = "";
 
 // ====== begin: Utils Methods ======
 String getUuidFromRfidReader(){
@@ -49,7 +50,24 @@ String getUuidFromRfidReader(){
 bool isButtonPressed(int btn) {
   return digitalRead(btn) == LOW;
 }
+
+bool hasClassStartedBefore() {
+  String classId = getClassIdFromNVS();
+  if (classId != "")
+    return true;
+  else
+    return false;
+}
 // ====== end: Utils Methods ======
+
+
+// ====== begin: Console Print Methods ======
+void printTagUuidToConsole(){
+  Serial.print("UID:");
+  Serial.println(getUuidFromRfidReader());
+  Serial.println();
+}
+// ====== end: Console Print Methods ======
 
 // ====== begin: LEDs Methods ======
 void turnOfAllLeds() {
@@ -141,6 +159,11 @@ int getProfessorSubjectSelection(){
 }
 
 void startNewClass(){
+  indicateStateWithLEDS(VALIDATING);
+
+  showReadingTagMessageToDisplay();
+  printTagUuidToConsole();
+
   String professorUuid = getUuidFromRfidReader();
 
   printConsultingServerToDisplay();
@@ -157,19 +180,20 @@ void startNewClass(){
   delay(1500); // simulando tempo de resposta do servidor
 
   // apresenta as matérias no LCD e retorna escolha
-  int selectedIndex  = getProfessorSubjectSelection();
+  int selectedIndex = getProfessorSubjectSelection();
 
-  if (selectedIndex  == -1) {
+  if (selectedIndex == -1) {
     return; // professor cancelou a escolha da matéria
   }
 
   Subject selectedSubject = subjects[selectedIndex];
 
-  String classId = startClassWithProfessorAndSubject(apiUrl, professorUuid, selectedSubject.id.c_str());
+  StartClassResponse classResponse = startClassWithProfessorAndSubject(apiUrl, professorUuid, selectedSubject.id.c_str());
 
-  if (classId != ""){
+  if (classResponse.isSuccess) {
     classStarted = true;
-    saveClassIdToNVS(classId);
+    classId = classResponse.classId;
+    saveClassIdToNVS(classResponse.classId);
     indicateStateWithLEDS(GRANTED);
     delay(1500);
     turnOfAllLeds();
@@ -182,15 +206,118 @@ void startNewClass(){
     turnOfAllLeds();
   }
 }
-// ====== end: UseCase Methods ======
 
-// ====== begin: Console Print Methods ======
-void printTagUuidToConsole(){
-  Serial.print("UID:");
-  Serial.println(getUuidFromRfidReader());
-  Serial.println();
+bool getProfessorConfirmationToContinueClass() {
+  showConfirmActionMessageToDisplay();
+
+  while (!isButtonPressed(BTN_CONFIRM) && !isButtonPressed(BTN_CANCEL)) {}
+
+  if(isButtonPressed(BTN_CONFIRM)){
+    delay(10);
+    if(isButtonPressed(BTN_CONFIRM)){
+      while(isButtonPressed(BTN_CONFIRM)){}
+      return true;
+    }
+  }
+
+  if(isButtonPressed(BTN_CANCEL)){
+    delay(10);
+    if(isButtonPressed(BTN_CANCEL)){
+      while(isButtonPressed(BTN_CANCEL)){}
+      return false;
+    }
+  }
+
+  return false;
 }
-// ====== end: Console Print Methods ======
+
+void continueClass() {
+  // mostrar mensagem de confirmação da ação (CONFIRM - Continuar, CANCEL - Cancelar)
+  // aguardar confirmação no botão
+  bool continueClass = getProfessorConfirmationToContinueClass();
+
+  if (!continueClass)
+    return;
+
+  // mostra mensagem para professor aproximar a tag
+  // aguardar aproximação da tag
+  while (true) {
+    showApproachTagMessageToDisplay();
+
+    while(!isButtonPressed(BTN_CANCEL) && (!rfid.PICC_IsNewCardPresent() || !rfid.PICC_ReadCardSerial())) {}
+
+    if(isButtonPressed(BTN_CANCEL)){
+      delay(10);
+      if(isButtonPressed(BTN_CANCEL)){
+        while(isButtonPressed(BTN_CANCEL)){}
+        return; // professor cancelou a ação de continuar a aula - volta para o loop principal
+      }
+    }
+
+    // obter uuid da tag do professor
+    // envia requisição para o servidor para continuar a aula com base no classId salvo no NVS e no uuid do professor
+    indicateStateWithLEDS(VALIDATING);
+    showReadingTagMessageToDisplay();
+    printTagUuidToConsole();
+
+    String professorUuid = getUuidFromRfidReader();
+    classId = getClassIdFromNVS();
+
+    ContinueClassResponse continueClassResponse = continueClassByProfessor(apiUrl, classId, professorUuid);
+
+    // mostra mensagem de sucesso
+    // volta para o loop principal
+    if (continueClassResponse.isSuccess) {
+      classStarted = true;
+      indicateStateWithLEDS(GRANTED);
+      delay(1500);
+      turnOfAllLeds();
+      return;
+    }
+    else {
+      classStarted = false;
+      indicateStateWithLEDS(DENIED);
+
+      if (continueClassResponse.errorCode == WIFI_NOT_CONNECTED_ERROR) {
+        showWifiNotConnectedErrorMessageToDisplay();
+        delay(1500);
+        turnOfAllLeds();
+        return; // volta para o loop inicial
+      }
+      else if (continueClassResponse.errorCode == REQUEST_ERROR) {
+        showRequestErrorMessageToDisplay();
+        delay(1500);
+        turnOfAllLeds();
+        return; // volta para o loop inicial
+      }
+      else if (continueClassResponse.errorCode == "ClassErrors.NotFound"){ // Aula não encontrada - volta para o loop inicial
+        showClassNotFoundErrorMessageToDisplay();
+        delay(1500);
+        turnOfAllLeds();
+        return; // volta para o loop inicial
+      }
+      else if (continueClassResponse.errorCode == "ProfessorErrors.NotFound"){ // Professor não encontrado - aguarda tag novamente e mostra mensagem de erro no LCD
+        showProfessorNotFoundErrorMessageToDisplay();
+        delay(1500);
+        turnOfAllLeds();
+        // aguarda tag novamente e mostra mensagem de erro no LCD
+      }
+      else if (continueClassResponse.errorCode == "ClassErrors.ProfessorMismatch"){ // Professor não iniciou a aula - aguarda tag novamente e mostra mensagem de erro no LCD
+        showClassProfessorMismatchErrorMessageToDisplay();
+        delay(1500);
+        turnOfAllLeds();
+        // aguarda tag novamente e mostra mensagem de erro no LCD
+      }
+      else if (continueClassResponse.errorCode == "ClassErrors.AlreadyFinished"){ // Aula já finalizada - volta para o loop inicial
+        showClassAlreadyFinishedErrorMessageToDisplay();
+        delay(1500);
+        turnOfAllLeds();
+        return;// volta para o loop inicial
+      }
+    }
+  }
+}
+// ====== end: UseCase Methods ======
 
 void setup() {
   pinMode(LED_BLUE, OUTPUT);
@@ -228,21 +355,19 @@ void loop() {
     showStartOrContinueClassMessageToDisplay();
 
     // incluir rotina de apertar botão para continuar aula.
-
-    // tag ainda não aproximada do leitor, volta para mostrar a messagem de aproximação
-    if (!rfid.PICC_IsNewCardPresent() || !rfid.PICC_ReadCardSerial()) {
-      return;
+    if (hasClassStartedBefore() && isButtonPressed(BTN_CONFIRM)){
+      continueClass();
     }
 
-    indicateStateWithLEDS(VALIDATING);
-
-    showReadingTagMessageToDisplay();
-    printTagUuidToConsole();
-
-    startNewClass();
+    // tag aproximada do leitor para iniciar nova aula
+    if (rfid.PICC_IsNewCardPresent() && rfid.PICC_ReadCardSerial()) {
+      startNewClass();
+    }
 
     if (classStarted)
       showApproachTagMessageToDisplay();
+    else
+      return;
   }
 
   // verifica se quer terminar a aula pressionando botão CONFIRM

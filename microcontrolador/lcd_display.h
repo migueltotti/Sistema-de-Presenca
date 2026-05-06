@@ -16,5 +16,12 @@ void showSelectionMethodsMessageToDisplay();
 void showProfessorNotFoundErrorMessageToDisplay();
 void showSubjectNotFoundErrorMessageToDisplay();
 void printSubjectNameToDisplay(String subjectName);
+void showConfirmActionMessageToDisplay();
+void showWifiNotConnectedErrorMessageToDisplay();
+void showRequestErrorMessageToDisplay();
+void showClassNotFoundErrorMessageToDisplay();
+void showProfessorNotFoundErrorMessageToDisplay();
+void showClassProfessorMismatchErrorMessageToDisplay();
+void showClassAlreadyFinishedErrorMessageToDisplay();
 
 #endif
