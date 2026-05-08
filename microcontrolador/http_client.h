@@ -28,7 +28,7 @@ extern int totalSubjects;
 
 void httpInit(const char* ssid, const char* password);
 bool fetchSubjects(const char* baseUrl, const String& professorUuid);
-StartClassResponse startClassWithProfessorAndSubject(const char* baseUrl, const String& professorUuid, const String& subjectUuid);
+StartClassResponse startClassWithProfessorAndSubject(const char* baseUrl, const String& professorUuid, const String& subjectUuid, const int& numberOfClasses);
 ContinueClassResponse continueClassByProfessor(const char* baseUrl, const String& classId, const String& professorUuid);
 
 #endif

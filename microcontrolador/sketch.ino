@@ -158,6 +158,64 @@ int getProfessorSubjectSelection(){
   return index;
 }
 
+int getNumberOfClassesFromProfessor() {
+  int numberOfClasses = 1;
+
+  showSelectNumberOfClassesMessageToDisplay();
+  printNumberOfClassesToDisplay(numberOfClasses);
+
+  while (true) {
+    while (!isButtonPressed(BTN_CONFIRM) && !isButtonPressed(BTN_CANCEL) && !isButtonPressed(BTN_UP) && !isButtonPressed(BTN_DOWN)) {}
+
+    delay(10);
+
+    if(isButtonPressed(BTN_CONFIRM)){
+      delay(10);
+      if(isButtonPressed(BTN_CONFIRM)){
+        while(isButtonPressed(BTN_CONFIRM)){}
+        delay(200);
+        break;
+      }
+    }
+
+    if(isButtonPressed(BTN_CANCEL)){
+      delay(10);
+      if(isButtonPressed(BTN_CANCEL)){
+        while(isButtonPressed(BTN_CANCEL)){}
+        numberOfClasses = -1;
+        delay(200);
+        break;
+      }
+    }
+
+    if(isButtonPressed(BTN_UP)){
+      delay(10);
+      if(isButtonPressed(BTN_UP)){
+        while(isButtonPressed(BTN_UP)){}
+
+        numberOfClasses++;
+        printNumberOfClassesToDisplay(numberOfClasses);
+        delay(200);
+      }
+    }
+
+    if(isButtonPressed(BTN_DOWN)){
+      delay(10);
+      if(isButtonPressed(BTN_DOWN)){
+        while(isButtonPressed(BTN_DOWN)){}
+
+        if (numberOfClasses > 1) {
+          numberOfClasses--;
+          printNumberOfClassesToDisplay(numberOfClasses);
+        }
+        delay(200);
+      }
+    }
+  }
+
+  return numberOfClasses;
+}
+
 void startNewClass(){
   indicateStateWithLEDS(VALIDATING);
 
@@ -187,9 +245,17 @@ void startNewClass(){
     return; // professor cancelou a escolha da matéria
   }
 
+  // pergunta qual o numero de aulas que serão dadas
+  int numberOfClasses = getNumberOfClassesFromProfessor();
+
+  if (numberOfClasses == -1) {
+    turnOfAllLeds();
+    return; // professor cancelou a escolha do número de aulas
+  }
+
   Subject selectedSubject = subjects[selectedIndex];
 
-  StartClassResponse classResponse = startClassWithProfessorAndSubject(apiUrl, professorUuid, selectedSubject.id.c_str());
+  StartClassResponse classResponse = startClassWithProfessorAndSubject(apiUrl, professorUuid, selectedSubject.id.c_str(), numberOfClasses);
 
   if (classResponse.isSuccess) {
     classStarted = true;

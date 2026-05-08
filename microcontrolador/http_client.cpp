@@ -87,7 +87,7 @@ bool fetchSubjects(const char* baseUrl, const String& professorUuid){
     }
 }
 
-StartClassResponse startClassWithProfessorAndSubject(const char* baseUrl, const String& professorUuid, const String& subjectUuid){
+StartClassResponse startClassWithProfessorAndSubject(const char* baseUrl, const String& professorUuid, const String& subjectUuid, const int& numberOfClasses){
     if (!isWifiConnected()) return StartClassResponse{false, "", REQUEST_ERROR};
 
     char url[150];
@@ -100,6 +100,7 @@ StartClassResponse startClassWithProfessorAndSubject(const char* baseUrl, const 
     JsonDocument doc;
     doc["professorId"] = professorUuid;
     doc["subjectId"]  = subjectUuid;
+    doc["numberOfClasses"] = numberOfClasses;
 
     String body;
     serializeJson(doc, body);  // converte para string JSON

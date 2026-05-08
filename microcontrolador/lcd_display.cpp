@@ -152,6 +152,40 @@ void showSelectionMethodsMessageToDisplay() {
     delay(1500);
 }
 
+void showSelectNumberOfClassesMessageToDisplay(){
+    lcd.clear();
+    lcd.setCursor(0, 0);
+    lcd.print("  Selecione o   ");
+    lcd.setCursor(0, 1);
+    lcd.print("numero de aulas ");
+
+    delay(1500);
+
+    lcd.clear();
+    lcd.setCursor(0, 0);
+    lcd.print("  Utilizando os ");
+    lcd.setCursor(0, 1);
+    lcd.print("     botoes     ");
+
+    delay(1500);
+
+    lcd.clear();
+    lcd.setCursor(0, 0);
+    lcd.print("   Cima | Baixo ");
+    lcd.setCursor(0, 1);
+    lcd.print("Confim. | Cancel");
+
+    delay(1500);
+}
+
+void printNumberOfClassesToDisplay(int numberOfClasses) {
+    lcd.clear();
+    lcd.setCursor(0, 0);
+    lcd.print("Numero de aulas:");
+    lcd.setCursor(0, 1);
+    lcd.print(numberOfClasses);
+}
+
 void showProfessorNotFoundErrorMessageToDisplay() {
     lcd.clear();
     lcd.setCursor(0, 0);

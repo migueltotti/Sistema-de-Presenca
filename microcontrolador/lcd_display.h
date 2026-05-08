@@ -13,6 +13,8 @@ void printConsultingServerToDisplay();
 void printAccessGrantedToDisplay();
 void printAccessDeniedToDisplay();
 void showSelectionMethodsMessageToDisplay();
+void showSelectNumberOfClassesMessageToDisplay();
+void printNumberOfClassesToDisplay(int numberOfClasses);
 void showProfessorNotFoundErrorMessageToDisplay();
 void showSubjectNotFoundErrorMessageToDisplay();
 void printSubjectNameToDisplay(String subjectName);
