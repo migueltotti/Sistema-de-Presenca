@@ -17,4 +17,8 @@
     <Folder Include="Controllers\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\SistemaPresenca.CrossCutting\SistemaPresenca.CrossCutting.csproj" />
+  </ItemGroup>
+
 </Project>
