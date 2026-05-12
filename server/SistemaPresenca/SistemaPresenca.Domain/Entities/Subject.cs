@@ -9,6 +9,7 @@ public class Subject : BaseEntity
     public Major Major { get; set; }
     public Guid? ProfessorId { get; set; }
     public User? Professor { get; set; }
+    public IEnumerable<Session> Sessions { get; set; }
 
     private Subject() : base()
     {
