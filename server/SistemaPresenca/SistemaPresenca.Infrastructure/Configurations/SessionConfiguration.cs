@@ -19,7 +19,7 @@ public class SessionConfiguration : BaseEntityConfiguration<Session>
             .IsRequired(false);
 
         builder.Property(s => s.TotalLessons)
-            .IsRequired(false);
+            .IsRequired();
 
         
         builder.HasOne(s => s.Subject)
