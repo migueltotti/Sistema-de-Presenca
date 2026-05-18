@@ -186,3 +186,51 @@ ContinueClassResponse continueClassByProfessor(const char* baseUrl, const String
         return ContinueClassResponse{false, REQUEST_ERROR};
     }
 }
+
+EndClassResponse endClassByProfessor(const char* baseUrl, const String& classId, const String& professorUuid){
+    if (!isWifiConnected()) return EndClassResponse{false, WIFI_NOT_CONNECTED_ERROR};
+
+    char url[150];
+    snprintf(url, sizeof(url), "%s/class/%s/end", baseUrl, classId.c_str());
+
+    HTTPClient http;
+    http.begin(url);
+    http.addHeader("Content-Type", "application/json");
+
+    JsonDocument doc;
+    doc["professorId"] = professorUuid;
+
+    String body;
+    serializeJson(doc, body);  // converte para string JSON
+    
+    int httpResponseCode = http.POST(body);
+
+    if (httpResponseCode > 0) {
+        Serial.printf("HTTP Status: %d\n", httpResponseCode);
+
+        if (httpResponseCode == HTTP_CODE_OK) {
+            String payload = http.getString();
+            Serial.println("Resposta:");
+            Serial.println(payload);
+
+            http.end();
+            return EndClassResponse{true, ""};
+        }
+        else{
+            JsonDocument errorDoc;
+            DeserializationError erro = deserializeJson(doc, payload);
+
+            String errorCode = errorDoc["code"].as<String>();
+            String errorMessage = errorDoc["description"].as<String>();
+
+            Serial.println(errorMessage);
+
+            http.end();
+            return EndClassResponse{false, errorCode};
+        }
+    } else {
+        Serial.println("Erro na requisição: " + String(httpResponseCode));
+        http.end();
+        return EndClassResponse{false, REQUEST_ERROR};
+    }
+}

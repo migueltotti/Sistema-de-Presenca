@@ -275,7 +275,7 @@ void startNewClass(){
 }
 
 bool getProfessorConfirmationToContinueClass() {
-  showConfirmActionMessageToDisplay();
+  showConfirmContinueClassActionMessageToDisplay();
 
   while (!isButtonPressed(BTN_CONFIRM) && !isButtonPressed(BTN_CANCEL)) {}
 
@@ -378,6 +378,107 @@ void continueClass() {
     }
   }
 }
+
+bool getProfessorConfirmationToEndClass() {
+  showConfirmEndClassActionMessageToDisplay();
+
+  while (!isButtonPressed(BTN_CONFIRM) && !isButtonPressed(BTN_CANCEL)) {}
+
+  if(isButtonPressed(BTN_CONFIRM)){
+    delay(10);
+    if(isButtonPressed(BTN_CONFIRM)){
+      while(isButtonPressed(BTN_CONFIRM)){}
+      return true;
+    }
+  }
+
+  if(isButtonPressed(BTN_CANCEL)){
+    delay(10);
+    if(isButtonPressed(BTN_CANCEL)){
+      while(isButtonPressed(BTN_CANCEL)){}
+      return false;
+    }
+  }
+
+  return false;
+}
+
+void endClass(){
+  // confirma ação da ação de finalizar a aula (CONFIRM - Finalizar, CANCEL - Cancelar)
+  bool endClass = getProfessorConfirmationToEndClass();
+
+  if (!endClass)
+    return;
+
+  while (true) {
+    showApproachTagMessageToDisplay();
+
+    while(!isButtonPressed(BTN_CANCEL) && (!rfid.PICC_IsNewCardPresent() || !rfid.PICC_ReadCardSerial())) {}
+
+    if(isButtonPressed(BTN_CANCEL)){
+      delay(10);
+      if(isButtonPressed(BTN_CANCEL)){
+        while(isButtonPressed(BTN_CANCEL)){}
+        return; // professor cancelou a ação de finalizar a aula - volta para o loop principal
+      }
+    }
+
+    indicateStateWithLEDS(VALIDATING);
+    showReadingTagMessageToDisplay();
+    printTagUuidToConsole();
+
+    // pega tag uuid do professor
+    // id da aula está na variavel classId
+    String professorUuid = getUuidFromRfidReader();
+
+    // envia requisição para o servidor para finalizar a aula
+    EndClassResponse endClassResponse = endClassByProfessor(apiUrl, classId, professorUuid);
+
+    // mostra mensagem de sucesso
+    // volta para o loop inicial com a aula finalizada
+    if (endClassResponse.isSuccess) {
+      classStarted = false;
+      indicateStateWithLEDS(GRANTED);
+      showClassEndedSuccessfullyMessageToDisplay();
+      turnOfAllLeds();
+      return;
+    }
+    else {
+      indicateStateWithLEDS(DENIED);
+
+      if (continueClassResponse.errorCode == WIFI_NOT_CONNECTED_ERROR) {
+        showWifiNotConnectedErrorMessageToDisplay();
+        turnOfAllLeds();
+        return; // volta para o loop inicial
+      }
+      else if (continueClassResponse.errorCode == REQUEST_ERROR) {
+        showRequestErrorMessageToDisplay();
+        turnOfAllLeds();
+        return; // volta para o loop inicial
+      }
+      else if (continueClassResponse.errorCode == "ClassErrors.NotFound"){ // Aula não encontrada - volta para o loop inicial
+        showClassNotFoundErrorMessageToDisplay();
+        turnOfAllLeds();
+        return; // volta para o loop inicial
+      }
+      else if (continueClassResponse.errorCode == "ProfessorErrors.NotFound"){ // Professor não encontrado - aguarda tag novamente e mostra mensagem de erro no LCD
+        showProfessorNotFoundErrorMessageToDisplay();
+        turnOfAllLeds();
+        // aguarda tag novamente e mostra mensagem de erro no LCD
+      }
+      else if (continueClassResponse.errorCode == "ClassErrors.ProfessorMismatch"){ // Professor não iniciou a aula - aguarda tag novamente e mostra mensagem de erro no LCD
+        showClassProfessorMismatchErrorMessageToDisplay();
+        turnOfAllLeds();
+        // aguarda tag novamente e mostra mensagem de erro no LCD
+      }
+      else if (continueClassResponse.errorCode == "ClassErrors.AlreadyFinished"){ // Aula já finalizada - volta para o loop inicial
+        showClassAlreadyFinishedErrorMessageToDisplay();
+        turnOfAllLeds();
+        return;// volta para o loop inicial
+      }
+    }
+  }
+}
 // ====== end: UseCase Methods ======
 
 void setup() {
@@ -435,11 +536,14 @@ void loop() {
   }
 
   // verifica se quer terminar a aula pressionando botão CONFIRM
+  if (classStarted && confirmPressed){
+    endClass();
+  }
 
   // verifica se quer cancelar a aula pressionando botão CANCEL
 
-  // tentar ler a tag do aluno
-  if (!rfid.PICC_IsNewCardPresent() || !rfid.PICC_ReadCardSerial()) {
+  // tentar ler a tag do aluno (ALTERAR POIS ATUALMENTE VERIFICA SE NÃO APROXIMOU)
+  if (!newCard) {
     return;
   }
 

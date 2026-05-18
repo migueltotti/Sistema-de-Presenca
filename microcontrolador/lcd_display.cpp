@@ -226,7 +226,7 @@ void printSubjectNameToDisplay(String subjectName) {
     lcd.print(subjectName);
 }
 
-void showConfirmActionMessageToDisplay() {
+void showConfirmContinueClassActionMessageToDisplay() {
     lcd.clear();
     lcd.setCursor(0, 0);
     lcd.print("Deseja continuar");
@@ -238,6 +238,24 @@ void showClassContinuedSuccessfullyMessageToDisplay() {
     lcd.clear();
     lcd.setCursor(0, 0);
     lcd.print("Aula continuada");
+    lcd.setCursor(0, 1);
+    lcd.print(" com sucesso ");
+
+    delay(1500);
+}
+
+void showConfirmEndClassActionMessageToDisplay() {
+    lcd.clear();
+    lcd.setCursor(0, 0);
+    lcd.print("Deseja finalizar");
+    lcd.setCursor(0, 1);
+    lcd.print("     aula ?     ");
+}
+
+void showClassEndedSuccessfullyMessageToDisplay() {
+    lcd.clear();
+    lcd.setCursor(0, 0);
+    lcd.print("Aula finalizada");
     lcd.setCursor(0, 1);
     lcd.print(" com sucesso ");
 
