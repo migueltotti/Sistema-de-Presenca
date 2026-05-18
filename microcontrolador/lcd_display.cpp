@@ -44,7 +44,7 @@ void showStartupMessageToDisplay() {
     delay(3000);
 }
 
-void showStartOrContinueClassMessageToDisplay() {
+void showStartOrContinueSessionMessageToDisplay() {
     unsigned long now = millis();
 
     if (now - lastMsgChange < MSG_INTERVAL) return; // ainda não é hora de trocar
@@ -226,7 +226,7 @@ void printSubjectNameToDisplay(String subjectName) {
     lcd.print(subjectName);
 }
 
-void showConfirmContinueClassActionMessageToDisplay() {
+void showConfirmContinueSessionActionMessageToDisplay() {
     lcd.clear();
     lcd.setCursor(0, 0);
     lcd.print("Deseja continuar");
@@ -234,7 +234,7 @@ void showConfirmContinueClassActionMessageToDisplay() {
     lcd.print("     aula ?     ");
 }
 
-void showClassContinuedSuccessfullyMessageToDisplay() {
+void showSessionContinuedSuccessfullyMessageToDisplay() {
     lcd.clear();
     lcd.setCursor(0, 0);
     lcd.print("Aula continuada");
@@ -244,7 +244,7 @@ void showClassContinuedSuccessfullyMessageToDisplay() {
     delay(1500);
 }
 
-void showConfirmEndClassActionMessageToDisplay() {
+void showConfirmEndSessionActionMessageToDisplay() {
     lcd.clear();
     lcd.setCursor(0, 0);
     lcd.print("Deseja finalizar");
@@ -252,7 +252,7 @@ void showConfirmEndClassActionMessageToDisplay() {
     lcd.print("     aula ?     ");
 }
 
-void showClassEndedSuccessfullyMessageToDisplay() {
+void showSessionEndedSuccessfullyMessageToDisplay() {
     lcd.clear();
     lcd.setCursor(0, 0);
     lcd.print("Aula finalizada");
@@ -290,7 +290,7 @@ void showRequestErrorMessageToDisplay() {
     delay(1500);
 }
 
-void showClassNotFoundErrorMessageToDisplay() {
+void showSessionNotFoundErrorMessageToDisplay() {
     lcd.clear();
     lcd.setCursor(0, 0);
     lcd.print("    Aula não    ");
@@ -304,7 +304,7 @@ void showClassNotFoundErrorMessageToDisplay() {
     delay(1500);
 }
 
-void showClassProfessorMismatchErrorMessageToDisplay() {
+void showSessionProfessorMismatchErrorMessageToDisplay() {
     lcd.clear();
     lcd.setCursor(0, 0);
     lcd.print(" Professor não  ");
@@ -318,7 +318,7 @@ void showClassProfessorMismatchErrorMessageToDisplay() {
     delay(1500);
 }
 
-void showClassAlreadyFinishedErrorMessageToDisplay() {
+void showSessionAlreadyFinishedErrorMessageToDisplay() {
     lcd.clear();
     lcd.setCursor(0, 0);
     lcd.print("    Aula já     ");

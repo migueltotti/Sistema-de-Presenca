@@ -9,18 +9,18 @@ struct Subject {
   String name;
 };
 
-struct ContinueClassResponse {
+struct ContinueSessionResponse {
   bool isSuccess;
   String errorCode;
 };
 
-struct StartClassResponse {
+struct StartSessionResponse {
   bool isSuccess;
-  String classId;
+  String sessionId;
   String errorCode;
 }
 
-struct EndClassResponse {
+struct EndSessionResponse {
   bool isSuccess;
   String errorCode;
 }
@@ -33,8 +33,8 @@ extern int totalSubjects;
 
 void httpInit(const char* ssid, const char* password);
 bool fetchSubjects(const char* baseUrl, const String& professorUuid);
-StartClassResponse startClassWithProfessorAndSubject(const char* baseUrl, const String& professorUuid, const String& subjectUuid, const int& numberOfClasses);
-ContinueClassResponse continueClassByProfessor(const char* baseUrl, const String& classId, const String& professorUuid);
-EndClassResponse endClassByProfessor(const char* baseUrl, const String& classId, const String& professorUuid);
+StartSessionResponse startSessionWithProfessorAndSubject(const char* baseUrl, const String& professorUuid, const String& subjectUuid, const int& numberOfClasses);
+ContinueSessionResponse continueSessionByProfessor(const char* baseUrl, const String& sessionId, const String& professorUuid);
+EndSessionResponse endSessionByProfessor(const char* baseUrl, const String& sessionId, const String& professorUuid);
 
 #endif

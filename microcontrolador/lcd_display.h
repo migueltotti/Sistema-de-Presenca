@@ -5,7 +5,7 @@
 
 void lcdInit();
 void showStartupMessageToDisplay();
-void showStartOrContinueClassMessageToDisplay();
+void showStartOrContinueSessionMessageToDisplay();
 void showApproachTagMessageToDisplay();
 void showReadingTagMessageToDisplay();
 void printTagUuidToDisplay(String uuid);
@@ -13,20 +13,20 @@ void printConsultingServerToDisplay();
 void printAccessGrantedToDisplay();
 void printAccessDeniedToDisplay();
 void showSelectionMethodsMessageToDisplay();
-void showSelectNumberOfClassesMessageToDisplay();
-void printNumberOfClassesToDisplay(int numberOfClasses);
+void showSelectNumberOfSessionesMessageToDisplay();
+void printNumberOfSessionesToDisplay(int numberOfClasses);
 void showProfessorNotFoundErrorMessageToDisplay();
 void showSubjectNotFoundErrorMessageToDisplay();
 void printSubjectNameToDisplay(String subjectName);
-void showConfirmContinueClassActionMessageToDisplay();
-void showClassContinuedSuccessfullyMessageToDisplay();
-void showConfirmEndClassActionMessageToDisplay();
-void showClassEndedSuccessfullyMessageToDisplay();
+void showConfirmContinueSessionActionMessageToDisplay();
+void showSessionContinuedSuccessfullyMessageToDisplay();
+void showConfirmEndSessionActionMessageToDisplay();
+void showSessionEndedSuccessfullyMessageToDisplay();
 void showWifiNotConnectedErrorMessageToDisplay();
 void showRequestErrorMessageToDisplay();
-void showClassNotFoundErrorMessageToDisplay();
+void showSessionNotFoundErrorMessageToDisplay();
 void showProfessorNotFoundErrorMessageToDisplay();
-void showClassProfessorMismatchErrorMessageToDisplay();
-void showClassAlreadyFinishedErrorMessageToDisplay();
+void showSessionProfessorMismatchErrorMessageToDisplay();
+void showSessionAlreadyFinishedErrorMessageToDisplay();
 
 #endif

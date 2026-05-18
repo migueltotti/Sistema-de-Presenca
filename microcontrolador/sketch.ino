@@ -29,8 +29,8 @@ const char* ssid     = "Wokwi-GUEST";  // rede virtual do Wokwi
 const char* password = "";              // sem senha
 const char* apiUrl = "https://jsonplaceholder.typicode.com/todos/1";
 
-bool classStarted = false;
-String classId = "";
+bool sessionStarted = false;
+String sessionId = "";
 
 // ====== begin: Utils Methods ======
 String getUuidFromRfidReader(){
@@ -51,9 +51,9 @@ bool isButtonPressed(int btn) {
   return digitalRead(btn) == LOW;
 }
 
-bool hasClassStartedBefore() {
-  String classId = getClassIdFromNVS();
-  if (classId != "")
+bool hasSessionStartedBefore() {
+  String sessionId = getSessionIdFromNVS();
+  if (sessionId != "")
     return true;
   else
     return false;
@@ -216,7 +216,7 @@ int getNumberOfClassesFromProfessor() {
   return numberOfClasses;
 }
 
-void startNewClass(){
+void startNewSession(){
   indicateStateWithLEDS(VALIDATING);
 
   showReadingTagMessageToDisplay();
@@ -255,18 +255,18 @@ void startNewClass(){
 
   Subject selectedSubject = subjects[selectedIndex];
 
-  StartClassResponse classResponse = startClassWithProfessorAndSubject(apiUrl, professorUuid, selectedSubject.id.c_str(), numberOfClasses);
+  StartSessionResponse classResponse = startSessionWithProfessorAndSubject(apiUrl, professorUuid, selectedSubject.id.c_str(), numberOfClasses);
 
   if (classResponse.isSuccess) {
-    classStarted = true;
-    classId = classResponse.classId;
-    saveClassIdToNVS(classResponse.classId);
+    sessionStarted = true;
+    sessionId = classResponse.sessionId;
+    saveSessionIdToNVS(sessionId);
     indicateStateWithLEDS(GRANTED);
     delay(1500);
     turnOfAllLeds();
   }
   else{
-    classStarted = false;
+    sessionStarted = false;
     indicateStateWithLEDS(DENIED);
     showSubjectNotFoundErrorMessageToDisplay();
     delay(1500);
@@ -274,8 +274,8 @@ void startNewClass(){
   }
 }
 
-bool getProfessorConfirmationToContinueClass() {
-  showConfirmContinueClassActionMessageToDisplay();
+bool getProfessorConfirmationToContinueSession() {
+  showConfirmContinueSessionActionMessageToDisplay();
 
   while (!isButtonPressed(BTN_CONFIRM) && !isButtonPressed(BTN_CANCEL)) {}
 
@@ -298,12 +298,12 @@ bool getProfessorConfirmationToContinueClass() {
   return false;
 }
 
-void continueClass() {
+void continueSession() {
   // mostrar mensagem de confirmação da ação (CONFIRM - Continuar, CANCEL - Cancelar)
   // aguardar confirmação no botão
-  bool continueClass = getProfessorConfirmationToContinueClass();
+  bool continueSession = getProfessorConfirmationToContinueSession();
 
-  if (!continueClass)
+  if (!continueSession)
     return;
 
   // mostra mensagem para professor aproximar a tag
@@ -328,50 +328,50 @@ void continueClass() {
     printTagUuidToConsole();
 
     String professorUuid = getUuidFromRfidReader();
-    classId = getClassIdFromNVS();
+    sessionId = getSessionIdFromNVS();
 
-    ContinueClassResponse continueClassResponse = continueClassByProfessor(apiUrl, classId, professorUuid);
+    ContinueSessionResponse continueSessionResponse = continueSessionByProfessor(apiUrl, sessionId, professorUuid);
 
     // mostra mensagem de sucesso
     // volta para o loop principal
-    if (continueClassResponse.isSuccess) {
-      classStarted = true;
+    if (continueSessionResponse.isSuccess) {
+      sessionStarted = true;
       indicateStateWithLEDS(GRANTED);
-      showClassContinuedSuccessfullyMessageToDisplay();
+      showSessionContinuedSuccessfullyMessageToDisplay();
       turnOfAllLeds();
       return;
     }
     else {
-      classStarted = false;
+      sessionStarted = false;
       indicateStateWithLEDS(DENIED);
 
-      if (continueClassResponse.errorCode == WIFI_NOT_CONNECTED_ERROR) {
+      if (continueSessionResponse.errorCode == WIFI_NOT_CONNECTED_ERROR) {
         showWifiNotConnectedErrorMessageToDisplay();
         turnOfAllLeds();
         return; // volta para o loop inicial
       }
-      else if (continueClassResponse.errorCode == REQUEST_ERROR) {
+      else if (continueSessionResponse.errorCode == REQUEST_ERROR) {
         showRequestErrorMessageToDisplay();
         turnOfAllLeds();
         return; // volta para o loop inicial
       }
-      else if (continueClassResponse.errorCode == "ClassErrors.NotFound"){ // Aula não encontrada - volta para o loop inicial
-        showClassNotFoundErrorMessageToDisplay();
+      else if (continueSessionResponse.errorCode == "SessionErrors.NotFound"){ // Aula não encontrada - volta para o loop inicial
+        showSessionNotFoundErrorMessageToDisplay();
         turnOfAllLeds();
         return; // volta para o loop inicial
       }
-      else if (continueClassResponse.errorCode == "ProfessorErrors.NotFound"){ // Professor não encontrado - aguarda tag novamente e mostra mensagem de erro no LCD
+      else if (continueSessionResponse.errorCode == "ProfessorErrors.NotFound"){ // Professor não encontrado - aguarda tag novamente e mostra mensagem de erro no LCD
         showProfessorNotFoundErrorMessageToDisplay();
         turnOfAllLeds();
         // aguarda tag novamente e mostra mensagem de erro no LCD
       }
-      else if (continueClassResponse.errorCode == "ClassErrors.ProfessorMismatch"){ // Professor não iniciou a aula - aguarda tag novamente e mostra mensagem de erro no LCD
-        showClassProfessorMismatchErrorMessageToDisplay();
+      else if (continueSessionResponse.errorCode == "SessionErrors.ProfessorMismatch"){ // Professor não iniciou a aula - aguarda tag novamente e mostra mensagem de erro no LCD
+        showSessionProfessorMismatchErrorMessageToDisplay();
         turnOfAllLeds();
         // aguarda tag novamente e mostra mensagem de erro no LCD
       }
-      else if (continueClassResponse.errorCode == "ClassErrors.AlreadyFinished"){ // Aula já finalizada - volta para o loop inicial
-        showClassAlreadyFinishedErrorMessageToDisplay();
+      else if (continueSessionResponse.errorCode == "SessionErrors.AlreadyFinished"){ // Aula já finalizada - volta para o loop inicial
+        showSessionAlreadyFinishedErrorMessageToDisplay();
         turnOfAllLeds();
         return;// volta para o loop inicial
       }
@@ -379,8 +379,8 @@ void continueClass() {
   }
 }
 
-bool getProfessorConfirmationToEndClass() {
-  showConfirmEndClassActionMessageToDisplay();
+bool getProfessorConfirmationToEndSession() {
+  showConfirmEndSessionActionMessageToDisplay();
 
   while (!isButtonPressed(BTN_CONFIRM) && !isButtonPressed(BTN_CANCEL)) {}
 
@@ -403,11 +403,11 @@ bool getProfessorConfirmationToEndClass() {
   return false;
 }
 
-void endClass(){
+void endSession(){
   // confirma ação da ação de finalizar a aula (CONFIRM - Finalizar, CANCEL - Cancelar)
-  bool endClass = getProfessorConfirmationToEndClass();
+  bool endSession = getProfessorConfirmationToEndSession();
 
-  if (!endClass)
+  if (!endSession)
     return;
 
   while (true) {
@@ -432,49 +432,44 @@ void endClass(){
     String professorUuid = getUuidFromRfidReader();
 
     // envia requisição para o servidor para finalizar a aula
-    EndClassResponse endClassResponse = endClassByProfessor(apiUrl, classId, professorUuid);
+    EndSessionResponse endSessionResponse = endSessionByProfessor(apiUrl, sessionId, professorUuid);
 
     // mostra mensagem de sucesso
     // volta para o loop inicial com a aula finalizada
-    if (endClassResponse.isSuccess) {
-      classStarted = false;
+    if (endSessionResponse.isSuccess) {
+      sessionStarted = false;
       indicateStateWithLEDS(GRANTED);
-      showClassEndedSuccessfullyMessageToDisplay();
+      showSessionEndedSuccessfullyMessageToDisplay();
       turnOfAllLeds();
       return;
     }
     else {
       indicateStateWithLEDS(DENIED);
 
-      if (continueClassResponse.errorCode == WIFI_NOT_CONNECTED_ERROR) {
+      if (endSessionResponse.errorCode == WIFI_NOT_CONNECTED_ERROR) {
         showWifiNotConnectedErrorMessageToDisplay();
         turnOfAllLeds();
         return; // volta para o loop inicial
       }
-      else if (continueClassResponse.errorCode == REQUEST_ERROR) {
+      else if (endSessionResponse.errorCode == REQUEST_ERROR) {
         showRequestErrorMessageToDisplay();
         turnOfAllLeds();
         return; // volta para o loop inicial
       }
-      else if (continueClassResponse.errorCode == "ClassErrors.NotFound"){ // Aula não encontrada - volta para o loop inicial
-        showClassNotFoundErrorMessageToDisplay();
+      else if (endSessionResponse.errorCode == "SessionErrors.NotFound"){ // Aula não encontrada - volta para o loop inicial
+        showSessionNotFoundErrorMessageToDisplay();
         turnOfAllLeds();
         return; // volta para o loop inicial
       }
-      else if (continueClassResponse.errorCode == "ProfessorErrors.NotFound"){ // Professor não encontrado - aguarda tag novamente e mostra mensagem de erro no LCD
+      else if (endSessionResponse.errorCode == "ProfessorErrors.NotFound"){ // Professor não encontrado - aguarda tag novamente e mostra mensagem de erro no LCD
         showProfessorNotFoundErrorMessageToDisplay();
         turnOfAllLeds();
         // aguarda tag novamente e mostra mensagem de erro no LCD
       }
-      else if (continueClassResponse.errorCode == "ClassErrors.ProfessorMismatch"){ // Professor não iniciou a aula - aguarda tag novamente e mostra mensagem de erro no LCD
-        showClassProfessorMismatchErrorMessageToDisplay();
+      else if (endSessionResponse.errorCode == "SessionErrors.ProfessorMismatch"){ // Professor não iniciou a aula - aguarda tag novamente e mostra mensagem de erro no LCD
+        showSessionProfessorMismatchErrorMessageToDisplay();
         turnOfAllLeds();
         // aguarda tag novamente e mostra mensagem de erro no LCD
-      }
-      else if (continueClassResponse.errorCode == "ClassErrors.AlreadyFinished"){ // Aula já finalizada - volta para o loop inicial
-        showClassAlreadyFinishedErrorMessageToDisplay();
-        turnOfAllLeds();
-        return;// volta para o loop inicial
       }
     }
   }
@@ -516,28 +511,28 @@ void loop() {
   bool newCard = rfid.PICC_IsNewCardPresent() && rfid.PICC_ReadCardSerial();
 
   // processo que inicia aula se não existir uma ativa no microcontrolador.
-  if (!classStarted){
-    showStartOrContinueClassMessageToDisplay();
+  if (!sessionStarted){
+    showStartOrContinueSessionMessageToDisplay();
 
     // incluir rotina de apertar botão para continuar aula.
-    if (hasClassStartedBefore() && confirmPressed){
-      continueClass();
+    if (hasSessionStartedBefore() && confirmPressed){
+      continueSession();
     }
 
     // tag aproximada do leitor para iniciar nova aula
     if (newCard) {
-      startNewClass();
+      startNewSession();
     }
 
-    if (classStarted)
+    if (sessionStarted)
       showApproachTagMessageToDisplay();
     else
       return;
   }
 
   // verifica se quer terminar a aula pressionando botão CONFIRM
-  if (classStarted && confirmPressed){
-    endClass();
+  if (sessionStarted && confirmPressed){
+    endSession();
   }
 
   // verifica se quer cancelar a aula pressionando botão CANCEL

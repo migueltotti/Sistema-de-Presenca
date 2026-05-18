@@ -87,11 +87,11 @@ bool fetchSubjects(const char* baseUrl, const String& professorUuid){
     }
 }
 
-StartClassResponse startClassWithProfessorAndSubject(const char* baseUrl, const String& professorUuid, const String& subjectUuid, const int& numberOfClasses){
-    if (!isWifiConnected()) return StartClassResponse{false, "", REQUEST_ERROR};
+StartSessionResponse startSessionWithProfessorAndSubject(const char* baseUrl, const String& professorUuid, const String& subjectUuid, const int& numberOfClasses){
+    if (!isWifiConnected()) return StartSessionResponse{false, "", REQUEST_ERROR};
 
     char url[150];
-    snprintf(url, sizeof(url), "%s/class", baseUrl);
+    snprintf(url, sizeof(url), "%s/session", baseUrl);
 
     HTTPClient http;
     http.begin(url);
@@ -118,10 +118,10 @@ StartClassResponse startClassWithProfessorAndSubject(const char* baseUrl, const 
         DeserializationError erro = deserializeJson(doc, payload);
 
         if (httpResponseCode == HTTP_CODE_CREATED) {
-            String classId = doc["classId"].as<String>();
+            String sessionId = doc["sessionId"].as<String>();
 
             http.end();
-            return StartClassResponse{true, classId, ""};
+            return StartSessionResponse{true, sessionId, ""};
         }
         else {
             String errorCode = errorDoc["code"].as<String>();
@@ -130,20 +130,20 @@ StartClassResponse startClassWithProfessorAndSubject(const char* baseUrl, const 
             Serial.println(errorMessage);
 
             http.end();
-            return StartClassResponse{false, "", errorCode};
+            return StartSessionResponse{false, "", errorCode};
         }
     } else {
         Serial.println("Erro na requisição: " + String(httpResponseCode));
         http.end();
-        return StartClassResponse{false, "", REQUEST_ERROR};
+        return StartSessionResponse{false, "", REQUEST_ERROR};
     }
 }
 
-ContinueClassResponse continueClassByProfessor(const char* baseUrl, const String& classId, const String& professorUuid){    
-    if (!isWifiConnected()) return ContinueClassResponse{false, WIFI_NOT_CONNECTED_ERROR};
+ContinueSessionResponse continueSessionByProfessor(const char* baseUrl, const String& sessionId, const String& professorUuid){    
+    if (!isWifiConnected()) return ContinueSessionResponse{false, WIFI_NOT_CONNECTED_ERROR};
 
     char url[150];
-    snprintf(url, sizeof(url), "%s/class/%s/continue", baseUrl, classId.c_str());
+    snprintf(url, sizeof(url), "%s/session/%s/continue", baseUrl, sessionId.c_str());
 
     HTTPClient http;
     http.begin(url);
@@ -166,7 +166,7 @@ ContinueClassResponse continueClassByProfessor(const char* baseUrl, const String
             Serial.println(payload);
 
             http.end();
-            return ContinueClassResponse{true, ""};
+            return ContinueSessionResponse{true, ""};
         }
         else{
             JsonDocument errorDoc;
@@ -178,20 +178,20 @@ ContinueClassResponse continueClassByProfessor(const char* baseUrl, const String
             Serial.println(errorMessage);
 
             http.end();
-            return ContinueClassResponse{false, errorCode};
+            return ContinueSessionResponse{false, errorCode};
         }
     } else {
         Serial.println("Erro na requisição: " + String(httpResponseCode));
         http.end();
-        return ContinueClassResponse{false, REQUEST_ERROR};
+        return ContinueSessionResponse{false, REQUEST_ERROR};
     }
 }
 
-EndClassResponse endClassByProfessor(const char* baseUrl, const String& classId, const String& professorUuid){
-    if (!isWifiConnected()) return EndClassResponse{false, WIFI_NOT_CONNECTED_ERROR};
+EndSessionResponse endSessionByProfessor(const char* baseUrl, const String& sessionId, const String& professorUuid){
+    if (!isWifiConnected()) return EndSessionResponse{false, WIFI_NOT_CONNECTED_ERROR};
 
     char url[150];
-    snprintf(url, sizeof(url), "%s/class/%s/end", baseUrl, classId.c_str());
+    snprintf(url, sizeof(url), "%s/session/%s/end", baseUrl, sessionId.c_str());
 
     HTTPClient http;
     http.begin(url);
@@ -214,7 +214,7 @@ EndClassResponse endClassByProfessor(const char* baseUrl, const String& classId,
             Serial.println(payload);
 
             http.end();
-            return EndClassResponse{true, ""};
+            return EndSessionResponse{true, ""};
         }
         else{
             JsonDocument errorDoc;
@@ -226,11 +226,11 @@ EndClassResponse endClassByProfessor(const char* baseUrl, const String& classId,
             Serial.println(errorMessage);
 
             http.end();
-            return EndClassResponse{false, errorCode};
+            return EndSessionResponse{false, errorCode};
         }
     } else {
         Serial.println("Erro na requisição: " + String(httpResponseCode));
         http.end();
-        return EndClassResponse{false, REQUEST_ERROR};
+        return EndSessionResponse{false, REQUEST_ERROR};
     }
 }

@@ -3,21 +3,21 @@
 /* Instancia para lidar com operações de persistência de dados (NVS) */
 Preferences preferences;
 
-String getClassIdFromNVS() {
-  preferences.begin("class", true);
-  String classId = preferences.getString("id", "");
+String getSessionIdFromNVS() {
+  preferences.begin("session", true);
+  String sessionId = preferences.getString("id", "");
   preferences.end();
-  return classId;
+  return sessionId;
 }
 
-void saveClassIdToNVS(String classId) {
-  preferences.begin("class", false);
-  preferences.putString("id", classId);
+void saveSessionIdToNVS(String sessionId) {
+  preferences.begin("session", false);
+  preferences.putString("id", sessionId);
   preferences.end();
 }
 
-void removeClassIdToNVS() {
-  preferences.begin("class", false);
+void removeSessionIdToNVS() {
+  preferences.begin("session", false);
   preferences.remove("id");
   preferences.end();
 }
