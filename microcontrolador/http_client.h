@@ -18,12 +18,12 @@ struct StartSessionResponse {
   bool isSuccess;
   String sessionId;
   String errorCode;
-}
+};
 
 struct EndSessionResponse {
   bool isSuccess;
   String errorCode;
-}
+};
 
 extern const String WIFI_NOT_CONNECTED_ERROR = "WIFI_NOT_CONNECTED";
 extern const String REQUEST_ERROR = "REQUEST_ERROR";
