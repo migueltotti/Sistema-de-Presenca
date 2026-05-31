@@ -331,3 +331,41 @@ void showSessionAlreadyFinishedErrorMessageToDisplay() {
 
     delay(1500);
 }
+
+void showAttendanceRegisteredSuccessfullyMessageToDisplay() {
+    lcd.clear();
+    lcd.setCursor(0, 0);
+    lcd.print("   Presença do  ");
+    lcd.setCursor(0, 1);
+    lcd.print("aluno registrada");
+
+    delay(1500);
+}
+
+void showStudentNotFoundErrorMessageToDisplay() {
+    lcd.clear();
+    lcd.setCursor(0, 0);
+    lcd.print("   Aluno não    ");
+    lcd.setCursor(0, 1);
+    lcd.print("   encontrado   ");
+
+    lcd.clear();
+    lcd.setCursor(0, 0);
+    lcd.print("Tente novamente ");
+
+    delay(1500);
+}
+
+void showStudentAttendanceAlreadyRegisteredErrorMessageToDisplay() {
+    lcd.clear();
+    lcd.setCursor(0, 0);
+    lcd.print("    Aluno já    ");
+    lcd.setCursor(0, 1);
+    lcd.print(" possui presenca");
+
+    lcd.clear();
+    lcd.setCursor(0, 0);
+    lcd.print("Tente novamente ");
+
+    delay(1500);
+}

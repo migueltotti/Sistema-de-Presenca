@@ -474,6 +474,50 @@ void endSession(){
     }
   }
 }
+
+void registerStudentAttendance() {
+  indicateStateWithLEDS(VALIDATING);
+  showReadingTagMessageToDisplay();
+  printTagUuidToConsole();
+
+  // pega tag uuid do aluno
+  // id da aula está na variavel classId
+  String studentUuid = getUuidFromRfidReader();
+
+  RegisterAttendanceResponse registerAttendanceResponse = registerAttendanceByStudent(apiUrl, sessionId, studentUuid);
+
+  if (registerAttendanceResponse.isSuccess) {
+    indicateStateWithLEDS(GRANTED);
+    showAttendanceRegisteredSuccessfullyMessageToDisplay();
+    turnOfAllLeds();
+    return;
+  }
+  else {
+    indicateStateWithLEDS(DENIED);
+
+    if (registerAttendanceResponse.errorCode == WIFI_NOT_CONNECTED_ERROR) {
+      showWifiNotConnectedErrorMessageToDisplay();
+    }
+    else if (registerAttendanceResponse.errorCode == REQUEST_ERROR) {
+      showRequestErrorMessageToDisplay();
+    }
+    else if (registerAttendanceResponse.errorCode == "SessionErrors.NotFound"){
+      showSessionNotFoundErrorMessageToDisplay();
+    }
+    else if (registerAttendanceResponse.errorCode == "SessionErrors.AlreadyFinished"){
+      showSessionAlreadyFinishedErrorMessageToDisplay();
+    }
+    else if (registerAttendanceResponse.errorCode == "SessionErrors.StudentNotFound"){
+      showStudentNotFoundErrorMessageToDisplay();
+    }
+    else if (registerAttendanceResponse.errorCode == "SessionErrors.StudentAttendanceAlreadyRegistered"){
+      showStudentAttendanceAlreadyRegisteredErrorMessageToDisplay();
+    }
+  }
+
+  turnOfAllLeds();
+  return; // volta para o loop inicial
+}
 // ====== end: UseCase Methods ======
 
 void setup() {
@@ -538,16 +582,9 @@ void loop() {
   // verifica se quer cancelar a aula pressionando botão CANCEL
 
   // tentar ler a tag do aluno (ALTERAR POIS ATUALMENTE VERIFICA SE NÃO APROXIMOU)
-  if (!newCard) {
-    return;
+  if (newCard) {
+    registerStudentAttendance();
   }
-
-  indicateStateWithLEDS(VALIDATING);
-
-  showReadingTagMessageToDisplay();
-
-  printTagUuidToConsole();
-  printTagUuidToDisplay(getUuidFromRfidReader());
 
   rfid.PICC_HaltA();
   delay(1000);

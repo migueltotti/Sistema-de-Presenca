@@ -28,5 +28,8 @@ void showSessionNotFoundErrorMessageToDisplay();
 void showProfessorNotFoundErrorMessageToDisplay();
 void showSessionProfessorMismatchErrorMessageToDisplay();
 void showSessionAlreadyFinishedErrorMessageToDisplay();
+void showAttendanceRegisteredSuccessfullyMessageToDisplay();
+void showStudentNotFoundErrorMessageToDisplay();
+void showStudentAttendanceAlreadyRegisteredErrorMessageToDisplay();
 
 #endif

@@ -234,3 +234,52 @@ EndSessionResponse endSessionByProfessor(const char* baseUrl, const String& sess
         return EndSessionResponse{false, REQUEST_ERROR};
     }
 }
+
+
+RegisterAttendanceResponse registerAttendanceByStudent(const char* baseUrl, const String& sessionId, const String& studentUuid) {
+    if (!isWifiConnected()) return RegisterAttendanceResponse{false, WIFI_NOT_CONNECTED_ERROR};
+
+    char url[150];
+    snprintf(url, sizeof(url), "%s/session/%s/attendance", baseUrl, sessionId.c_str());
+
+    HTTPClient http;
+    http.begin(url);
+    http.addHeader("Content-Type", "application/json");
+
+    JsonDocument doc;
+    doc["studentId"] = studentUuid;
+
+    String body;
+    serializeJson(doc, body);  // converte para string JSON
+    
+    int httpResponseCode = http.POST(body);
+
+    if (httpResponseCode > 0) {
+        Serial.printf("HTTP Status: %d\n", httpResponseCode);
+
+        if (httpResponseCode == HTTP_CODE_OK) {
+            String payload = http.getString();
+            Serial.println("Resposta:");
+            Serial.println(payload);
+
+            http.end();
+            return RegisterAttendanceResponse{true, ""};
+        }
+        else{
+            JsonDocument errorDoc;
+            DeserializationError erro = deserializeJson(doc, payload);
+
+            String errorCode = errorDoc["code"].as<String>();
+            String errorMessage = errorDoc["description"].as<String>();
+
+            Serial.println(errorMessage);
+
+            http.end();
+            return RegisterAttendanceResponse{false, errorCode};
+        }
+    } else {
+        Serial.println("Erro na requisição: " + String(httpResponseCode));
+        http.end();
+        return RegisterAttendanceResponse{false, REQUEST_ERROR};
+    }
+}

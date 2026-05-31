@@ -25,6 +25,11 @@ struct EndSessionResponse {
   String errorCode;
 };
 
+struct RegisterAttendanceResponse {
+  bool isSuccess;
+  String errorCode;
+};
+
 extern const String WIFI_NOT_CONNECTED_ERROR = "WIFI_NOT_CONNECTED";
 extern const String REQUEST_ERROR = "REQUEST_ERROR";
 
@@ -36,5 +41,6 @@ bool fetchSubjects(const char* baseUrl, const String& professorUuid);
 StartSessionResponse startSessionWithProfessorAndSubject(const char* baseUrl, const String& professorUuid, const String& subjectUuid, const int& numberOfClasses);
 ContinueSessionResponse continueSessionByProfessor(const char* baseUrl, const String& sessionId, const String& professorUuid);
 EndSessionResponse endSessionByProfessor(const char* baseUrl, const String& sessionId, const String& professorUuid);
+RegisterAttendanceResponse registerAttendanceByStudent(const char* baseUrl, const String& sessionId, const String& studentUuid);
 
 #endif
