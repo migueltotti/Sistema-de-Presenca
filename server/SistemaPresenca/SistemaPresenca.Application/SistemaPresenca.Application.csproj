@@ -7,6 +7,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="LiteBus.Commands.Abstractions" Version="5.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\SistemaPresenca.Domain\SistemaPresenca.Domain.csproj" />
   </ItemGroup>
 
