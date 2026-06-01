@@ -1,4 +1,5 @@
 ﻿using LiteBus.Commands.Abstractions;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using SistemaPresenca.Application.Requests.Session;
 using SistemaPresenca.Application.Responses.Session;
@@ -21,5 +22,18 @@ public class SessionsController(ICommandMediator commandMediator) : ControllerBa
         }
 
         return Ok(result.Data);
+    }
+
+    [HttpPost("{id:guid}/continue")]
+    public async Task<ActionResult> ContinueSessionAsync([FromRoute] Guid id, [FromBody] ContinueSessionRequest request, CancellationToken cancellationToken)
+    {
+        var result = await commandMediator.SendAsync(new ContinueSessionCommand(id, request.ProfessorTagId), cancellationToken);
+
+        if (result.IsFailure)
+        {
+            return BadRequest(result.Error);
+        }
+
+        return Ok();
     }
 }
