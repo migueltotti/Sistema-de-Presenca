@@ -22,7 +22,7 @@ public class AttendanceConfiguration : IEntityTypeConfiguration<Attendance>
             .OnDelete(DeleteBehavior.Cascade);
 
         builder.HasOne(a => a.Session)
-            .WithMany()
+            .WithMany(s => s.Attendances)
             .HasForeignKey(a => a.SessionId)
             .OnDelete(DeleteBehavior.Cascade);
     }
