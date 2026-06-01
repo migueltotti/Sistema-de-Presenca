@@ -32,6 +32,10 @@ const char* apiUrl = "https://jsonplaceholder.typicode.com/todos/1";
 bool sessionStarted = false;
 String sessionId = "";
 
+// Variáveis globais para edge detection
+bool lastConfirmState = HIGH;
+bool confirmJustPressed = false;
+
 // ====== begin: Utils Methods ======
 String getUuidFromRfidReader(){
   String uid = "";
@@ -275,27 +279,21 @@ void startNewSession(){
 }
 
 bool getProfessorConfirmationToContinueSession() {
+  delay(500);
   showConfirmContinueSessionActionMessageToDisplay();
 
+  // Aguarda qualquer um dos dois botões ser pressionado
   while (!isButtonPressed(BTN_CONFIRM) && !isButtonPressed(BTN_CANCEL)) {}
 
-  if(isButtonPressed(BTN_CONFIRM)){
-    delay(10);
-    if(isButtonPressed(BTN_CONFIRM)){
-      while(isButtonPressed(BTN_CONFIRM)){}
-      return true;
-    }
-  }
+  // Identifica qual foi pressionado AGORA (ainda pressionado)
+  bool confirmed = isButtonPressed(BTN_CONFIRM);
 
-  if(isButtonPressed(BTN_CANCEL)){
-    delay(10);
-    if(isButtonPressed(BTN_CANCEL)){
-      while(isButtonPressed(BTN_CANCEL)){}
-      return false;
-    }
-  }
+  // Aguarda soltar o botão antes de continuar (evita propagação)
+  while (isButtonPressed(BTN_CONFIRM) || isButtonPressed(BTN_CANCEL)) {}
 
-  return false;
+  delay(50); // debounce após soltar
+
+  return confirmed;
 }
 
 void continueSession() {
@@ -380,38 +378,32 @@ void continueSession() {
 }
 
 bool getProfessorConfirmationToEndSession() {
+  delay(500);
   showConfirmEndSessionActionMessageToDisplay();
 
+  // Aguarda qualquer um dos dois botões ser pressionado
   while (!isButtonPressed(BTN_CONFIRM) && !isButtonPressed(BTN_CANCEL)) {}
 
-  if(isButtonPressed(BTN_CONFIRM)){
-    delay(10);
-    if(isButtonPressed(BTN_CONFIRM)){
-      while(isButtonPressed(BTN_CONFIRM)){}
-      return true;
-    }
-  }
+  // Identifica qual foi pressionado AGORA (ainda pressionado)
+  bool confirmed = isButtonPressed(BTN_CONFIRM);
 
-  if(isButtonPressed(BTN_CANCEL)){
-    delay(10);
-    if(isButtonPressed(BTN_CANCEL)){
-      while(isButtonPressed(BTN_CANCEL)){}
-      return false;
-    }
-  }
+  // Aguarda soltar o botão antes de continuar (evita propagação)
+  while (isButtonPressed(BTN_CONFIRM) || isButtonPressed(BTN_CANCEL)) {}
 
-  return false;
+  delay(50); // debounce após soltar
+
+  return confirmed;
 }
 
 void endSession(){
   // confirma ação da ação de finalizar a aula (CONFIRM - Finalizar, CANCEL - Cancelar)
-  bool endSession = getProfessorConfirmationToEndSession();
+  bool endSessionConfirmation = getProfessorConfirmationToEndSession();
 
-  if (!endSession)
+  if (!endSessionConfirmation)
     return;
 
   while (true) {
-    showApproachTagMessageToDisplay();
+    showApproachProfessorTagMessageToDisplay();
 
     while(!isButtonPressed(BTN_CANCEL) && (!rfid.PICC_IsNewCardPresent() || !rfid.PICC_ReadCardSerial())) {}
 
@@ -489,8 +481,6 @@ void registerStudentAttendance() {
   if (registerAttendanceResponse.isSuccess) {
     indicateStateWithLEDS(GRANTED);
     showAttendanceRegisteredSuccessfullyMessageToDisplay();
-    turnOfAllLeds();
-    return;
   }
   else {
     indicateStateWithLEDS(DENIED);
@@ -516,7 +506,6 @@ void registerStudentAttendance() {
   }
 
   turnOfAllLeds();
-  return; // volta para o loop inicial
 }
 // ====== end: UseCase Methods ======
 
@@ -551,7 +540,10 @@ void setup() {
 void loop() {
   delay(10);
 
-  bool confirmPressed = isButtonPressed(BTN_CONFIRM);
+  bool currentConfirmState = digitalRead(BTN_CONFIRM);
+  confirmJustPressed = (lastConfirmState == HIGH && currentConfirmState == LOW);
+  lastConfirmState = currentConfirmState;
+  
   bool newCard = rfid.PICC_IsNewCardPresent() && rfid.PICC_ReadCardSerial();
 
   // processo que inicia aula se não existir uma ativa no microcontrolador.
@@ -559,7 +551,7 @@ void loop() {
     showStartOrContinueSessionMessageToDisplay();
 
     // incluir rotina de apertar botão para continuar aula.
-    if (hasSessionStartedBefore() && confirmPressed){
+    if (hasSessionStartedBefore() && confirmJustPressed){
       continueSession();
     }
 
@@ -568,27 +560,24 @@ void loop() {
       startNewSession();
     }
 
-    if (sessionStarted)
+    if (sessionStarted){
       showApproachTagMessageToDisplay();
-    else
-      return;
+    }
   }
+  else{ // Aula já em andamento
+    // verifica se quer terminar a aula pressionando botão CONFIRM
+    if (sessionStarted && confirmJustPressed){
+      endSession();
+    }
 
-  // verifica se quer terminar a aula pressionando botão CONFIRM
-  if (sessionStarted && confirmPressed){
-    endSession();
-  }
-
-  // verifica se quer cancelar a aula pressionando botão CANCEL
-
-  // tentar ler a tag do aluno (ALTERAR POIS ATUALMENTE VERIFICA SE NÃO APROXIMOU)
-  if (newCard) {
-    registerStudentAttendance();
+    // tentar ler a tag do aluno
+    if (newCard) {
+      registerStudentAttendance();
+      
+      showApproachTagMessageToDisplay();
+    }
   }
 
   rfid.PICC_HaltA();
-  delay(1000);
-
-  showApproachTagMessageToDisplay();
   turnOfAllLeds();
 }

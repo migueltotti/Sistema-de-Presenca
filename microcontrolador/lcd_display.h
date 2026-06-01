@@ -7,6 +7,7 @@ void lcdInit();
 void showStartupMessageToDisplay();
 void showStartOrContinueSessionMessageToDisplay();
 void showApproachTagMessageToDisplay();
+void showApproachProfessorTagMessageToDisplay();
 void showReadingTagMessageToDisplay();
 void printTagUuidToDisplay(String uuid);
 void printConsultingServerToDisplay();
