@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using SistemaPresenca.Infrastructure.Context;
@@ -11,9 +12,11 @@ using SistemaPresenca.Infrastructure.Context;
 namespace SistemaPresenca.Infrastructure.Migrations
 {
     [DbContext(typeof(SistemaPresencaDbContext))]
-    partial class SistemaPresencaDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260601222244_Update entities")]
+    partial class Updateentities
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -33,9 +36,14 @@ namespace SistemaPresenca.Infrastructure.Migrations
                     b.Property<DateTime?>("RegisteredAt")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<Guid?>("SessionId1")
+                        .HasColumnType("uuid");
+
                     b.HasKey("StudentId", "SessionId");
 
                     b.HasIndex("SessionId");
+
+                    b.HasIndex("SessionId1");
 
                     b.ToTable("Attendances", (string)null);
                 });
@@ -235,10 +243,14 @@ namespace SistemaPresenca.Infrastructure.Migrations
             modelBuilder.Entity("SistemaPresenca.Domain.Entities.Attendance", b =>
                 {
                     b.HasOne("SistemaPresenca.Domain.Entities.Session", "Session")
-                        .WithMany("Attendances")
+                        .WithMany()
                         .HasForeignKey("SessionId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.HasOne("SistemaPresenca.Domain.Entities.Session", null)
+                        .WithMany("Attendances")
+                        .HasForeignKey("SessionId1");
 
                     b.HasOne("SistemaPresenca.Domain.Entities.User", "Student")
                         .WithMany()

@@ -9,7 +9,7 @@ public class Session : BaseEntity
     public Subject Subject { get; set; }
     public Guid ProfessorId { get; set; }
     public User Professor { get; set; }
-    public IEnumerable<Attendance> Attendances { get; set; }
+    public List<Attendance> Attendances { get; set; }
 
     private Session() : base()
     {
@@ -21,5 +21,6 @@ public class Session : BaseEntity
         TotalLessons = totalLessons;
         SubjectId = subjectId;
         ProfessorId = professorId;
+        Attendances = [];
     }
 }

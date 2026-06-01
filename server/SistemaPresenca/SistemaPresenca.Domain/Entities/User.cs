@@ -11,6 +11,7 @@ public class User : BaseEntity
     public string? Cpf { get; set; }
     public string? TagId { get; set; }
     public UserRole Role { get; set; }
+    public List<Subject> Subjects { get; set; }
 
     private User() : base()
     {
@@ -25,5 +26,6 @@ public class User : BaseEntity
         Cpf = cpf;
         TagId = tagId;
         Role = role;
+        Subjects = [];
     }
 }
