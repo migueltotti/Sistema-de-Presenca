@@ -10,6 +10,7 @@ public static class RepositoriesExtension
     {
         services.AddScoped<ISessionRepository, SessionRepository>();
         services.AddScoped<ISubjectRepository, SubjectRepository>();
+        services.AddScoped<IUserRepository, UserRepository>();
 
         return services;
     }

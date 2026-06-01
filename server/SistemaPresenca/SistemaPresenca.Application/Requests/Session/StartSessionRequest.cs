@@ -1,7 +1,7 @@
 ﻿namespace SistemaPresenca.Application.Requests.Session;
 
 public record StartSessionRequest(
-    Guid ProfessorId,
+    string ProfessorTagId,
     Guid SubjectId,
     int NumberOfClasses
 );
