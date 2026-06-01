@@ -1,6 +1,5 @@
 using Mattioli.Configurations.Extensions.Controllers;
 using Mattioli.Configurations.Extensions.Handlers;
-using SistemaPresenca.CrossCutting;
 using SistemaPresenca.CrossCutting.Extensions;
 using SistemaPresenca.CrossCutting.Models;
 

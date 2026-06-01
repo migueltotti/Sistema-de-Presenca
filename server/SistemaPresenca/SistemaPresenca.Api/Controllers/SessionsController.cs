@@ -7,8 +7,8 @@ using SistemaPresenca.Application.UseCases.Commands.Sessions;
 namespace SistemaPresenca.Api.Controllers;
 
 [ApiController]
-[Route("api/v1/session")]
-public class SessionController(ICommandMediator commandMediator) : ControllerBase
+[Route("api/v1/sessions")]
+public class SessionsController(ICommandMediator commandMediator) : ControllerBase
 {
     [HttpPost]
     public async Task<ActionResult<StartSessionResponse>> StartSessionAsync([FromBody] StartSessionRequest request, CancellationToken cancellationToken)

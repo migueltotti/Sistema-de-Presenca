@@ -1,9 +1,11 @@
 ﻿using LiteBus.Commands;
 using LiteBus.Extensions.Microsoft.DependencyInjection;
+using LiteBus.Queries;
 using Microsoft.Extensions.DependencyInjection;
 using SistemaPresenca.Application.UseCases.Commands.Sessions;
+using SistemaPresenca.Application.UseCases.Queries.Subjects;
 
-namespace SistemaPresenca.CrossCutting;
+namespace SistemaPresenca.CrossCutting.Extensions;
 
 public static class MediatorExtension
 {
@@ -13,6 +15,9 @@ public static class MediatorExtension
         {
             config.AddCommandModule(module => module
                 .RegisterFromAssembly(typeof(StartSessionCommand).Assembly));
+
+            config.AddQueryModule(module => module
+                .RegisterFromAssembly(typeof(GetProfessorSubjectsQuery).Assembly));
         });
     }
 }

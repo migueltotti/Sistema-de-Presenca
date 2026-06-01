@@ -9,6 +9,7 @@
 
   <ItemGroup>
 	  <PackageReference Include="LiteBus.Commands.Extensions.Microsoft.DependencyInjection" Version="5.0.0" />
+	  <PackageReference Include="LiteBus.Queries.Extensions.Microsoft.DependencyInjection" Version="5.0.0" />
 	  <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="10.0.8" />
 	  <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="10.0.8" />
 	  <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="10.0.8" />
