@@ -15,4 +15,14 @@ public static class SessionErrors
     public static Error AlreadyFinished => new(
         "SessionErrors.AlreadyFinished",
         "Session with provided id is already finished.");
+
+    public static Error StudentNotFound => new(
+        "SessionErrors.StudentNotFound",
+        "Student with provided tag id not found at session."
+    );
+
+    public static Error StudentAttendanceAlreadyRegistered => new(
+        "SessionErrors.StudentAttendanceAlreadyRegistered",
+        "Student with provided tag id already has attendance registered for this session."
+    );
 }

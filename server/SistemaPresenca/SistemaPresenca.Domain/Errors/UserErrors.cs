@@ -8,4 +8,9 @@ public static class UserErrors
         "UserErrors.ProfessorNotFound",
         "Professor with provided tag id not found."
     );
+
+    public static Error StudentNotFound => new(
+        "UserErrors.StudentNotFound",
+        "Student with provided tag id not found."
+    );
 }

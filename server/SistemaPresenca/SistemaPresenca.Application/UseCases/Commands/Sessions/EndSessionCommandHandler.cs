@@ -36,7 +36,7 @@ public sealed class EndSessionCommandHandler(
 
         session.FinalizedAt = DateTime.UtcNow;
 
-        await sessionRepository.Update(session, cancellationToken);
+        await sessionRepository.UpdateAsync(session, cancellationToken);
 
         logger.LogInformation("Session with id {SessionId} - finalized successfully", command.SessionId);
 

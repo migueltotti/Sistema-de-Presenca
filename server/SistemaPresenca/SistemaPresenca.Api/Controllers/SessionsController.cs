@@ -49,4 +49,17 @@ public class SessionsController(ICommandMediator commandMediator) : ControllerBa
 
         return Ok();
     }
+
+    [HttpPost("{id:guid}/attendance")]
+    public async Task<ActionResult> RegisterAttendanceAsync([FromRoute] Guid id, [FromBody] RegisterAttendanceRequest request, CancellationToken cancellationToken)
+    {
+        var result = await commandMediator.SendAsync(new RegisterAttendanceCommand(id, request.StudentTagId), cancellationToken);
+
+        if (result.IsFailure)
+        {
+            return BadRequest(result.Error);
+        }
+
+        return Ok();
+    }
 }

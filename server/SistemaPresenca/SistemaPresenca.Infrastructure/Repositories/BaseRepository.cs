@@ -29,7 +29,7 @@ public class BaseRepository<T>(SistemaPresencaDbContext context)
         await context.SaveChangesAsync(cancellationToken);
     }
 
-    public async Task Update(T entity, CancellationToken cancellationToken = default)
+    public async Task UpdateAsync(T entity, CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(entity);
 
@@ -38,7 +38,7 @@ public class BaseRepository<T>(SistemaPresencaDbContext context)
         await context.SaveChangesAsync(cancellationToken);
     }
 
-    public async Task Delete(T entity, CancellationToken cancellationToken = default)
+    public async Task DeleteAsync(T entity, CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(entity);
 
