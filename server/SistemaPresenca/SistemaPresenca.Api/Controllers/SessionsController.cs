@@ -36,4 +36,17 @@ public class SessionsController(ICommandMediator commandMediator) : ControllerBa
 
         return Ok();
     }
+
+    [HttpPost("{id:guid}/end")]
+    public async Task<ActionResult> EndSessionAsync([FromRoute] Guid id, [FromBody] EndSessionRequest request, CancellationToken cancellationToken)
+    {
+        var result = await commandMediator.SendAsync(new EndSessionCommand(id, request.ProfessorTagId), cancellationToken);
+
+        if (result.IsFailure)
+        {
+            return BadRequest(result.Error);
+        }
+
+        return Ok();
+    }
 }
