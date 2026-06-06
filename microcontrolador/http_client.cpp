@@ -30,7 +30,7 @@ bool fetchSubjects(const char* baseUrl, const String& professorUuid){
     if (!isWifiConnected()) return false;
 
     char url[150];
-    snprintf(url, sizeof(url), "%s/professor/%s/subjects", baseUrl, professorUuid.c_str());
+    snprintf(url, sizeof(url), "%s/subjects?professorTagId=%s", baseUrl, professorUuid.c_str());
     
     HTTPClient http;
     http.begin(url);
@@ -62,7 +62,7 @@ bool fetchSubjects(const char* baseUrl, const String& professorUuid){
                 if (totalSubjects >= MAX_SUBJECTS) break;  // evita overflow
 
                 subjects[totalSubjects].id   = subject["id"].as<String>();
-                subjects[totalSubjects].name = subject["Name"].as<String>();
+                subjects[totalSubjects].name = subject["name"].as<String>();
                 totalSubjects++;
             }
 
@@ -98,7 +98,7 @@ StartSessionResponse startSessionWithProfessorAndSubject(const char* baseUrl, co
     http.addHeader("Content-Type", "application/json");
 
     JsonDocument doc;
-    doc["professorId"] = professorUuid;
+    doc["professorTagId"] = professorUuid;
     doc["subjectId"]  = subjectUuid;
     doc["numberOfClasses"] = numberOfClasses;
 
@@ -150,7 +150,7 @@ ContinueSessionResponse continueSessionByProfessor(const char* baseUrl, const St
     http.addHeader("Content-Type", "application/json");
 
     JsonDocument doc;
-    doc["professorId"] = professorUuid;
+    doc["professorTagId"] = professorUuid;
 
     String body;
     serializeJson(doc, body);  // converte para string JSON
@@ -198,7 +198,7 @@ EndSessionResponse endSessionByProfessor(const char* baseUrl, const String& sess
     http.addHeader("Content-Type", "application/json");
 
     JsonDocument doc;
-    doc["professorId"] = professorUuid;
+    doc["professorTagId"] = professorUuid;
 
     String body;
     serializeJson(doc, body);  // converte para string JSON
@@ -247,7 +247,7 @@ RegisterAttendanceResponse registerAttendanceByStudent(const char* baseUrl, cons
     http.addHeader("Content-Type", "application/json");
 
     JsonDocument doc;
-    doc["studentId"] = studentUuid;
+    doc["studentTagId"] = studentUuid;
 
     String body;
     serializeJson(doc, body);  // converte para string JSON
