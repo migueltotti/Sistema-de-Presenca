@@ -28,7 +28,7 @@ app.MapOpenApi();
 app.UseSpecification();
 
 app
-    .UseHttpsRedirection()
+    //.UseHttpsRedirection()
     .UseAuthorization();
 
 app.MapControllers();
