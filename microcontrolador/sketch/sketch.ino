@@ -12,7 +12,7 @@
 #define BTN_CONFIRM 18
 #define BTN_CANCEL 19
 
-#define LED_BLUE 0
+#define LED_BLUE 15
 #define LED_GREEN 2
 #define LED_RED 4
 
@@ -25,9 +25,9 @@ enum AccessState {
   DENIED
 };
 
-const char* ssid     = "Wokwi-GUEST";  // rede virtual do Wokwi
-const char* password = "";              // sem senha
-const char* apiUrl = "https://jsonplaceholder.typicode.com/todos/1";
+const char* ssid     = "MIGUEL";  // rede virtual do Wokwi
+const char* password = "miguel2005";              // sem senha
+const char* apiUrl = "https://dizygotic-ethelene-elvishly.ngrok-free.dev/api/v1";
 
 bool sessionStarted = false;
 String sessionId = "";
@@ -74,14 +74,14 @@ void printTagUuidToConsole(){
 // ====== end: Console Print Methods ======
 
 // ====== begin: LEDs Methods ======
-void turnOfAllLeds() {
+void turnOffAllLeds() {
   digitalWrite(LED_BLUE, LOW);
   digitalWrite(LED_GREEN, LOW);
   digitalWrite(LED_RED, LOW);
 }
 
 void indicateStateWithLEDS(AccessState state){
-  turnOfAllLeds();
+  turnOffAllLeds();
 
   switch (state) {
     case VALIDATING:
@@ -221,8 +221,6 @@ int getNumberOfClassesFromProfessor() {
 }
 
 void startNewSession(){
-  indicateStateWithLEDS(VALIDATING);
-
   showReadingTagMessageToDisplay();
   printTagUuidToConsole();
 
@@ -233,19 +231,17 @@ void startNewSession(){
 
   bool fetchResult = fetchSubjects(apiUrl, professorUuid);
   if (!fetchResult) {
-    // apresentar mensagem de erro no LCD e voltar para tela inicial
     indicateStateWithLEDS(DENIED);  
     showProfessorNotFoundErrorMessageToDisplay();
     return;
   }
 
-  delay(1500); // simulando tempo de resposta do servidor
+  turnOffAllLeds();
 
   // apresenta as matérias no LCD e retorna escolha
   int selectedIndex = getProfessorSubjectSelection();
 
   if (selectedIndex == -1) {
-    turnOfAllLeds();
     return; // professor cancelou a escolha da matéria
   }
 
@@ -253,7 +249,7 @@ void startNewSession(){
   int numberOfClasses = getNumberOfClassesFromProfessor();
 
   if (numberOfClasses == -1) {
-    turnOfAllLeds();
+    lcd.clear();
     return; // professor cancelou a escolha do número de aulas
   }
 
@@ -265,16 +261,18 @@ void startNewSession(){
     sessionStarted = true;
     sessionId = classResponse.sessionId;
     saveSessionIdToNVS(sessionId);
+    showSessionStartedSuccessfullyMessageToDisplay();
     indicateStateWithLEDS(GRANTED);
     delay(1500);
-    turnOfAllLeds();
+    turnOffAllLeds();
   }
   else{
     sessionStarted = false;
-    indicateStateWithLEDS(DENIED);
+    sessionId = "";
     showSubjectNotFoundErrorMessageToDisplay();
+    indicateStateWithLEDS(DENIED);
     delay(1500);
-    turnOfAllLeds();
+    turnOffAllLeds();
   }
 }
 
@@ -301,13 +299,15 @@ void continueSession() {
   // aguardar confirmação no botão
   bool continueSession = getProfessorConfirmationToContinueSession();
 
-  if (!continueSession)
+  if (!continueSession){
+    lcd.clear();
     return;
+  }
 
   // mostra mensagem para professor aproximar a tag
   // aguardar aproximação da tag
   while (true) {
-    showApproachTagMessageToDisplay();
+    showApproachProfessorTagMessageToDisplay();
 
     while(!isButtonPressed(BTN_CANCEL) && (!rfid.PICC_IsNewCardPresent() || !rfid.PICC_ReadCardSerial())) {}
 
@@ -315,6 +315,7 @@ void continueSession() {
       delay(10);
       if(isButtonPressed(BTN_CANCEL)){
         while(isButtonPressed(BTN_CANCEL)){}
+        lcd.clear();
         return; // professor cancelou a ação de continuar a aula - volta para o loop principal
       }
     }
@@ -336,7 +337,7 @@ void continueSession() {
       sessionStarted = true;
       indicateStateWithLEDS(GRANTED);
       showSessionContinuedSuccessfullyMessageToDisplay();
-      turnOfAllLeds();
+      turnOffAllLeds();
       return;
     }
     else {
@@ -345,32 +346,32 @@ void continueSession() {
 
       if (continueSessionResponse.errorCode == WIFI_NOT_CONNECTED_ERROR) {
         showWifiNotConnectedErrorMessageToDisplay();
-        turnOfAllLeds();
+        turnOffAllLeds();
         return; // volta para o loop inicial
       }
       else if (continueSessionResponse.errorCode == REQUEST_ERROR) {
         showRequestErrorMessageToDisplay();
-        turnOfAllLeds();
+        turnOffAllLeds();
         return; // volta para o loop inicial
       }
       else if (continueSessionResponse.errorCode == "SessionErrors.NotFound"){ // Aula não encontrada - volta para o loop inicial
         showSessionNotFoundErrorMessageToDisplay();
-        turnOfAllLeds();
+        turnOffAllLeds();
         return; // volta para o loop inicial
       }
       else if (continueSessionResponse.errorCode == "ProfessorErrors.NotFound"){ // Professor não encontrado - aguarda tag novamente e mostra mensagem de erro no LCD
         showProfessorNotFoundErrorMessageToDisplay();
-        turnOfAllLeds();
+        turnOffAllLeds();
         // aguarda tag novamente e mostra mensagem de erro no LCD
       }
       else if (continueSessionResponse.errorCode == "SessionErrors.ProfessorMismatch"){ // Professor não iniciou a aula - aguarda tag novamente e mostra mensagem de erro no LCD
         showSessionProfessorMismatchErrorMessageToDisplay();
-        turnOfAllLeds();
+        turnOffAllLeds();
         // aguarda tag novamente e mostra mensagem de erro no LCD
       }
       else if (continueSessionResponse.errorCode == "SessionErrors.AlreadyFinished"){ // Aula já finalizada - volta para o loop inicial
         showSessionAlreadyFinishedErrorMessageToDisplay();
-        turnOfAllLeds();
+        turnOffAllLeds();
         return;// volta para o loop inicial
       }
     }
@@ -381,27 +382,36 @@ bool getProfessorConfirmationToEndSession() {
   delay(500);
   showConfirmEndSessionActionMessageToDisplay();
 
-  // Aguarda qualquer um dos dois botões ser pressionado
   while (!isButtonPressed(BTN_CONFIRM) && !isButtonPressed(BTN_CANCEL)) {}
 
-  // Identifica qual foi pressionado AGORA (ainda pressionado)
-  bool confirmed = isButtonPressed(BTN_CONFIRM);
+  if(isButtonPressed(BTN_CONFIRM)){
+    delay(10);
+    if(isButtonPressed(BTN_CONFIRM)){
+      while(isButtonPressed(BTN_CONFIRM)){}
+      return true;
+    }
+  }
 
-  // Aguarda soltar o botão antes de continuar (evita propagação)
-  while (isButtonPressed(BTN_CONFIRM) || isButtonPressed(BTN_CANCEL)) {}
+  if(isButtonPressed(BTN_CANCEL)){
+    delay(10);
+    if(isButtonPressed(BTN_CANCEL)){
+      while(isButtonPressed(BTN_CANCEL)){}
+      return false;
+    }
+  }
 
-  delay(50); // debounce após soltar
-
-  return confirmed;
+  return false;
 }
 
 void endSession(){
   // confirma ação da ação de finalizar a aula (CONFIRM - Finalizar, CANCEL - Cancelar)
   bool endSessionConfirmation = getProfessorConfirmationToEndSession();
 
-  if (!endSessionConfirmation)
+  if (!endSessionConfirmation){
+    lcd.clear();
     return;
-
+  }
+    
   while (true) {
     showApproachProfessorTagMessageToDisplay();
 
@@ -411,6 +421,7 @@ void endSession(){
       delay(10);
       if(isButtonPressed(BTN_CANCEL)){
         while(isButtonPressed(BTN_CANCEL)){}
+        lcd.clear();
         return; // professor cancelou a ação de finalizar a aula - volta para o loop principal
       }
     }
@@ -430,9 +441,10 @@ void endSession(){
     // volta para o loop inicial com a aula finalizada
     if (endSessionResponse.isSuccess) {
       sessionStarted = false;
+      removeSessionIdToNVS();
       indicateStateWithLEDS(GRANTED);
       showSessionEndedSuccessfullyMessageToDisplay();
-      turnOfAllLeds();
+      turnOffAllLeds();
       return;
     }
     else {
@@ -440,27 +452,27 @@ void endSession(){
 
       if (endSessionResponse.errorCode == WIFI_NOT_CONNECTED_ERROR) {
         showWifiNotConnectedErrorMessageToDisplay();
-        turnOfAllLeds();
+        turnOffAllLeds();
         return; // volta para o loop inicial
       }
       else if (endSessionResponse.errorCode == REQUEST_ERROR) {
         showRequestErrorMessageToDisplay();
-        turnOfAllLeds();
+        turnOffAllLeds();
         return; // volta para o loop inicial
       }
       else if (endSessionResponse.errorCode == "SessionErrors.NotFound"){ // Aula não encontrada - volta para o loop inicial
         showSessionNotFoundErrorMessageToDisplay();
-        turnOfAllLeds();
+        turnOffAllLeds();
         return; // volta para o loop inicial
       }
-      else if (endSessionResponse.errorCode == "ProfessorErrors.NotFound"){ // Professor não encontrado - aguarda tag novamente e mostra mensagem de erro no LCD
+      else if (endSessionResponse.errorCode == "UserErrors.ProfessorNotFound"){ // Professor não encontrado - aguarda tag novamente e mostra mensagem de erro no LCD
         showProfessorNotFoundErrorMessageToDisplay();
-        turnOfAllLeds();
+        turnOffAllLeds();
         // aguarda tag novamente e mostra mensagem de erro no LCD
       }
       else if (endSessionResponse.errorCode == "SessionErrors.ProfessorMismatch"){ // Professor não iniciou a aula - aguarda tag novamente e mostra mensagem de erro no LCD
         showSessionProfessorMismatchErrorMessageToDisplay();
-        turnOfAllLeds();
+        turnOffAllLeds();
         // aguarda tag novamente e mostra mensagem de erro no LCD
       }
     }
@@ -497,15 +509,18 @@ void registerStudentAttendance() {
     else if (registerAttendanceResponse.errorCode == "SessionErrors.AlreadyFinished"){
       showSessionAlreadyFinishedErrorMessageToDisplay();
     }
-    else if (registerAttendanceResponse.errorCode == "SessionErrors.StudentNotFound"){
+    else if (registerAttendanceResponse.errorCode == "UserErrors.StudentNotFound"){
       showStudentNotFoundErrorMessageToDisplay();
+    }
+    else if (registerAttendanceResponse.errorCode == "SessionErrors.StudentNotFound"){
+      showStudentNotFoundInSessionErrorMessageToDisplay();
     }
     else if (registerAttendanceResponse.errorCode == "SessionErrors.StudentAttendanceAlreadyRegistered"){
       showStudentAttendanceAlreadyRegisteredErrorMessageToDisplay();
     }
   }
 
-  turnOfAllLeds();
+  turnOffAllLeds();
 }
 // ====== end: UseCase Methods ======
 
@@ -514,14 +529,14 @@ void setup() {
   pinMode(LED_GREEN, OUTPUT);
   pinMode(LED_RED, OUTPUT);
 
-  pinMode(BTN_UP, INPUT); // pull-up externo
-  pinMode(BTN_DOWN, INPUT); // pull-up externo
-  pinMode(BTN_CONFIRM, INPUT); // pull-up externo
-  pinMode(BTN_CANCEL, INPUT); // pull-up externo
+  pinMode(BTN_UP, INPUT_PULLUP); // pull-up externo
+  pinMode(BTN_DOWN, INPUT_PULLUP); // pull-up externo
+  pinMode(BTN_CONFIRM, INPUT_PULLUP); // pull-up externo
+  pinMode(BTN_CANCEL, INPUT_PULLUP); // pull-up externo
   // botão pressionado = LOW
   // botão normal = HIGH
 
-  turnOfAllLeds();
+  turnOffAllLeds();
 
   lcdInit();
 
@@ -546,6 +561,25 @@ void loop() {
   
   bool newCard = rfid.PICC_IsNewCardPresent() && rfid.PICC_ReadCardSerial();
 
+  if (isButtonPressed(BTN_CONFIRM)){
+    Serial.println("Botão confirm pressionado!");
+  }
+
+  if (isButtonPressed(BTN_CANCEL)){
+    Serial.println("Botão cancel pressionado!");
+    indicateStateWithLEDS(DENIED); 
+    delay(500);
+    turnOffAllLeds();
+  }
+
+  if (isButtonPressed(BTN_UP)){
+    Serial.println("Botão up pressionado!");
+  }
+
+  if (isButtonPressed(BTN_DOWN)){
+    Serial.println("Botão down pressionado!");
+  }
+
   // processo que inicia aula se não existir uma ativa no microcontrolador.
   if (!sessionStarted){
     showStartOrContinueSessionMessageToDisplay();
@@ -553,6 +587,10 @@ void loop() {
     // incluir rotina de apertar botão para continuar aula.
     if (hasSessionStartedBefore() && confirmJustPressed){
       continueSession();
+
+      if (sessionStarted){
+        showApproachTagMessageToDisplay();
+      }
     }
 
     // tag aproximada do leitor para iniciar nova aula
@@ -568,6 +606,10 @@ void loop() {
     // verifica se quer terminar a aula pressionando botão CONFIRM
     if (sessionStarted && confirmJustPressed){
       endSession();
+
+      if (sessionStarted){
+        showApproachTagMessageToDisplay();
+      }
     }
 
     // tentar ler a tag do aluno
@@ -579,5 +621,5 @@ void loop() {
   }
 
   rfid.PICC_HaltA();
-  turnOfAllLeds();
+  turnOffAllLeds();
 }

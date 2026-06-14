@@ -1,8 +1,0 @@
-# Wokwi Library List
-# See https://docs.wokwi.com/guides/libraries
-
-MFRC522
-LiquidCrystal I2C
-HttpClient
-ArduinoJson
-Preferences

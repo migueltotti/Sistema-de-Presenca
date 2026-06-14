@@ -1,4 +1,7 @@
-#include "lcd_display.h"
+#ifndef LCD_DISPLAY_H
+#define LCD_DISPLAY_H
+
+#include <LiquidCrystal_I2C.h>
 
 #define I2C_ADDR 0x27
 #define LCD_COLUMNS 16
@@ -198,7 +201,7 @@ void printNumberOfClassesToDisplay(int numberOfClasses) {
 void showProfessorNotFoundErrorMessageToDisplay() {
   lcd.clear();
   lcd.setCursor(0, 0);
-  lcd.print(" Professor não  ");
+  lcd.print(" Professor nao  ");
   lcd.setCursor(0, 1);
   lcd.print("   encontrado   ");
 
@@ -211,10 +214,20 @@ void showProfessorNotFoundErrorMessageToDisplay() {
   delay(1500);
 }
 
+void showSessionStartedSuccessfullyMessageToDisplay() {
+  lcd.clear();
+  lcd.setCursor(0, 0);
+  lcd.print("Aula iniciada");
+  lcd.setCursor(0, 1);
+  lcd.print(" com sucesso ");
+
+  delay(1500);
+}
+
 void showSubjectNotFoundErrorMessageToDisplay() {
   lcd.clear();
   lcd.setCursor(0, 0);
-  lcd.print(" Disciplina não ");
+  lcd.print(" Disciplina nao ");
   lcd.setCursor(0, 1);
   lcd.print("   encontrada   ");
 
@@ -278,6 +291,8 @@ void showWifiNotConnectedErrorMessageToDisplay() {
   lcd.setCursor(0, 1);
   lcd.print("  NAO CONECTADO ");
 
+  delay(1000);
+
   lcd.clear();
   lcd.setCursor(0, 0);
   lcd.print("Tente novamente ");
@@ -292,6 +307,8 @@ void showRequestErrorMessageToDisplay() {
   lcd.setCursor(0, 1);
   lcd.print("     falhou     ");
 
+  delay(1000);
+
   lcd.clear();
   lcd.setCursor(0, 0);
   lcd.print("Tente novamente ");
@@ -302,9 +319,11 @@ void showRequestErrorMessageToDisplay() {
 void showSessionNotFoundErrorMessageToDisplay() {
   lcd.clear();
   lcd.setCursor(0, 0);
-  lcd.print("    Aula não    ");
+  lcd.print("    Aula nao    ");
   lcd.setCursor(0, 1);
   lcd.print("   encontrada   ");
+
+  delay(1000);
 
   lcd.clear();
   lcd.setCursor(0, 0);
@@ -316,9 +335,11 @@ void showSessionNotFoundErrorMessageToDisplay() {
 void showSessionProfessorMismatchErrorMessageToDisplay() {
   lcd.clear();
   lcd.setCursor(0, 0);
-  lcd.print(" Professor não  ");
+  lcd.print(" Professor nao  ");
   lcd.setCursor(0, 1);
   lcd.print(" iniciou a aula ");
+
+  delay(1000);
 
   lcd.clear();
   lcd.setCursor(0, 0);
@@ -330,9 +351,11 @@ void showSessionProfessorMismatchErrorMessageToDisplay() {
 void showSessionAlreadyFinishedErrorMessageToDisplay() {
   lcd.clear();
   lcd.setCursor(0, 0);
-  lcd.print("    Aula já     ");
+  lcd.print("    Aula ja     ");
   lcd.setCursor(0, 1);
   lcd.print("   terminada    ");
+
+  delay(1000);
 
   lcd.clear();
   lcd.setCursor(0, 0);
@@ -344,7 +367,7 @@ void showSessionAlreadyFinishedErrorMessageToDisplay() {
 void showAttendanceRegisteredSuccessfullyMessageToDisplay() {
   lcd.clear();
   lcd.setCursor(0, 0);
-  lcd.print("   Presença do  ");
+  lcd.print("   Presenca do  ");
   lcd.setCursor(0, 1);
   lcd.print("aluno registrada");
 
@@ -354,9 +377,27 @@ void showAttendanceRegisteredSuccessfullyMessageToDisplay() {
 void showStudentNotFoundErrorMessageToDisplay() {
   lcd.clear();
   lcd.setCursor(0, 0);
-  lcd.print("   Aluno não    ");
+  lcd.print("   Aluno nao    ");
   lcd.setCursor(0, 1);
   lcd.print("   encontrado   ");
+
+  delay(1000);
+
+  lcd.clear();
+  lcd.setCursor(0, 0);
+  lcd.print("Tente novamente ");
+
+  delay(1500);
+}
+
+void showStudentNotFoundInSessionErrorMessageToDisplay() {
+  lcd.clear();
+  lcd.setCursor(0, 0);
+  lcd.print(" Aluno nao esta ");
+  lcd.setCursor(0, 1);
+  lcd.print("  na disciplina ");
+
+  delay(1000);
 
   lcd.clear();
   lcd.setCursor(0, 0);
@@ -368,9 +409,11 @@ void showStudentNotFoundErrorMessageToDisplay() {
 void showStudentAttendanceAlreadyRegisteredErrorMessageToDisplay() {
   lcd.clear();
   lcd.setCursor(0, 0);
-  lcd.print("    Aluno já    ");
+  lcd.print("    Aluno ja    ");
   lcd.setCursor(0, 1);
   lcd.print(" possui presenca");
+
+  delay(1000);
 
   lcd.clear();
   lcd.setCursor(0, 0);
@@ -378,3 +421,5 @@ void showStudentAttendanceAlreadyRegisteredErrorMessageToDisplay() {
 
   delay(1500);
 }
+
+#endif

@@ -1,4 +1,7 @@
-#include "nvs_storage.h"
+#ifndef NVS_STORAGE_H
+#define NVS_STORAGE_H
+
+#include <Preferences.h>
 
 /* Instancia para lidar com operações de persistência de dados (NVS) */
 Preferences preferences;
@@ -21,3 +24,5 @@ void removeSessionIdToNVS() {
   preferences.remove("id");
   preferences.end();
 }
+
+#endif
