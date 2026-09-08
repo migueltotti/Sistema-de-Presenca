@@ -1,0 +1,68 @@
+===== Entidades =====
+- Administrador [Talvez juntar em uma classe usuário e colocar isso como uma Role] (já existe - remover lista de Disciplinas, tornar a senha e cpf obrigatório retirando o `?`)
+- Professor	[Talvez juntar em uma classe usuário e colocar isso como uma Role] (já existe - remover lista de Disciplinas, tornar a senha e cpf obrigatório retirando o `?`)
+- Aluno 	[Talvez juntar em uma classe usuário e colocar isso como uma Role] (já existe - remover lista de Disciplinas, tornar a senha e cpf obrigatório retirando o `?`)
+- Cursos	(já existe -  sem ajustes)
+- Disciplina	(já existe - Transformar a propriedade professor para Professores e ser uma lista)
+- Sessão	(já existe -  sem ajustes)
+- Sala		(não existe - Criar a entidade com as propriedades: Id:guid, Nome:string (102, LabMaker....), Localização:string (Bloco B por exemplo), Identificador Microcontrolador:string (algo como e_102) que pode ser gerada internamente que vamos usar para fazer a comunicação de mensageria entre o servidor central e o microcontrolador daquela sala específica - se achar que vai ser desnecessário, podemos usar o nome como base)
+- Permissões de Acesso (não existe - É uma Entidade Associativa que vai ligar Admin,Professor,Aluno 0..* --- 0..* Sala tendo as seguintes propriedades: Id:guid, Usuário:User, Data de Concessão:DateTime, Ativo:bool)
+- Registro de Acesso à Sala (não existe - com propriedades: id:guid, id da sala:guid, quem abriu:User, data de abertura:DateTime, quem fechou:User, data de fechamento:DateTime)
+
+===== Relacionamentos =====
+- Administrador cadastra todo mundo e ele mesmo
+- Disciplina 0..* --- 1 Curso
+- Professor 0..* --- 0..* Disciplinas
+- Aluno 0..* --- 0..* Disciplinas
+- Aluno 1..* --- 0..* Sessões ---> Presença [Entidade Associativa]
+- Professor 1 --- 0..* Sessões
+- Disciplina 1 --- 0..* Sessões
+- Professor, Administrador e Aluno 0..* --- 0..* Sala ---> Permissão de Acesso [Entidade Associativa]
+- Sala 1 --- 0..* Registros de Acesso à Sala
+- Professor, Administrador e Aluno 1..2 --- 0..* Registros de Acesso à Sala
+
+===== Casos de Uso =====
+
+=== Administrador/Professor/Aluno ===
+- Cadastar	(não existe - validar se o usuário que está fazendo a requisição é Admin)
+- Atualizar 	(não existe - pesquisar para usar JsonPatchDocument para infos mais simples)
+- Buscar	(não existe - add filtros por id, nome, id da tag)
+- Remover 	(não existe - SoftDelete)
+
+=== Curso ===
+- Cadastar	(não existe - validar se o usuário que está fazendo a requisição é Admin)
+- Atualizar 	(não existe - pesquisar para usar JsonPatchDocument para infos mais simples)
+- Buscar	(não existe - add filtros por id, nome, codigo)
+- Remover 	(não existe - SoftDelete)
+
+=== Disciplina ===
+- Cadastar	(não existe - validar se o usuário que está fazendo a requisição é Admin)
+- Atualizar 	(não existe - pesquisar para usar JsonPatchDocument para infos mais simples)
+- Buscar	(não existe - add filtros por id, nome, codigo, id do curso)
+- Remover 	(não existe - SoftDelete)
+
+=== Sala ===
+- Cadastar	(não existe - validar se o usuário que está fazendo a requisição é Admin)
+- Atualizar 	(não existe - pesquisar para usar JsonPatchDocument para infos mais simples)
+- Buscar	(não existe - add filtros por id, nome, localização)
+- Remover 	(não existe - SoftDelete)
+- Add permissão de acesso (não existe - criar um registro da entidade de associação entre Admin/Professor/Aluno - Sala)
+- Remover permissão de acesso (não existe - criar um registro da entidade de associação entre Admin/Professor/Aluno - Sala)
+- Ativar/Desativar permissão de acesso (não existe)
+- Abrir/Fechar sala (não existe - buscar nas permissões do usuário que faz a requisição se ele pode realizar a ação e registrar o acesso)
+
+=== Sessão ===
+- Continuar Sessão/Aula (já existe - modificar para usar mensageria servidor-microcontrolador)
+- Finalizar Sessão/Aula (já existe - modificar para usar mensageria servidor-microcontrolador)
+- Iniciar Sessão/Aula	(já existe - modificar para usar mensageria servidor-microcontrolador)
+- Registrar presença do aluno (já existe - sem modificações)
+
+=== Microcontrolador ===
+Precisamos modificar como o Código do microcontrolador está escrito para separar em Tasks e utilizarr os dois nucleos. 
+- O nucleo 0 é mais potente e vamos utilizarr para fazer as comunicações web HTTP e tbm mensageria.
+- O nucelo 1 será usado para os leitores, displays, botões e leds pois são operações menos custosas para o esp.
+
+- Continuar Sessão/Aula (já existe - modificar para iniciar essa rotina via mensageria)
+- Finalizar Sessão/Aula (já existe - modificar para iniciar essa rotina via mensageria)
+- Iniciar Sessão/Aula	(já existe - modificar para iniciar essa rotina via mensageria)
+- Abrir/Fechar Sala 	(não existe - iniciar essa rotina via mensageria)
