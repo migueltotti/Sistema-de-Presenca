@@ -8,9 +8,10 @@ public static class RepositoriesExtension
 {
     public static IServiceCollection AddRepositories(this IServiceCollection services)
     {
-        services.AddScoped<ISessionRepository, SessionRepository>();
-        services.AddScoped<ISubjectRepository, SubjectRepository>();
         services.AddScoped<IUserRepository, UserRepository>();
+        services.AddScoped<IMajorRepoitory, MajorRepoitory>();
+        services.AddScoped<ISubjectRepository, SubjectRepository>();
+        services.AddScoped<ISessionRepository, SessionRepository>();
 
         return services;
     }

@@ -8,6 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+	  <PackageReference Include="FluentValidation.DependencyInjectionExtensions" Version="12.1.1" />
 	  <PackageReference Include="LiteBus.Commands.Extensions.Microsoft.DependencyInjection" Version="6.0.2" />
 	  <PackageReference Include="LiteBus.Queries.Extensions.Microsoft.DependencyInjection" Version="6.0.2" />
 	  <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="10.0.12" />
@@ -15,6 +16,7 @@
 	  <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="10.0.12" />
 	  <PackageReference Include="Scalar.AspNetCore" Version="2.17.3" />
 	  <PackageReference Include="Scalar.AspNetCore.Microsoft" Version="2.17.3" />
+	  <PackageReference Include="SharpGrip.FluentValidation.AutoValidation.Mvc" Version="2.0.0" />
   </ItemGroup>
 
   <ItemGroup>

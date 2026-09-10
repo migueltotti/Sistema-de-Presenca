@@ -18,6 +18,7 @@ builder.Services
     .AddDatabase(applicationSettings.PostgresSettings)
     .AddRepositories()
     .AddMediator()
+    .AddValidators()
     .AddApiSpecification()
     .AddEndpointsApiExplorer();
 
