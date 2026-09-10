@@ -6,6 +6,10 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+	<PropertyGroup>
+		<NoWarn>CA1873</NoWarn>
+	</PropertyGroup>
+
   <ItemGroup>
     <PackageReference Include="LiteBus.Commands.Abstractions" Version="6.0.2" />
     <PackageReference Include="LiteBus.Queries.Abstractions" Version="6.0.2" />
