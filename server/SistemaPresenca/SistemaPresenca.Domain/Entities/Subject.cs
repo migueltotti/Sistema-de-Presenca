@@ -7,10 +7,9 @@ public class Subject : BaseEntity
     public int TotalClasses { get; set; }
     public Guid MajorId { get; set; }
     public Major Major { get; set; }
-    public Guid? ProfessorId { get; set; }
-    public User? Professor { get; set; }
+    public IEnumerable<Guid> ProfessorIds { get; set; }
+    public IEnumerable<User> Professors { get; set; }
     public IEnumerable<User> Students { get; set; }
-    public IEnumerable<Session> Sessions { get; set; }
 
     private Subject() : base()
     {
@@ -22,7 +21,7 @@ public class Subject : BaseEntity
         Code = code;
         TotalClasses = totalClasses;
         MajorId = majorId;
+        Professors = [];
         Students = [];
-        Sessions = [];
     }
 }

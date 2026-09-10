@@ -6,5 +6,5 @@ public sealed record GetSubsjectResponse(
     string Code,
     int TotalClasses,
     Guid MajorId,
-    Guid? ProfessorId
+    IEnumerable<Guid>? ProfessorIds
 );

@@ -14,7 +14,7 @@ public static class SubjectMapper
             subject.Code,
             subject.TotalClasses,
             subject.MajorId,
-            subject.ProfessorId
+            subject.ProfessorIds
         );  
     }
 }

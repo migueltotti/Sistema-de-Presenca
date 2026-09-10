@@ -31,7 +31,7 @@ public class StartSessionCommandHandler(
             return Result<StartSessionResponse>.Failure(UserErrors.ProfessorNotFound);
         }
 
-        if (!subject.ProfessorId.Equals(professor.Id))
+        if (!subject.ProfessorIds.Contains(professor.Id))
         {
             logger.LogError("Professor {ProfessorId} does not teach the provided Subject {SubjectId}", professor.Id, subject.Id);
             return Result<StartSessionResponse>.Failure(SubjectErrors.ProfessorMismatch);

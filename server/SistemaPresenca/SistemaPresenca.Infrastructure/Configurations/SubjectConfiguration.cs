@@ -30,10 +30,13 @@ public class SubjectConfiguration : BaseEntityConfiguration<Subject>
             .HasForeignKey(s => s.MajorId)
             .OnDelete(DeleteBehavior.Cascade);
 
-        builder.HasOne(s => s.Professor)
+        builder.HasMany(s => s.Professors)
             .WithMany()
-            .HasForeignKey(s => s.ProfessorId)
-            .OnDelete(DeleteBehavior.SetNull);
+            .UsingEntity("SubjectProfessors");
+
+        builder.HasMany(s => s.Students)
+            .WithMany()
+            .UsingEntity("SubjectStudents");
 
         builder.HasIndex(s => s.Code)
             .IsUnique();

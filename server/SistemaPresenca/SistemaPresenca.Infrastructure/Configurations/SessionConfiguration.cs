@@ -23,7 +23,7 @@ public class SessionConfiguration : BaseEntityConfiguration<Session>
 
         
         builder.HasOne(s => s.Subject)
-            .WithMany(sub => sub.Sessions)
+            .WithMany()
             .HasForeignKey(s => s.SubjectId)
             .OnDelete(DeleteBehavior.Cascade);
 

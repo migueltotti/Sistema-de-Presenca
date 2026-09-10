@@ -22,6 +22,7 @@ public class UserConfiguration : BaseEntityConfiguration<User>
             .HasMaxLength(200);
 
         builder.Property(u => u.Password)
+            .IsRequired()
             .HasMaxLength(200);
 
         builder.Property(u => u.RegistrationId)
@@ -29,12 +30,14 @@ public class UserConfiguration : BaseEntityConfiguration<User>
             .HasMaxLength(10);
 
         builder.Property(u => u.Cpf)
+            .IsRequired()
             .HasMaxLength(11);
 
         builder.Property(u => u.TagId)
             .HasMaxLength(50);
 
         builder.Property(u => u.Role)
+            .IsRequired()
             .HasConversion<string>();
 
 
@@ -45,9 +48,6 @@ public class UserConfiguration : BaseEntityConfiguration<User>
             .IsUnique();
 
         builder.HasIndex(u => u.RegistrationId)
-            .IsUnique();
-
-        builder.HasIndex(u => u.TagId)
             .IsUnique();
     }
 }

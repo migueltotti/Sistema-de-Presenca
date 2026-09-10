@@ -19,7 +19,7 @@ public class SubjectRepository(SistemaPresencaDbContext context) : BaseRepositor
     {
         return await context.Subjects
            .AsNoTracking()
-           .Where(x => x.ProfessorId == professorId)
+           .Where(x => x.ProfessorIds.Contains(professorId))
            .ToListAsync(cancellationToken);
     }
 }
