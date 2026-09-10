@@ -7,8 +7,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="LiteBus.Commands.Abstractions" Version="5.0.0" />
-    <PackageReference Include="LiteBus.Queries.Abstractions" Version="5.0.0" />
+    <PackageReference Include="LiteBus.Commands.Abstractions" Version="6.0.2" />
+    <PackageReference Include="LiteBus.Queries.Abstractions" Version="6.0.2" />
   </ItemGroup>
 
   <ItemGroup>
