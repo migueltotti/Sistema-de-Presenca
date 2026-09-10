@@ -16,7 +16,7 @@ public sealed class GetProfessorSubjectsQueryHandler(
 {
     public async Task<Result<IEnumerable<GetSubsjectResponse>>> HandleAsync(GetProfessorSubjectsQuery query, CancellationToken cancellationToken = default)
     {
-        var professor = await userRepository.GetAsync(x => x.TagId == query.ProfessorTagId && x.Role == UserRole.Professor, cancellationToken);
+        var professor = await userRepository.GetOneAsync(x => x.TagId == query.ProfessorTagId && x.Role == UserRole.Professor, cancellationToken);
         if (professor is null)
         {
             logger.LogError("Professor with tagId {ProfessorTagId} - not found", query.ProfessorTagId);

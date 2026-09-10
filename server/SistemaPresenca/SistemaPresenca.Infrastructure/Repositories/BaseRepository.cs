@@ -8,7 +8,7 @@ namespace SistemaPresenca.Infrastructure.Repositories;
 public class BaseRepository<T>(SistemaPresencaDbContext context)
     : IBaseRepository<T> where T : class
 {
-    public async Task<T?> GetAsync(Expression<Func<T, bool>> expression, CancellationToken cancellationToken = default)
+    public async Task<T?> GetOneAsync(Expression<Func<T, bool>> expression, CancellationToken cancellationToken = default)
     {
         return await context.Set<T>()
             .AsNoTracking()

@@ -24,7 +24,7 @@ public class StartSessionCommandHandler(
             return Result<StartSessionResponse>.Failure(SubjectErrors.NotFound);
         }
 
-        var professor = await userRepository.GetAsync(x => x.TagId == command.Request.ProfessorTagId && x.Role == UserRole.Professor, cancellationToken);
+        var professor = await userRepository.GetOneAsync(x => x.TagId == command.Request.ProfessorTagId && x.Role == UserRole.Professor, cancellationToken);
         if (professor is null)
         {
             logger.LogError("Professor with tagId {ProfessorTagId} - not found", command.Request.ProfessorTagId);

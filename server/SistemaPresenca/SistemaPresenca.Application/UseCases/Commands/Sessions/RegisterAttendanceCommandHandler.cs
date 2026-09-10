@@ -27,7 +27,7 @@ public sealed class RegisterAttendanceCommandHandler(
             return Result.Failure(SessionErrors.AlreadyFinished);
         }
 
-        var student = await userRepository.GetAsync(x => x.TagId == command.StudentTagId && x.Role == UserRole.Student, cancellationToken);
+        var student = await userRepository.GetOneAsync(x => x.TagId == command.StudentTagId && x.Role == UserRole.Student, cancellationToken);
         if (student is null)
         {
             logger.LogError("Student with tagId {StudentTagId} - not found", command.StudentTagId);
