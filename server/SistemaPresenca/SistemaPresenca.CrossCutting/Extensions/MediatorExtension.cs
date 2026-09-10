@@ -1,5 +1,6 @@
 ﻿using LiteBus.Commands;
 using LiteBus.Extensions.Microsoft.DependencyInjection;
+using LiteBus.Messaging;
 using LiteBus.Queries;
 using Microsoft.Extensions.DependencyInjection;
 using SistemaPresenca.Application.UseCases.Commands.Sessions;
@@ -13,10 +14,12 @@ public static class MediatorExtension
     {
         return services.AddLiteBus(config =>
         {
-            config.AddCommandModule(module => module
+            config.AddMessaging(_ => { });
+
+            config.AddCommands(module => module
                 .RegisterFromAssembly(typeof(StartSessionCommand).Assembly));
 
-            config.AddQueryModule(module => module
+            config.AddQueries(module => module
                 .RegisterFromAssembly(typeof(GetProfessorSubjectsQuery).Assembly));
         });
     }

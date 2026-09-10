@@ -1,4 +1,4 @@
-﻿using Mattioli.Configurations.Models;
+﻿using SistemaPresenca.Domain.Models;
 
 namespace SistemaPresenca.Domain.Errors;
 

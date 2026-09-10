@@ -1,5 +1,5 @@
-using Mattioli.Configurations.Extensions.Controllers;
-using Mattioli.Configurations.Extensions.Handlers;
+using SistemaPresenca.Api.Extensions;
+using SistemaPresenca.Api.Handlers;
 using SistemaPresenca.CrossCutting.Extensions;
 using SistemaPresenca.CrossCutting.Models;
 
@@ -10,7 +10,6 @@ var applicationSettings = builder.Configuration.GetApplicationSettings(builder.E
 builder.Services
     .AddSingleton<ISettings>(applicationSettings)
     .AddControllers(ControllerExtensions.ConfigureMvcOptions)
-    .AddNewtonsoftJson(ControllerExtensions.ConfigureNewtonsoftJson)
     .ConfigureApiBehaviorOptions(ControllerExtensions.ConfigureApiBehaviorOptions);
 
 builder.Services

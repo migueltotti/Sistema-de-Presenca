@@ -1,9 +1,9 @@
 ﻿using LiteBus.Commands.Abstractions;
-using Mattioli.Configurations.Models;
 using Microsoft.Extensions.Logging;
 using SistemaPresenca.Domain.Enums;
 using SistemaPresenca.Domain.Errors;
 using SistemaPresenca.Domain.Interfaces.Repositories;
+using SistemaPresenca.Domain.Models;
 
 namespace SistemaPresenca.Application.UseCases.Commands.Sessions;
 

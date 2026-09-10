@@ -9,6 +9,7 @@
   <ItemGroup>
     <PackageReference Include="LiteBus.Commands.Abstractions" Version="6.0.2" />
     <PackageReference Include="LiteBus.Queries.Abstractions" Version="6.0.2" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="10.0.12" />
   </ItemGroup>
 
   <ItemGroup>

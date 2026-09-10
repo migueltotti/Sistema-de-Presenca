@@ -1,5 +1,5 @@
 ﻿using LiteBus.Commands.Abstractions;
-using Mattioli.Configurations.Models;
+using SistemaPresenca.Domain.Models;
 using SistemaPresenca.Application.Requests.Session;
 using SistemaPresenca.Application.Responses.Session;
 

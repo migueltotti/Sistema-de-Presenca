@@ -1,5 +1,4 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using MongoDB.Bson;
 using SistemaPresenca.Domain.Entities;
 using SistemaPresenca.Domain.Interfaces.Repositories;
 using SistemaPresenca.Infrastructure.Context;

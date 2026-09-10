@@ -1,5 +1,5 @@
 ﻿using LiteBus.Queries.Abstractions;
-using Mattioli.Configurations.Models;
+using SistemaPresenca.Domain.Models;
 using SistemaPresenca.Application.Responses.Subjects;
 
 namespace SistemaPresenca.Application.UseCases.Queries.Subjects;

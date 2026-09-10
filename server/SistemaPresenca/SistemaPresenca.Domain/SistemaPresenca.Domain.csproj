@@ -6,8 +6,4 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
-  <ItemGroup>
-    <PackageReference Include="Mattioli.Configurations" Version="1.70.0" />
-  </ItemGroup>
-
 </Project>
