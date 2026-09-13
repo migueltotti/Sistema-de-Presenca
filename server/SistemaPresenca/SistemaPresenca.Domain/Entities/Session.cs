@@ -22,5 +22,7 @@ public class Session : BaseEntity
         SubjectId = subjectId;
         ProfessorId = professorId;
         Attendances = [];
+        Subject = default!;
+        Professor = default!;
     }
 }

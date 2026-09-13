@@ -21,6 +21,8 @@ public class Subject : BaseEntity
         Code = code;
         TotalClasses = totalClasses;
         MajorId = majorId;
+        Major = default!;
+        ProfessorIds = [];
         Professors = [];
         Students = [];
     }
