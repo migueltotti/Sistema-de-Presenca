@@ -20,7 +20,9 @@ public static class MajorMappers
         return new GetMajorsResponse(
             major.Id,
             major.Name,
-            major.Code
+            major.Code,
+            major.CreatedAt,
+            major.CreatedByAdminId
         );
     }
 }
