@@ -1,4 +1,5 @@
 ﻿using SistemaPresenca.Application.Requests.Majors;
+using SistemaPresenca.Application.Responses.Majors;
 using SistemaPresenca.Domain.Entities;
 
 namespace SistemaPresenca.Application.Mappers;
@@ -11,6 +12,15 @@ public static class MajorMappers
             request.Name,
             request.Code,
             Guid.Parse("95934e86-cda1-44d0-831c-0aa42892650c")
+        );
+    }
+
+    public static GetMajorsResponse ToResponse(this Major major)
+    {
+        return new GetMajorsResponse(
+            major.Id,
+            major.Name,
+            major.Code
         );
     }
 }
