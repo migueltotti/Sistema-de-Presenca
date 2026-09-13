@@ -38,11 +38,17 @@ public class BaseRepository<T>(SistemaPresencaDbContext context)
         await context.SaveChangesAsync(cancellationToken);
     }
 
-    public async Task DeleteAsync(T entity, CancellationToken cancellationToken = default)
+    public async Task DeleteAsync(T entity, Guid adminId, CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(entity);
 
-        context.Set<T>().Remove(entity);
+        var deletedAtProperty = entity.GetType().GetProperty("DeletedAt");
+        deletedAtProperty?.SetValue(entity, DateTime.UtcNow);
+
+        var deletedByAdminIdProperty = entity.GetType().GetProperty("DeletedByAdminId");
+        deletedByAdminIdProperty?.SetValue(entity, adminId);
+
+        context.Set<T>().Update(entity);
 
         await context.SaveChangesAsync(cancellationToken);
     }

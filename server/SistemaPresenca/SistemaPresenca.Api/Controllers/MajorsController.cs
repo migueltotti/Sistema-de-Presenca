@@ -56,4 +56,20 @@ public sealed class MajorsController(ICommandMediator commandMediator) : Control
 
         return Created();
     }
+
+    [HttpDelete("{id:guid}")]
+    [ProducesResponseType(typeof(void), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(Error), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
+    public async Task<IActionResult> DeleteMajorAsync([FromRoute] Guid id, CancellationToken cancellationToken)
+    {
+        var result = await commandMediator.SendAsync(new DeleteMajorCommand(id), cancellationToken);
+
+        if (result.IsFailure)
+        {
+            return NotFound(result.Error);
+        }
+
+        return Ok();
+    }
 }
