@@ -15,6 +15,19 @@ public static class MajorMappers
         );
     }
 
+    public static Major ToEntity(this GetMajorsResponse response)
+    {
+        return new Major(
+            response.Name,
+            response.Code,
+            response.CreatedByAdminId
+        )
+        {
+            Id = response.Id,
+            CreatedAt = response.CreatedAt
+        };
+    }
+
     public static GetMajorsResponse ToResponse(this Major major)
     {
         return new GetMajorsResponse(
