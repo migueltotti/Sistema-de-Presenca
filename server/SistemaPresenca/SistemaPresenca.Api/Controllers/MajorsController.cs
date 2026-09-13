@@ -23,9 +23,9 @@ public sealed class MajorsController(ICommandMediator commandMediator) : Control
     }
 
     [HttpPost]
-    [ProducesResponseType(StatusCodes.Status201Created)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    [ProducesResponseType(typeof(void), StatusCodes.Status201Created)]
+    [ProducesResponseType(typeof(Error), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> CreateMajorAsync([FromBody] CreateMajorRequest request, CancellationToken cancellationToken)
     {
         var result = await commandMediator.SendAsync(new CreateMajorsCommand(request), cancellationToken);
