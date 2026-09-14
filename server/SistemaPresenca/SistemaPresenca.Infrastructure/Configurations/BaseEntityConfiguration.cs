@@ -16,9 +16,20 @@ public class BaseEntityConfiguration<T> : IEntityTypeConfiguration<T> where T : 
         builder.Property(x => x.CreatedByAdminId)
             .IsRequired(false);
 
+        builder.Property(x => x.DeletedAt)
+            .IsRequired(false);
+
+        builder.Property(x => x.DeletedByAdminId)
+            .IsRequired(false);
+
         builder.HasOne(x => x.CreatedByAdmin)
             .WithMany()
             .HasForeignKey(x => x.CreatedByAdminId)
+            .OnDelete(DeleteBehavior.ClientNoAction);
+
+        builder.HasOne(x => x.DeletedByAdmin)
+            .WithMany()
+            .HasForeignKey(x => x.DeletedByAdminId)
             .OnDelete(DeleteBehavior.ClientNoAction);
     }
 }
