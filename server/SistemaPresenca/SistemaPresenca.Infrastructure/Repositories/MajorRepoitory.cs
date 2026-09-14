@@ -16,6 +16,7 @@ public class MajorRepoitory(SistemaPresencaDbContext context) : BaseRepository<M
         return await _context.Majors
             .AsQueryable()
             .AsNoTracking()
+            .ApplyOnlyActiveEntitiesFilter()
             .FilterMajors(filters)
             .ToListAsync(cancellationToken: cancellationToken);
     }

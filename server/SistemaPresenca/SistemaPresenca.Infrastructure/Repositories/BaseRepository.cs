@@ -1,23 +1,29 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using SistemaPresenca.Domain.Entities;
 using SistemaPresenca.Domain.Interfaces.Repositories;
 using SistemaPresenca.Infrastructure.Context;
+using SistemaPresenca.Infrastructure.Stages;
 using System.Linq.Expressions;
 
 namespace SistemaPresenca.Infrastructure.Repositories;
 
 public class BaseRepository<T>(SistemaPresencaDbContext context)
-    : IBaseRepository<T> where T : class
+    : IBaseRepository<T> where T : BaseEntity
 {
     public async Task<T?> GetOneAsync(Expression<Func<T, bool>> expression, CancellationToken cancellationToken = default)
     {
         return await context.Set<T>()
             .AsNoTracking()
+            .ApplyOnlyActiveEntitiesFilter()
             .FirstOrDefaultAsync(expression, cancellationToken);
     }
 
     public async Task<IEnumerable<T>> GetAllAsync(CancellationToken cancellationToken = default)
     {
-        return await context.Set<T>().ToListAsync(cancellationToken);
+        return await context.Set<T>()
+            .AsNoTracking()
+            .ApplyOnlyActiveEntitiesFilter()
+            .ToListAsync(cancellationToken);
     }
 
     public async Task AddAsync(T entity, CancellationToken cancellationToken = default)
@@ -42,11 +48,8 @@ public class BaseRepository<T>(SistemaPresencaDbContext context)
     {
         ArgumentNullException.ThrowIfNull(entity);
 
-        var deletedAtProperty = entity.GetType().GetProperty("DeletedAt");
-        deletedAtProperty?.SetValue(entity, DateTime.UtcNow);
-
-        var deletedByAdminIdProperty = entity.GetType().GetProperty("DeletedByAdminId");
-        deletedByAdminIdProperty?.SetValue(entity, adminId);
+        entity.DeletedAt = DateTime.UtcNow;
+        entity.DeletedByAdminId = adminId;
 
         context.Set<T>().Update(entity);
 
