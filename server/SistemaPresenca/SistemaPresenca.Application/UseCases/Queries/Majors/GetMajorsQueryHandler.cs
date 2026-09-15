@@ -1,4 +1,4 @@
-﻿using LiteBus.Commands.Abstractions;
+﻿using LiteBus.Queries.Abstractions;
 using SistemaPresenca.Application.Mappers;
 using SistemaPresenca.Application.Responses.Majors;
 using SistemaPresenca.Domain.Filters;
@@ -6,9 +6,9 @@ using SistemaPresenca.Domain.Interfaces.Repositories;
 
 namespace SistemaPresenca.Application.UseCases.Queries.Majors;
 
-public sealed class GetMajorsCommandHandler(IMajorRepository majorRepoitory) : ICommandHandler<GetMajorsCommand, IEnumerable<GetMajorsResponse>>
+public sealed class GetMajorsQueryHandler(IMajorRepository majorRepoitory) : IQueryHandler<GetMajorsQuery, IEnumerable<GetMajorsResponse>>
 {
-    public async Task<IEnumerable<GetMajorsResponse>> HandleAsync(GetMajorsCommand message, CancellationToken cancellationToken = default)
+    public async Task<IEnumerable<GetMajorsResponse>> HandleAsync(GetMajorsQuery message, CancellationToken cancellationToken = default)
     {
         var filter = new MajorFilters.Builder()
             .WithIds(message.Request.Ids)

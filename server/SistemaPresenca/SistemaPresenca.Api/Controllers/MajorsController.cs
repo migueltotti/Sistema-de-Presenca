@@ -1,4 +1,5 @@
 ﻿using LiteBus.Commands.Abstractions;
+using LiteBus.Queries.Abstractions;
 using Microsoft.AspNetCore.JsonPatch.SystemTextJson;
 using Microsoft.AspNetCore.Mvc;
 using SistemaPresenca.Application.Requests.Majors;
@@ -12,14 +13,14 @@ namespace SistemaPresenca.Api.Controllers;
 
 [ApiController]
 [Route("api/v1/majors")]
-public sealed class MajorsController(ICommandMediator commandMediator) : ControllerBase
+public sealed class MajorsController(ICommandMediator commandMediator, IQueryMediator queryMediator) : ControllerBase
 {
     [HttpGet]
     [ProducesResponseType(typeof(IEnumerable<GetMajorsResponse>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> GetMajorsAsync([FromQuery] GetMajorsRequest request, CancellationToken cancellationToken)
     {
-        var result = await commandMediator.SendAsync(new GetMajorsCommand(request), cancellationToken);
+        var result = await queryMediator.QueryAsync(new GetMajorsQuery(request), cancellationToken);
 
         return Ok(result);
     }
