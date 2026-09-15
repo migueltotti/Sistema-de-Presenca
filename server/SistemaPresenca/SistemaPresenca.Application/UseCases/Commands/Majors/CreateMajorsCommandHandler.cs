@@ -8,7 +8,7 @@ using SistemaPresenca.Domain.Models;
 namespace SistemaPresenca.Application.UseCases.Commands.Majors;
 
 public sealed class CreateMajorsCommandHandler(
-    IMajorRepoitory majorRepository,
+    IMajorRepository majorRepository,
     ILogger<CreateMajorsCommandHandler> logger) : ICommandHandler<CreateMajorsCommand, Result>
 {
     public async Task<Result> HandleAsync(CreateMajorsCommand command, CancellationToken cancellationToken = default)

@@ -7,7 +7,7 @@ using SistemaPresenca.Infrastructure.Stages;
 
 namespace SistemaPresenca.Infrastructure.Repositories;
 
-public class MajorRepoitory(SistemaPresencaDbContext context) : BaseRepository<Major>(context), IMajorRepoitory
+public class MajorRepository(SistemaPresencaDbContext context) : BaseRepository<Major>(context), IMajorRepository
 {
     private readonly SistemaPresencaDbContext _context = context;
 

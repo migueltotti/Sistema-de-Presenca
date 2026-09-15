@@ -7,7 +7,7 @@ using SistemaPresenca.Domain.Models;
 namespace SistemaPresenca.Application.UseCases.Commands.Majors;
 
 public sealed class DeleteMajorCommandHandler(
-    IMajorRepoitory majorRepoitory,
+    IMajorRepository majorRepoitory,
     ILogger<DeleteMajorCommandHandler> logger) : ICommandHandler<DeleteMajorCommand, Result>
 {
     public async Task<Result> HandleAsync(DeleteMajorCommand command, CancellationToken cancellationToken = default)

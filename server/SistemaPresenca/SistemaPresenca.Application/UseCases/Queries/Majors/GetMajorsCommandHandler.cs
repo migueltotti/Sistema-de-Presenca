@@ -6,7 +6,7 @@ using SistemaPresenca.Domain.Interfaces.Repositories;
 
 namespace SistemaPresenca.Application.UseCases.Queries.Majors;
 
-public sealed class GetMajorsCommandHandler(IMajorRepoitory majorRepoitory) : ICommandHandler<GetMajorsCommand, IEnumerable<GetMajorsResponse>>
+public sealed class GetMajorsCommandHandler(IMajorRepository majorRepoitory) : ICommandHandler<GetMajorsCommand, IEnumerable<GetMajorsResponse>>
 {
     public async Task<IEnumerable<GetMajorsResponse>> HandleAsync(GetMajorsCommand message, CancellationToken cancellationToken = default)
     {
