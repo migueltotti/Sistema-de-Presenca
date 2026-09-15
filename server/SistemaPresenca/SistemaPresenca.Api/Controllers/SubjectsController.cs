@@ -5,6 +5,7 @@ using SistemaPresenca.Application.Requests.Majors;
 using SistemaPresenca.Application.Requests.Subjects;
 using SistemaPresenca.Application.Responses.Majors;
 using SistemaPresenca.Application.Responses.Subjects;
+using SistemaPresenca.Application.UseCases.Commands.Majors;
 using SistemaPresenca.Application.UseCases.Commands.Subjects;
 using SistemaPresenca.Application.UseCases.Queries.Majors;
 using SistemaPresenca.Application.UseCases.Queries.Subjects;
@@ -40,5 +41,21 @@ public class SubjectsController(ICommandMediator commandMediator, IQueryMediator
         }
 
         return Created();
+    }
+
+    [HttpDelete("{id:guid}")]
+    [ProducesResponseType(typeof(void), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(Error), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
+    public async Task<IActionResult> DeleteSubjectAsync([FromRoute] Guid id, CancellationToken cancellationToken)
+    {
+        var result = await commandMediator.SendAsync(new DeleteSubjectCommand(id), cancellationToken);
+
+        if (result.IsFailure)
+        {
+            return NotFound(result.Error);
+        }
+
+        return Ok();
     }
 }
