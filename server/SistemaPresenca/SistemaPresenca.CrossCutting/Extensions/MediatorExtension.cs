@@ -20,7 +20,7 @@ public static class MediatorExtension
                 .RegisterFromAssembly(typeof(StartSessionCommand).Assembly));
 
             config.AddQueries(module => module
-                .RegisterFromAssembly(typeof(GetProfessorSubjectsQuery).Assembly));
+                .RegisterFromAssembly(typeof(GetSubjectsQuery).Assembly));
         });
     }
 }

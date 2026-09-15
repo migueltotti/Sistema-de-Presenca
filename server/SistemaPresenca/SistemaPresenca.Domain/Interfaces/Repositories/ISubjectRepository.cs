@@ -1,9 +1,9 @@
 ﻿using SistemaPresenca.Domain.Entities;
+using SistemaPresenca.Domain.Filters;
 
 namespace SistemaPresenca.Domain.Interfaces.Repositories;
 
 public interface ISubjectRepository : IBaseRepository<Subject>
 {
-    Task<Subject?> GetWithStudents(Guid subjectId, CancellationToken cancellationToken = default);
-    Task<IEnumerable<Subject>> GetByProfessorId(Guid professorId, CancellationToken cancellationToken = default);
+    Task<IEnumerable<Subject>> GetSubjectsAsync(SubjectFilters filters, CancellationToken cancellationToken = default);
 }

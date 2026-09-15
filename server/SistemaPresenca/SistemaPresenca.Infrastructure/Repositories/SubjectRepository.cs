@@ -1,25 +1,22 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using SistemaPresenca.Domain.Entities;
+using SistemaPresenca.Domain.Filters;
 using SistemaPresenca.Domain.Interfaces.Repositories;
 using SistemaPresenca.Infrastructure.Context;
+using SistemaPresenca.Infrastructure.Stages;
 
 namespace SistemaPresenca.Infrastructure.Repositories;
 
 public class SubjectRepository(SistemaPresencaDbContext context) : BaseRepository<Subject>(context), ISubjectRepository
 {
-    public async Task<Subject?> GetWithStudents(Guid subjectId, CancellationToken cancellationToken = default)
+    private readonly SistemaPresencaDbContext _context = context;
+    public async Task<IEnumerable<Subject>> GetSubjectsAsync(SubjectFilters filters, CancellationToken cancellationToken = default)
     {
-        return await context.Subjects
+        return await _context.Subjects
+            .AsQueryable()
             .AsNoTracking()
-            .Include(x => x.Students)
-            .FirstOrDefaultAsync(x => x.Id == subjectId, cancellationToken);
-    }
-
-    public async Task<IEnumerable<Subject>> GetByProfessorId(Guid professorId, CancellationToken cancellationToken = default)
-    {
-        return await context.Subjects
-           .AsNoTracking()
-           .Where(x => x.ProfessorIds.Contains(professorId))
-           .ToListAsync(cancellationToken);
+            .ApplyOnlyActiveEntitiesFilter()
+            .FilterSubjects(filters)
+            .ToListAsync(cancellationToken: cancellationToken);
     }
 }

@@ -1,0 +1,7 @@
+﻿using LiteBus.Queries.Abstractions;
+using SistemaPresenca.Application.Requests.Subjects;
+using SistemaPresenca.Application.Responses.Subjects;
+
+namespace SistemaPresenca.Application.UseCases.Queries.Subjects;
+
+public sealed record GetSubjectsQuery(GetSubjectsRequest Request) : IQuery<IEnumerable<GetSubjectResponse>>;

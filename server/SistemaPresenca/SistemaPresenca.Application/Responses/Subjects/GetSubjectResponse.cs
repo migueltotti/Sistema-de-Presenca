@@ -1,6 +1,6 @@
 ﻿namespace SistemaPresenca.Application.Responses.Subjects;
 
-public sealed record GetSubsjectResponse(
+public sealed record GetSubjectResponse(
     Guid Id,
     string Name,
     string Code,

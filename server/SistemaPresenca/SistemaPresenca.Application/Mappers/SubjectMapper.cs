@@ -17,10 +17,9 @@ public static class SubjectMapper
         );
     }
 
-    public static GetSubsjectResponse ToResponse(this Subject subject)
+    public static GetSubjectResponse ToResponse(this Subject subject)
     {
-        return new GetSubsjectResponse
-        (
+        return new GetSubjectResponse(
             subject.Id,
             subject.Name,
             subject.Code,

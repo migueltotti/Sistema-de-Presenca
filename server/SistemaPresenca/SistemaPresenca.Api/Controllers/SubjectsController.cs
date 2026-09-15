@@ -1,9 +1,12 @@
 ﻿using LiteBus.Commands.Abstractions;
 using LiteBus.Queries.Abstractions;
 using Microsoft.AspNetCore.Mvc;
+using SistemaPresenca.Application.Requests.Majors;
 using SistemaPresenca.Application.Requests.Subjects;
+using SistemaPresenca.Application.Responses.Majors;
 using SistemaPresenca.Application.Responses.Subjects;
 using SistemaPresenca.Application.UseCases.Commands.Subjects;
+using SistemaPresenca.Application.UseCases.Queries.Majors;
 using SistemaPresenca.Application.UseCases.Queries.Subjects;
 using SistemaPresenca.Domain.Models;
 
@@ -14,16 +17,13 @@ namespace SistemaPresenca.Api.Controllers;
 public class SubjectsController(ICommandMediator commandMediator, IQueryMediator queryMediator) : ControllerBase
 {
     [HttpGet]
-    public async Task<ActionResult<GetSubsjectResponse>> GetProfessorSubjectsAsync([FromQuery] string professorTagId, CancellationToken cancellationToken)
+    [ProducesResponseType(typeof(IEnumerable<GetSubjectResponse>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
+    public async Task<IActionResult> GetSubjectsAsync([FromQuery] GetSubjectsRequest request, CancellationToken cancellationToken)
     {
-        var result = await queryMediator.QueryAsync(new GetProfessorSubjectsQuery(professorTagId), cancellationToken);
+        var result = await queryMediator.QueryAsync(new GetSubjectsQuery(request), cancellationToken);
 
-        if (result.IsFailure)
-        {
-            return BadRequest(result.Error);
-        }
-
-        return Ok(result.Data);
+        return Ok(result);
     }
 
     [HttpPost]

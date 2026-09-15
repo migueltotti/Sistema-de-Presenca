@@ -17,7 +17,7 @@ public class StartSessionCommandHandler(
 {
     public async Task<Result<StartSessionResponse>> HandleAsync(StartSessionCommand command, CancellationToken cancellationToken = default)
     {
-        var subject = await subjectRepository.GetWithStudents(command.Request.SubjectId, cancellationToken);
+        var subject = await subjectRepository.GetOneAsync(x => x.Id == command.Request.SubjectId, cancellationToken);
         if (subject is null)
         {
             logger.LogError("Subject with id {SubjectId} - not found", command.Request.SubjectId);
