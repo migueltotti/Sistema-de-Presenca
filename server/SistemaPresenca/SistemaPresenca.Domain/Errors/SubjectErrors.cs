@@ -15,4 +15,8 @@ public static class SubjectErrors
     public static Error ProfessorMismatch => new(
         "SubjectErrors.ProfessorMismatch",
         "Professor does not teach the provided subject.");
+
+    public static Error InvalidUpdateRequest(string description) => new(
+        "SubjectErrors.InvalidUpdateRequest",
+        description);
 }

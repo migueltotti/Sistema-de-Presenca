@@ -1,13 +1,10 @@
 ﻿using LiteBus.Commands.Abstractions;
 using LiteBus.Queries.Abstractions;
+using Microsoft.AspNetCore.JsonPatch.SystemTextJson;
 using Microsoft.AspNetCore.Mvc;
-using SistemaPresenca.Application.Requests.Majors;
 using SistemaPresenca.Application.Requests.Subjects;
-using SistemaPresenca.Application.Responses.Majors;
 using SistemaPresenca.Application.Responses.Subjects;
-using SistemaPresenca.Application.UseCases.Commands.Majors;
 using SistemaPresenca.Application.UseCases.Commands.Subjects;
-using SistemaPresenca.Application.UseCases.Queries.Majors;
 using SistemaPresenca.Application.UseCases.Queries.Subjects;
 using SistemaPresenca.Domain.Models;
 
@@ -41,6 +38,23 @@ public class SubjectsController(ICommandMediator commandMediator, IQueryMediator
         }
 
         return Created();
+    }
+
+    [HttpPatch("{id:guid}")]
+    [ProducesResponseType(typeof(void), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(Error), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
+    [Consumes("application/json-patch+json")]
+    public async Task<IActionResult> UpdateSubjectAsync([FromRoute] Guid id, [FromBody] JsonPatchDocument<UpdateSubjectRequest> request, CancellationToken cancellationToken)
+    {
+        var result = await commandMediator.SendAsync(new UpdateSubjectCommand(id, request), cancellationToken);
+
+        if (result.IsFailure)
+        {
+            return NotFound(result.Error);
+        }
+
+        return Ok();
     }
 
     [HttpDelete("{id:guid}")]

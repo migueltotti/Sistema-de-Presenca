@@ -28,4 +28,20 @@ public static class SubjectMapper
             subject.ProfessorIds
         );  
     }
+
+    public static UpdateSubjectRequest ToUpdateRequest(this Subject subject)
+    {
+        return new UpdateSubjectRequest(
+            subject.Name,
+            subject.Code,
+            subject.TotalClasses
+        );
+    }
+
+    public static void UpdatedEntity(this UpdateSubjectRequest request, Subject subject)
+    {
+        subject.Name = request.Name;
+        subject.Code = request.Code;
+        subject.TotalClasses = request.TotalClasses;
+    }
 }
