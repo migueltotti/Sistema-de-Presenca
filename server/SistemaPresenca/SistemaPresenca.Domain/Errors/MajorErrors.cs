@@ -11,4 +11,8 @@ public static class MajorErrors
     public static Error CodeAlreadyExists => new(
         "MajorErrors.CodeAlreadyExists",
         "Major with the same code already exists.");
+
+    public static Error InvalidUpdateRequest(string description) => new(
+        "MajorErrors.InvalidUpdateRequest",
+        description);
 }

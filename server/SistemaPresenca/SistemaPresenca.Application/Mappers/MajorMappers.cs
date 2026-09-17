@@ -1,4 +1,5 @@
-﻿using SistemaPresenca.Application.Requests.Majors;
+﻿using Microsoft.Extensions.Diagnostics.HealthChecks;
+using SistemaPresenca.Application.Requests.Majors;
 using SistemaPresenca.Application.Responses.Majors;
 using SistemaPresenca.Domain.Entities;
 
@@ -15,19 +16,6 @@ public static class MajorMappers
         );
     }
 
-    public static Major ToEntity(this GetMajorsResponse response)
-    {
-        return new Major(
-            response.Name,
-            response.Code,
-            response.CreatedByAdminId
-        )
-        {
-            Id = response.Id,
-            CreatedAt = response.CreatedAt
-        };
-    }
-
     public static GetMajorsResponse ToResponse(this Major major)
     {
         return new GetMajorsResponse(
@@ -37,5 +25,19 @@ public static class MajorMappers
             major.CreatedAt,
             major.CreatedByAdminId
         );
+    }
+
+    public static UpdateMajorRequest ToUpdateRequest(this Major major)
+    {
+        return new UpdateMajorRequest(
+            major.Name,
+            major.Code
+        );
+    }
+
+    public static void UpdateEntity(this UpdateMajorRequest request, Major major)
+    {
+        major.Name = request.Name;
+        major.Code = request.Code;
     }
 }

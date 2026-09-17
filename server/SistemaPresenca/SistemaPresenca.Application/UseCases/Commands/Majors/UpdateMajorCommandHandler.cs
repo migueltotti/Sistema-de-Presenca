@@ -1,6 +1,8 @@
-﻿using LiteBus.Commands.Abstractions;
+﻿using FluentValidation;
+using LiteBus.Commands.Abstractions;
 using Microsoft.Extensions.Logging;
 using SistemaPresenca.Application.Mappers;
+using SistemaPresenca.Application.Requests.Majors;
 using SistemaPresenca.Domain.Errors;
 using SistemaPresenca.Domain.Interfaces.Repositories;
 using SistemaPresenca.Domain.Models;
@@ -9,6 +11,7 @@ namespace SistemaPresenca.Application.UseCases.Commands.Majors;
 
 public class UpdateMajorCommandHandler(
     IMajorRepository majorRepoitory,
+    IValidator<UpdateMajorRequest> validator,
     ILogger<UpdateMajorCommandHandler> logger) : ICommandHandler<UpdateMajorCommand, Result>
 {
     public async Task<Result> HandleAsync(UpdateMajorCommand command, CancellationToken cancellationToken = default)
@@ -21,28 +24,35 @@ public class UpdateMajorCommandHandler(
             return Result.Failure(MajorErrors.NotFound);
         }
 
-        var majorResponse = major.ToResponse();
+        var majorUpdateRequest = major.ToUpdateRequest();
 
-        command.PatchRequest
-            .Document
-            .ApplyTo(majorResponse);
+        command.
+            PatchRequest
+            .ApplyTo(majorUpdateRequest);
 
-        var updatedMajor = majorResponse.ToEntity();
+        var validationResult = validator.Validate(majorUpdateRequest);
+        if (!validationResult.IsValid)
+        {
+            logger.LogError("Invalid major update request for major with id {Id}.", command.Id);
+            return Result.Failure(MajorErrors.InvalidUpdateRequest(string.Join(",", validationResult.Errors)));
+        }
+
+        majorUpdateRequest.UpdateEntity(major);
 
         var majorWithSameCode = await majorRepoitory.GetOneAsync(x =>
-            x.Code == updatedMajor.Code &&
-            x.Id != updatedMajor.Id,
+            x.Code == majorUpdateRequest.Code &&
+            x.Id != major.Id,
             cancellationToken);
 
         if (majorWithSameCode is not null)
         {
-            logger.LogError("Major with code {Code} already exists.", updatedMajor.Code);
+            logger.LogError("Major with code {Code} already exists.", majorUpdateRequest.Code);
             return Result.Failure(MajorErrors.CodeAlreadyExists);
         }
 
-        await majorRepoitory.UpdateAsync(updatedMajor, cancellationToken);
+        await majorRepoitory.UpdateAsync(major, cancellationToken);
 
-        logger.LogInformation("Major with Id {Id} updated successfully.", updatedMajor.Id);
+        logger.LogInformation("Major with Id {Id} updated successfully.", major.Id);
 
         return Result.Success();
     }

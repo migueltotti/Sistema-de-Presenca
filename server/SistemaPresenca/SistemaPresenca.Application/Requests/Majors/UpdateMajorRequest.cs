@@ -1,6 +1,5 @@
-﻿using Microsoft.AspNetCore.JsonPatch.SystemTextJson;
-using SistemaPresenca.Application.Responses.Majors;
+﻿namespace SistemaPresenca.Application.Requests.Majors;
 
-namespace SistemaPresenca.Application.Requests.Majors;
-
-public sealed record UpdateMajorRequest(JsonPatchDocument<GetMajorsResponse> Document);
+public sealed record UpdateMajorRequest(
+    string Name,
+    string Code);

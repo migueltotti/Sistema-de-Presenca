@@ -8,14 +8,17 @@ public class UpdateSubjectRequestValidator : AbstractValidator<UpdateSubjectRequ
     public UpdateSubjectRequestValidator()
     {
         RuleFor(x => x.Name)
-            .NotEmpty().WithMessage("Name is required.")
-            .MaximumLength(200).WithMessage("Name must not exceed 200 characters.");
+            .NotEmpty()
+            .MaximumLength(200)
+            .WithMessage("Name is required and must not exceed 200 characters.");
 
         RuleFor(x => x.Code)
-            .NotEmpty().WithMessage("Code is required.")
-            .MaximumLength(10).WithMessage("Code must not exceed 10 characters.");
+            .NotEmpty()
+            .MaximumLength(10)
+            .WithMessage("Code is required and must not exceed 10 characters.");
 
         RuleFor(x => x.TotalClasses)
-            .GreaterThan(0).WithMessage("Total classes must be a positive number.");
+            .GreaterThan(0)
+            .WithMessage("Total classes is required and must be a positive number.");
     }
 }

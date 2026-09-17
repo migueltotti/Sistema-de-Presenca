@@ -46,9 +46,9 @@ public sealed class MajorsController(ICommandMediator commandMediator, IQueryMed
     [ProducesResponseType(typeof(Error), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
     [Consumes("application/json-patch+json")]
-    public async Task<IActionResult> UpdateMajorAsync([FromRoute] Guid id, [FromBody] JsonPatchDocument<GetMajorsResponse> request, CancellationToken cancellationToken)
+    public async Task<IActionResult> UpdateMajorAsync([FromRoute] Guid id, [FromBody] JsonPatchDocument<UpdateMajorRequest> request, CancellationToken cancellationToken)
     {
-        var result = await commandMediator.SendAsync(new UpdateMajorCommand(id, new(request)), cancellationToken);
+        var result = await commandMediator.SendAsync(new UpdateMajorCommand(id, request), cancellationToken);
 
         if (result.IsFailure)
         {
