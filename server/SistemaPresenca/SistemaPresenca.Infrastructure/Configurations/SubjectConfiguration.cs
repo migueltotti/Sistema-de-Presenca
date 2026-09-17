@@ -39,6 +39,7 @@ public class SubjectConfiguration : BaseEntityConfiguration<Subject>
             .UsingEntity("SubjectStudents");
 
         builder.HasIndex(s => s.Code)
-            .IsUnique();
+            .IsUnique()
+            .HasFilter("\"DeletedAt\" IS NULL");
     }
 }
