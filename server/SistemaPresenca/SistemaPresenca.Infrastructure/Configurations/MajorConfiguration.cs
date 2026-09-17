@@ -21,6 +21,7 @@ public class MajorConfiguration : BaseEntityConfiguration<Major>
             .HasMaxLength(10);
 
         builder.HasIndex(m => m.Code)
-            .IsUnique();
+            .IsUnique()
+            .HasFilter("\"DeletedAt\" IS NULL");
     }
 }

@@ -42,12 +42,15 @@ public class UserConfiguration : BaseEntityConfiguration<User>
 
 
         builder.HasIndex(u => u.Email)
-            .IsUnique();
+            .IsUnique()
+            .HasFilter("\"DeletedAt\" IS NULL");
 
         builder.HasIndex(u => u.Cpf)
-            .IsUnique();
+            .IsUnique()
+            .HasFilter("\"DeletedAt\" IS NULL");
 
         builder.HasIndex(u => u.RegistrationId)
-            .IsUnique();
+            .IsUnique()
+            .HasFilter("\"DeletedAt\" IS NULL");
     }
 }
