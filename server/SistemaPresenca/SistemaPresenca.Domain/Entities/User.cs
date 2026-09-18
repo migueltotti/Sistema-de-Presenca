@@ -16,14 +16,14 @@ public class User : BaseEntity
     {
     }
 
-    public User(string name, string email, string password, string registrationId, string cpf, string? tagId, UserRole role, Guid? createdByAdminId) : base(createdByAdminId)
+    public User(string name, string email, string registrationId, string cpf, UserRole role, Guid? createdByAdminId) : base(createdByAdminId)
     {
         Name = name;
         Email = email;
-        Password = password;
+        Password = string.Empty;
         RegistrationId = registrationId;
         Cpf = cpf;
-        TagId = tagId;
+        TagId = null;
         Role = role;
     }
 }

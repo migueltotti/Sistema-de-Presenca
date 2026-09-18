@@ -1,5 +1,4 @@
-﻿using Microsoft.Extensions.Diagnostics.HealthChecks;
-using SistemaPresenca.Application.Requests.Majors;
+﻿using SistemaPresenca.Application.Requests.Majors;
 using SistemaPresenca.Application.Responses.Majors;
 using SistemaPresenca.Domain.Entities;
 
