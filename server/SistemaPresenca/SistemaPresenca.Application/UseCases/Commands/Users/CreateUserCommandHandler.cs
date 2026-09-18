@@ -2,13 +2,12 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
 using SistemaPresenca.Application.Mappers;
-using SistemaPresenca.Application.UseCases.Commands.Users;
 using SistemaPresenca.Domain.Entities;
 using SistemaPresenca.Domain.Errors;
 using SistemaPresenca.Domain.Interfaces.Repositories;
 using SistemaPresenca.Domain.Models;
 
-namespace SistemaPresenca.Application.Requests.Users;
+namespace SistemaPresenca.Application.UseCases.Commands.Users;
 
 public class CreateUserCommandHandler(
     IUserRepository userRepository,
