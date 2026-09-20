@@ -7,6 +7,8 @@ public class Session : BaseEntity
     public int TotalLessons { get; set; }
     public Guid SubjectId { get; set; }
     public Subject Subject { get; set; }
+    public Guid RoomId { get; set; }
+    public Room Room { get; set; }
     public Guid ProfessorId { get; set; }
     public User Professor { get; set; }
     public List<Attendance> Attendances { get; set; }
@@ -20,9 +22,11 @@ public class Session : BaseEntity
         InitiedAt = initiedAt;
         TotalLessons = totalLessons;
         SubjectId = subjectId;
+        RoomId = roomId;
         ProfessorId = professorId;
         Attendances = [];
         Subject = default!;
+        Room = default; 
         Professor = default!;
     }
 }
