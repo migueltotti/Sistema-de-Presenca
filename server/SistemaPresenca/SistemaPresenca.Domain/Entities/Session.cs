@@ -26,7 +26,7 @@ public class Session : BaseEntity
         ProfessorId = professorId;
         Attendances = [];
         Subject = default!;
-        Room = default; 
+        Room = default!; 
         Professor = default!;
     }
 }
