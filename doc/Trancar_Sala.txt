@@ -1,0 +1,24 @@
+=== TRANCAR SALA (Inicialmente aberta) ===
+
+1. Display de fora mostra a mensagem de "Porta Aberta" e caso tenha uma aula em andamento, mostra a mensagem "Aula em Andamento".
+
+2. Usuário (professor/admin) aproxima a tag do leitor.
+
+3. Mostra mensagem perguntando se quer confimar o fechamento da sala.
+	- CONFIRMA continua 
+	- CANCELA cancela a ação e volta para a mensagem do passo 1
+
+4. Verifica se a tag lida é igual a tag do professor que da aula.
+	4.1 Se for igual, continua.
+	4.2 Se não for igual, consulta o servidor para verificar se aquele usuário é Admin (apenas o professor que iniciou a aula e Admins podem trancar a porta com aula acontecendo) ???
+		- Se for admin, continua
+		- Se for outro usuário que não for Admin ou o professor dono da aula, retorna falha e volta para o passo 1.
+
+5. Verifica se ja tem uma aula acontecendo (consulta variavel do próprio Código).
+	5.1 Se tiver, mostra mensagem perguntando se quer finalizar a aula.
+		5.1.1 Caso clique em CONFIRMAR (finalizer aula), para o registro de presença no ESP32, tranca a porta, publica a mensagem para registrar que a porta foi trancada e publica mensagem para finalizer a aula (pensar se seria melhor publicar a mensagem ou fazer de forma sincrona).
+		5.1.2 Caso clique em CANCELAR, tranca a sala e publica uma mensagem (ou de forma sincrona) para registrar que a porta foi trancada.
+
+	5.2 Se não tiver, tranca a sala e publica uma mensagem (ou de forma sincrona) para registrar que a porta foi trancada.
+
+6. Mostra a mensagem no display de fora dizendo que a sala está trancada. Se tiver aula acontecendo, mostra que está tem aula em andamento.

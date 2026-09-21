@@ -1,0 +1,34 @@
+
+
+=== DESTRANCAR SALA (Inicialmente Trancada) ===
+1. Mensagem no display informando porta trancada
+
+2. Usuário (professor/admin) aproxima a tag do leitor
+
+3. Mostra mensagem perguntando se quer confimar a abertura 
+	- CONFIRMA continua 
+	- CANCELA cancela a ação e volta para a mensagem do passo 1
+
+4. Verifica se ja tem uma aula acontecendo (consulta variavel do próprio Código).
+	4.1 Se tiver, compara a tag lida com a tag do professor armazenada no ESP32.
+		4.1.1 Se for igual, abre a porta.
+		4.1.2 Se não for igual, consulta o servidor para verificar se aquele usuário é Admin (apenas o professor que iniciou a aula e Admins podem abrir a porta com aula acontecendo) ???
+
+	4.2 Se não tiver, consulta servidor para verificar se aquele usuário tem permissão para abrir a porta.
+		4.2.1 Se não tiver permissão, retorna falha.
+		4.2.2 Se tiver permissão, busca por agendamentos próximos (no dia? nos proximos X minutos?) para aquela sala.
+			4.2.2.1 Se não tiver, registra abertura de porta e retorna sucesso.
+			4.2.2.2 Se tiver, verificar se o usuário é Admin ou Professor.
+				- Se for Admin, registra abertura e retorna sucesso.
+				- Se for Professor, verifica se o agendamento é do professor e se está perto do horário de agendamento.
+				-> Se não for o professor e o horário de agendamento está longe (mais de 50 minutos ??), registra abertura e retorna sucesso.
+				-> Se não for o professor e o horário de agentamendo está perto (menor que 50 min ??), retorna falha dizendo que tem um agendamento proximo para outro resposavel.
+				-> Se for o professor e o agendamento é do tipo pessoal, registra abertura e retorna sucesso.
+				-> Se for o professor e o agendamento é do tipo aula, verifica se a aula está configurada com "Iniciar registro de presença de forma automática na abertura da porta".
+				
+				--> Se essa configuração estiver falsa (inicio de presença de forma manual), registra abertura e retorna sucesso.
+				--> Se essa configuração estiver verdadeira (inicia registro de presença de forma automática), registra abertura, retorna sucesso e publica mensagem para iniciar o registro de aula no ESP32 (4.2.2.*). (A publicação seria apenas para reaproveitar a rotina que já vai existir para iniciar registro de forma manual, mas podemos pensar em retornar os dados necessários e começar a aula nessa requisição mesmo).
+
+			4.2.2.2.* ESP32 consome a mensagem contendo o id da aula, tagId do professor, e identificador da sala ??? para iniciar o registro de presença.
+
+5. Aula iniciada, o display de dentro mostra a mensagem para aproximar a tag do aluno e o display de fora mostra a mensagem que uma aula está acontecendo.

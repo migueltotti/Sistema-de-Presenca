@@ -1,0 +1,12 @@
+=== Finalizar aula ===
+1. Professor ou Administrador faz a requisição numa aula já existente para finalizar a aula.
+
+2. Servidor verifica se é Admin ou Professor
+	- Se for Admin, apenas finaliza.
+	- Se for Professor, verifica se é o professor da aula.
+		- Se não for, retorna erro
+
+3. Publica mensagem para o ESP32 finalizar o registro de presença automática.
+
+
+

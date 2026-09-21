@@ -1,0 +1,13 @@
+=== INICIAR AULA MANUAL ===
+
+1. Professor ou Administrador faz a requisição numa aula já existente para iniciar registro de presença manual.
+
+2. Servidor verifica se tem Sala registrada para aquela aula. 
+	- Se não tiver, retorna erro dizendo que deve registrar uma sala para aquela aula.
+	
+3. Servidor verifica se tem um agendamento naquela sala no horário ou que existe durante o tempo normal de aula que não seja do professor.
+	- Se tiver, retorna erro.
+
+4. Publica a mensagem para o ESP32 iniciar a aula.
+
+5. ESP32 consome a mensagem verificando se tem uma aula acontecendo naquele momento, se tiver, não registra a presença.
