@@ -1,3 +1,5 @@
+using SistemaPresenca.Domain.Enums;
+
 namespace SistemaPresenca.Application.Responses.Rooms;
 
 public sealed record GetRoomResponse(
