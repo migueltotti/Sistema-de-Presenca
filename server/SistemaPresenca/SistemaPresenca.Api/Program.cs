@@ -17,6 +17,7 @@ builder.Services
     .AddProblemDetails()
     .AddDatabase(applicationSettings.PostgresSettings)
     .AddRepositories()
+    .AddServices()
     .AddMediator()
     .AddValidators()
     .AddApiSpecification()
