@@ -18,6 +18,7 @@ public class SistemaPresencaDbContext : DbContext
     public DbSet<Major> Majors { get; set; }
     public DbSet<Subject> Subjects { get; set; }
     public DbSet<Room> Rooms { get; set; }
+    public DbSet<RoomAccessPermission> RoomAccessPermissions { get; set; }
     public DbSet<Session> Sessions { get; set; }
     public DbSet<Attendance> Attendances { get; set; }
 }

@@ -2,9 +2,12 @@ using LiteBus.Commands.Abstractions;
 using LiteBus.Queries.Abstractions;
 using Microsoft.AspNetCore.JsonPatch.SystemTextJson;
 using Microsoft.AspNetCore.Mvc;
+using SistemaPresenca.Application.Requests.RoomAccessPermissions;
 using SistemaPresenca.Application.Requests.Rooms;
 using SistemaPresenca.Application.Responses.Rooms;
 using SistemaPresenca.Application.UseCases.Commands.Rooms;
+using SistemaPresenca.Application.UseCases.Commands.Rooms.CloseRoom;
+using SistemaPresenca.Application.UseCases.Commands.Rooms.OpenRoom;
 using SistemaPresenca.Application.UseCases.Queries.Rooms;
 using SistemaPresenca.Domain.Models;
 
@@ -72,6 +75,44 @@ public class RoomsController(ICommandMediator commandMediator, IQueryMediator qu
         if (result.IsFailure)
         {
             return NotFound(result.Error);
+        }
+
+        return Ok();
+    }
+
+    [HttpPost("{roomId:guid}/open")]
+    [ProducesResponseType(typeof(void), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(Error), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
+    public async Task<IActionResult> OpenRoomAsync(
+        [FromRoute] Guid roomId,
+        [FromBody] RoomAccessRequest request,
+        CancellationToken cancellationToken)
+    {
+        var result = await commandMediator.SendAsync(new OpenRoomCommand(roomId, request.UserId), cancellationToken);
+
+        if (result.IsFailure)
+        {
+            return BadRequest(result.Error);
+        }
+
+        return Ok();
+    }
+
+    [HttpPost("{roomId:guid}/close")]
+    [ProducesResponseType(typeof(void), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(Error), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
+    public async Task<IActionResult> CloseRoomAsync(
+        [FromRoute] Guid roomId,
+        [FromBody] RoomAccessRequest request,
+        CancellationToken cancellationToken)
+    {
+        var result = await commandMediator.SendAsync(new CloseRoomCommand(roomId, request.UserId), cancellationToken);
+
+        if (result.IsFailure)
+        {
+            return BadRequest(result.Error);
         }
 
         return Ok();
