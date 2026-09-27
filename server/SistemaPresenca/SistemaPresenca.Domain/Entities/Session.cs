@@ -17,7 +17,7 @@ public class Session : BaseEntity
     {
     }
 
-    public Session(DateTime initiedAt, int totalLessons, Guid subjectId, Guid professorId, Guid? createdByAdminId) : base(createdByAdminId)
+    public Session(DateTime initiedAt, int totalLessons, Guid subjectId, Guid roomId, Guid professorId, Guid? createdByAdminId) : base(createdByAdminId)
     {
         InitiedAt = initiedAt;
         TotalLessons = totalLessons;

@@ -1,3 +1,5 @@
+using SistemaPresenca.Domain.Models;
+
 namespace SistemaPresenca.Domain.Errors;
 
 public static class RoomErrors
@@ -13,4 +15,8 @@ public static class RoomErrors
     public static Error NotFound => new(
         "Room.NotFound",
         "Room not found.");
+
+    public static Error InvalidUpdateRequest(string description) => new(
+        "Room.InvalidUpdateRequest",
+        description);
 }

@@ -12,6 +12,7 @@ namespace SistemaPresenca.Application.UseCases.Commands.Sessions;
 public class StartSessionCommandHandler(
     ISessionRepository sessionRepository,
     ISubjectRepository subjectRepository,
+    IRoomRepository roomRepository,
     IUserRepository userRepository,
     ILogger<StartSessionCommandHandler> logger) : ICommandHandler<StartSessionCommand, Result<StartSessionResponse>>
 {
@@ -22,6 +23,13 @@ public class StartSessionCommandHandler(
         {
             logger.LogError("Subject with id {SubjectId} - not found", command.Request.SubjectId);
             return Result<StartSessionResponse>.Failure(SubjectErrors.NotFound);
+        }
+
+        var room = await roomRepository.GetOneAsync(x => x.Id == command.Request.RoomId, cancellationToken);
+        if (room is null)
+        {
+            logger.LogError("Room with id {RoomId} - not found", command.Request.RoomId);
+            return Result<StartSessionResponse>.Failure(RoomErrors.NotFound);
         }
 
         var professor = await userRepository.GetOneAsync(x => x.TagId == command.Request.ProfessorTagId && x.Role == UserRole.Professor, cancellationToken);
@@ -41,6 +49,7 @@ public class StartSessionCommandHandler(
             DateTime.UtcNow,
             command.Request.NumberOfClasses,
             subject.Id,
+            room.Id,
             professor.Id,
             null
         );

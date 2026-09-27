@@ -1,3 +1,5 @@
+using SistemaPresenca.Domain.Enums;
+
 namespace SistemaPresenca.Domain.Entities;
 
 public class Room : BaseEntity

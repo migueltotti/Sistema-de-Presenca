@@ -11,6 +11,7 @@ public static class RepositoriesExtension
         services.AddScoped<IUserRepository, UserRepository>();
         services.AddScoped<IMajorRepository, MajorRepository>();
         services.AddScoped<ISubjectRepository, SubjectRepository>();
+        services.AddScoped<IRoomRepository, RoomRepository>();
         services.AddScoped<ISessionRepository, SessionRepository>();
 
         return services;
