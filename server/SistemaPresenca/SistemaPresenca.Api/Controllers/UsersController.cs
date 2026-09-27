@@ -1,12 +1,10 @@
 ﻿using LiteBus.Commands.Abstractions;
 using LiteBus.Queries.Abstractions;
+using Microsoft.AspNetCore.JsonPatch.SystemTextJson;
 using Microsoft.AspNetCore.Mvc;
-using SistemaPresenca.Application.Requests.Subjects;
 using SistemaPresenca.Application.Requests.Users;
-using SistemaPresenca.Application.Responses.Subjects;
 using SistemaPresenca.Application.Responses.Users;
 using SistemaPresenca.Application.UseCases.Commands.Users;
-using SistemaPresenca.Application.UseCases.Queries.Subjects;
 using SistemaPresenca.Application.UseCases.Queries.Users;
 using SistemaPresenca.Domain.Models;
 
@@ -40,5 +38,22 @@ public class UsersController(ICommandMediator commandMediator, IQueryMediator qu
         }
 
         return Created();
+    }
+
+    [HttpPatch("{id:guid}")]
+    [ProducesResponseType(typeof(void), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(Error), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
+    [Consumes("application/json-patch+json")]
+    public async Task<IActionResult> UpdateUserAsync([FromRoute] Guid id, [FromBody] JsonPatchDocument<UpdateUserRequest> request, CancellationToken cancellationToken)
+    {
+        var result = await commandMediator.SendAsync(new UpdateUserCommand(id, request), cancellationToken);
+
+        if (result.IsFailure)
+        {
+            return NotFound(result.Error);
+        }
+
+        return Ok();
     }
 }
