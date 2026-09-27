@@ -9,6 +9,7 @@ public class Room : BaseEntity
     public string MicrocontrollerId { get; set; }
     public RoomStatus Status { get; set; }
     public List<Session> Sessions { get; set; }
+    public List<RoomAccessPermission> RoomAccessPermissions { get; set; }
 
     private Room() : base()
     {
@@ -21,5 +22,6 @@ public class Room : BaseEntity
         MicrocontrollerId = microcontrollerId; // decidir qual abordagem vamos usar para nomear o microcontrolador
         Status = RoomStatus.Active;
         Sessions = [];
+        RoomAccessPermissions = [];
     }
 }
