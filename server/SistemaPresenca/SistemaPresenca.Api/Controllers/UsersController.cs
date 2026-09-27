@@ -56,4 +56,20 @@ public class UsersController(ICommandMediator commandMediator, IQueryMediator qu
 
         return Ok();
     }
+
+    [HttpDelete("{id:guid}")]
+    [ProducesResponseType(typeof(void), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(Error), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
+    public async Task<IActionResult> DeleteUserAsync([FromRoute] Guid id, CancellationToken cancellationToken)
+    {
+        var result = await commandMediator.SendAsync(new DeleteUserCommand(id), cancellationToken);
+
+        if (result.IsFailure)
+        {
+            return NotFound(result.Error);
+        }
+
+        return Ok();
+    }
 }
