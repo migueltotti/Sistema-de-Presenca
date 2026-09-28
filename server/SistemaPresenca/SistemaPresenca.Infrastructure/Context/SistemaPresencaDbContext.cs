@@ -20,5 +20,6 @@ public class SistemaPresencaDbContext : DbContext
     public DbSet<Room> Rooms { get; set; }
     public DbSet<RoomAccessPermission> RoomAccessPermissions { get; set; }
     public DbSet<Session> Sessions { get; set; }
+    public DbSet<RoomBooking> RoomBookings { get; set; }
     public DbSet<Attendance> Attendances { get; set; }
 }
