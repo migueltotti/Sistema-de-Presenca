@@ -2,59 +2,85 @@
 #include <Wire.h>
 #include <SPI.h>
 #include <MFRC522.h>
+#include "types.h" 
+#include "functions.h"
 
-#define SS_PIN  32
-#define RST_PIN 33   
-#define IRQ_PIN 13       
+#define SS_INTERNO_PIN  32
+#define SCK_PIN         25
+#define MISO_PIN        27
+#define MOSI_PIN        26
+#define RST_PIN         33
 
-MFRC522 mfrc522(SS_PIN, RST_PIN);   // Create MFRC522 instance.
+MFRC522 rfidInterno(SS_INTERNO_PIN, RST_PIN);   // Create MFRC522 instance.
 
-bool flag = false;
+QueueHandle_t eventQueue;
 
-void IRAM_ATTR irqReader() {
-  flag = true;
+// Compartilhada com a futura versão por IRQ: lê o UID e publica o evento.
+static bool publicarTag(MFRC522& leitor, Lado lado) {
+  if (!leitor.PICC_ReadCardSerial()) return false;
+
+  AppEvent ev{};
+  ev.type = EVT_TAG;
+  ev.tag.lado = lado;
+  uidParaHex(leitor.uid, ev.tag.uid);
+
+  leitor.PICC_HaltA();          // tag para de responder até sair do campo
+  leitor.PCD_StopCrypto1();     // TALVEZ REMOVER
+
+  if (xQueueSend(eventQueue, &ev, 0) != pdTRUE) {
+    Serial.println("[reader] eventQueue cheia, evento descartado.");
+  }
+  else{
+    Serial.println("[reader] evento publicado.");
+  }
+  return true;
+}
+
+void readerTask(void*) {
+  MFRC522* leitores[1]  = { &rfidInterno };
+  uint32_t bloqueadoAte[1] = { 0 };
+
+  for (;;) {
+    for (uint8_t i = 0; i < 1; i++) {
+      if ((int32_t)(bloqueadoAte[i] - millis()) > 0) continue;
+
+      if (leitores[i]->PICC_IsNewCardPresent() && publicarTag(*leitores[i], (Lado)i)) {
+        bloqueadoAte[i] = millis() + 1500;   // ignora releituras por 1,5 s
+      }
+    }
+    vTaskDelay(pdMS_TO_TICKS(50));           // cede a CPU; sem isso a task ocuparia o núcleo
+  }
+}
+
+void controllerTask(void*) {
+  AppEvent ev;
+  for (;;) {
+    if (xQueueReceive(eventQueue, &ev, portMAX_DELAY) == pdTRUE) {
+      switch (ev.type) {
+        case EVT_TAG:
+          Serial.printf("[ctrl] tag %s no leitor %s\n", ev.tag.uid, ev.tag.lado == LADO_INTERNO ? "interno" : "externo");
+          break;
+
+        default:
+          break;
+      }
+    }
+
+    Serial.println("[ctrl] aguardando evento...");
+  }
 }
 
 void setup() {
-  Serial.begin(115200);               // Initialize serial communications with the PC
-  SPI.begin(25, 27, 26, SS_PIN);      // Init SPI bus
-  mfrc522.PCD_Init();                 // Init MFRC522 card
-  mfrc522.PCD_DumpVersionToSerial();  // Show details of PCD - MFRC522 Card Reader details
-  pinMode(IRQ_PIN, INPUT_PULLUP);     // Set IRQ pin as input with pull-up resistor
+  Serial.begin(115200); 
+  
+  eventQueue = xQueueCreate(16, sizeof(AppEvent));
 
-  mfrc522.PCD_WriteRegister(mfrc522.ComIEnReg, 0xA0); // Enable interrupts for Rx and Idle
-  attachInterrupt(digitalPinToInterrupt(IRQ_PIN), irqReader, FALLING); // Attach interrupt to IRQ pin, trigger on falling edge
+  SPI.begin(SCK_PIN, MISO_PIN, MOSI_PIN);         // Init SPI bus
+  rfidInterno.PCD_Init();                         // Init MFRC522 reader interno
+  rfidInterno.PCD_DumpVersionToSerial();          // Show details of PCD - MFRC522 Card Reader details
+
+  xTaskCreatePinnedToCore(readerTask,     "reader", 4096, nullptr, 3, nullptr, 1);
+  xTaskCreatePinnedToCore(controllerTask, "ctrl",   4096, nullptr, 2, nullptr, 1);
 }
 
-int count = 0;
-void loop() {
-
-  if (flag) {
-
-    if (!mfrc522.PICC_IsNewCardPresent())
-      return;
-    
-    if (!mfrc522.PICC_ReadCardSerial())
-      return;
-
-    // Serial.print(F("Card UID:"));
-    // for (byte i = 0; i < mfrc522.uid.size; i++) {
-    //   Serial.print(mfrc522.uid.uidByte[i] < 0x10 ? " 0" : " ");
-    //   Serial.print(mfrc522.uid.uidByte[i], HEX);
-    // }
-    // Serial.println();
-
-    mfrc522.PICC_DumpToSerial(&(mfrc522.uid));          // Dump UID to serial
-    mfrc522.PCD_WriteRegister(mfrc522.ComIEnReg, 0x7f);
-    mfrc522.PICC_HaltA();
-    flag = false;
-  } else {
-    Serial.printf("Counter: %d\n", count);
-    count += 1;
-    delay(1000);
-  }
-
-  mfrc522.PCD_WriteRegister(mfrc522.FIFODataReg, mfrc522.PICC_CMD_REQA);
-  mfrc522.PCD_WriteRegister(mfrc522.CommandReg, mfrc522.PCD_Transceive);
-  mfrc522.PCD_WriteRegister(mfrc522.BitFramingReg, 0x87);
-}
+void loop() { vTaskDelete(NULL); }
