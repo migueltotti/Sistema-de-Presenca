@@ -7,6 +7,7 @@
 #include <ArduinoJson.h>
 #include "types.h" 
 #include "functions.h"
+#include "display.h"
 
 #define SS_INTERNO_PIN  32
 #define SCK_PIN         25
@@ -16,7 +17,7 @@
 
 MFRC522 rfidInterno(SS_INTERNO_PIN, RST_PIN);   // Create MFRC522 instance.
 
-QueueHandle_t eventQueue;
+QueueHandle_t eventQueue, displayQueue;
 
 WiFiClient espClient;
 PubSubClient client(espClient);
@@ -196,11 +197,14 @@ void mqttTask(void*) {
 // =================================================
 
 void controllerTask(void*) {
+  mostrar(LADO_INTERNO, "Nenhuma aula",  "em andamento");          // permanente
+
   AppEvent ev;
   for (;;) {
     if (xQueueReceive(eventQueue, &ev, portMAX_DELAY) == pdTRUE) {
       switch (ev.type) {
         case EVT_TAG:
+          mostrar(LADO_INTERNO, "Presenca OK",   "Maria Silva", 2000);     // volta sozinho
           Serial.printf("[ctrl] tag %s no leitor %s\n", ev.tag.uid, ev.tag.lado == LADO_INTERNO ? "interno" : "externo");
           break;
 
@@ -211,10 +215,12 @@ void controllerTask(void*) {
           break;
 
         case EVT_AULA_INICIOU:
+          mostrar(LADO_INTERNO, "Aula iniciada", "Aproxime a tag");        // permanente
           Serial.printf("[ctrl] aula com id %s iniciada para o professor %s.\n", ev.aula.aulaId, ev.aula.professorId);
           break;
 
         case EVT_AULA_FINALIZOU:
+          mostrar(LADO_INTERNO, "Aula finalizada", "Obrigado!", 3000);     // temporaria
           Serial.printf("[ctrl] aula com id %s finalizada para o professor %s.\n", ev.aula.aulaId, ev.aula.professorId);
           break;
 
@@ -231,13 +237,16 @@ void controllerTask(void*) {
 }
 
 void setup() {
-  Serial.begin(115200); 
+  Serial.begin(115200);  
   
-  eventQueue = xQueueCreate(16, sizeof(AppEvent));
+  eventQueue    = xQueueCreate(16, sizeof(AppEvent));
+  displayQueue  = xQueueCreate(8,  sizeof(DisplayMsg));
 
   SPI.begin(SCK_PIN, MISO_PIN, MOSI_PIN);         // Init SPI bus
   rfidInterno.PCD_Init();                         // Init MFRC522 reader interno
   rfidInterno.PCD_DumpVersionToSerial();          // Show details of PCD - MFRC522 Card Reader details
+
+  displayInit();
 
   connectToWiFi();
 
@@ -255,9 +264,10 @@ void setup() {
   client.publish(topic, "Hi, I'm ESP32 ^^");
   client.subscribe(topic);
 
-  xTaskCreatePinnedToCore(readerTask,     "reader", 4096, nullptr, 3, nullptr, 1);
-  xTaskCreatePinnedToCore(controllerTask, "ctrl",   4096, nullptr, 2, nullptr, 1);
-  xTaskCreatePinnedToCore(mqttTask,       "mqtt",   4096, nullptr, 2, nullptr, 0);
+  xTaskCreatePinnedToCore(readerTask,     "reader",   4096, nullptr, 3, nullptr, 1);
+  xTaskCreatePinnedToCore(displayTask,    "display",  4096, nullptr, 1, nullptr, 1);
+  xTaskCreatePinnedToCore(controllerTask, "ctrl",     4096, nullptr, 2, nullptr, 1);
+  xTaskCreatePinnedToCore(mqttTask,       "mqtt",     4096, nullptr, 2, nullptr, 0);
 }
 
 void loop() { vTaskDelete(NULL); }
