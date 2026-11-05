@@ -11,5 +11,16 @@ services:
     volumes:
       - postgres_sistema_presenca:/var/lib/postgresql/data/
 
+  broker:
+    image: eclipse-mosquitto:2
+    container_name: mosquitto
+    restart: unless-stopped
+    ports:
+      - "1883:1883" # MQTT sem TLS
+    volumes:
+      - ./mosquitto/config:/mosquitto/config
+      - mosquitto_data:/mosquitto/data # persistência (retained messages, sessões, subscriptions)
+ 
 volumes:
   postgres_sistema_presenca:
+  mosquitto_data:
