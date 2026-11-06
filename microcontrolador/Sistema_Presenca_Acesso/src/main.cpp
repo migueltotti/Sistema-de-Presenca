@@ -8,6 +8,10 @@
 QueueHandle_t eventQueue, displayQueue;
 
 void controllerTask(void*) {
+  bool aulaAtiva = false;
+  char *aulaId = nullptr;
+  char *professorId = nullptr;
+
   mostrar(LADO_INTERNO, "Nenhuma aula",  "em andamento");          // permanente
 
   AppEvent ev;
@@ -26,12 +30,37 @@ void controllerTask(void*) {
           break;
 
         case EVT_AULA_INICIOU:
-          mostrar(LADO_INTERNO, "Aula iniciada", "Aproxime a tag");        // permanente
+          if (aulaAtiva) {
+            Serial.printf("[ctrl] evento de aula iniciada recebido, mas já havia aula ativa (ativa: %s, recebida: %s).\n", aulaId, ev.aula.aulaId);
+            break;
+          }
+
+          aulaAtiva = true;
+          aulaId = ev.aula.aulaId;
+          professorId = ev.aula.professorId;
+
+          mostrar(LADO_INTERNO, "Aula iniciada", "", 3000);               // temporaria
+          mostrar(LADO_INTERNO, "Aproxime uma tag", ">>            <<");  // permanente
           Serial.printf("[ctrl] aula com id %s iniciada para o professor %s.\n", ev.aula.aulaId, ev.aula.professorId);
           break;
 
         case EVT_AULA_FINALIZOU:
+          if (!aulaAtiva) {
+            Serial.println("[ctrl] evento de aula finalizada recebido, mas não havia aula ativa.");
+            break;
+          }
+
+          if (aulaId != nullptr && strcmp(aulaId, ev.aula.aulaId) != 0) {
+            Serial.printf("[ctrl] evento de aula finalizada recebido, mas o id da aula não corresponde à aula ativa (ativa: %s, recebida: %s).\n", aulaId, ev.aula.aulaId);
+            break;
+          }
+          
+          aulaAtiva = false;
+          aulaId = nullptr;
+          professorId = nullptr;
+
           mostrar(LADO_INTERNO, "Aula finalizada", "Obrigado!", 3000);     // temporaria
+          mostrar(LADO_INTERNO, "Nenhuma aula",  "em andamento");          // permanente
           Serial.printf("[ctrl] aula com id %s finalizada para o professor %s.\n", ev.aula.aulaId, ev.aula.professorId);
           break;
 
@@ -63,6 +92,9 @@ void setup() {
   xTaskCreatePinnedToCore(displayTask,    "display",  4096, nullptr, 1, nullptr, 1);
   xTaskCreatePinnedToCore(controllerTask, "ctrl",     4096, nullptr, 2, nullptr, 1);
   xTaskCreatePinnedToCore(mqttTask,       "mqtt",     4096, nullptr, 2, nullptr, 0);
+
+  mostrar(LADO_INTERNO, "Sistema de", "Presenca pronto", 3000);  // permanente
+  //mostrar(LADO_EXTERNO, "Sistema de", "Presenca pronto", 3000);  // permanente
 }
 
 void loop() { vTaskDelete(NULL); }
