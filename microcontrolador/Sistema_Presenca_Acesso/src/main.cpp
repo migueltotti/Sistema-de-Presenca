@@ -5,7 +5,7 @@
 #include "mqtt.h"
 #include "display.h"
 
-QueueHandle_t eventQueue, displayQueue;
+QueueHandle_t eventQueue, displayQueue, httpQueue;
 
 void controllerTask(void*) {
   bool aulaAtiva = false;
@@ -19,6 +19,15 @@ void controllerTask(void*) {
     if (xQueueReceive(eventQueue, &ev, portMAX_DELAY) == pdTRUE) {
       switch (ev.type) {
         case EVT_TAG:
+          if (!aulaAtiva && ev.tag.lado == LADO_INTERNO) {
+            Serial.printf("[ctrl] tag %s no leitor interno, mas não há aula ativa.\n", ev.tag.uid);
+            break;
+          }
+
+          // publica evento na queue para marcar a presenca do aluno no servidor.
+
+          // tirar essas linhas abaixo pois elas serão executadas no 'case EVT_HTTP_RESULTADO' quando o resultado do HTTP chegar.
+          // nesse case apeganas pegamos o que veio do evento de tag e colocamos na queue para fazer a req http.
           mostrar(LADO_INTERNO, "Presenca OK",   "Maria Silva", 2000);     // volta sozinho
           Serial.printf("[ctrl] tag %s no leitor %s\n", ev.tag.uid, ev.tag.lado == LADO_INTERNO ? "interno" : "externo");
           break;
@@ -81,6 +90,7 @@ void setup() {
   
   eventQueue    = xQueueCreate(16, sizeof(AppEvent));
   displayQueue  = xQueueCreate(8,  sizeof(DisplayMsg));
+  httpQueue     = xQueueCreate(8,  sizeof(HttpRequest));
 
   displayInit();
   readersInit();
