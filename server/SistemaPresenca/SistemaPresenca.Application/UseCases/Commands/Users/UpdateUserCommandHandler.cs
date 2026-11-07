@@ -33,7 +33,7 @@ public class UpdateUserCommandHandler(
         var validationResult = validator.Validate(userUpdateRequest);
         if (!validationResult.IsValid)
         {
-            logger.LogError("Invalid user update request for subject with id {Id}.", command.Id);
+            logger.LogError("Invalid user update request for user with id {Id}.", command.Id);
             return Result.Failure(UserErrors.InvalidUpdateRequest(string.Join(",", validationResult.Errors)));
         }
 
