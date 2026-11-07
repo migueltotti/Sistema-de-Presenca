@@ -13,12 +13,12 @@ public sealed class RevokeRoomAccessCommandHandler(
     public async Task<Result> HandleAsync(RevokeRoomAccessCommand command, CancellationToken cancellationToken = default)
     {
         var permission = await roomAccessPermissionRepository.GetOneAsync(
-            permission => permission.Id == command.Id,
+            permission => permission.Id == command.PermissionId && permission.RoomId == command.RoomId,
             cancellationToken);
 
         if (permission is null)
         {
-            logger.LogError("Room access permission with id {Id} not found.", command.Id);
+            logger.LogError("Room access permission with id {Id} not found.", command.PermissionId);
             return Result.Failure(RoomAccessPermissionErrors.NotFound);
         }
 
@@ -27,7 +27,7 @@ public sealed class RevokeRoomAccessCommandHandler(
             Guid.Parse("95934e86-cda1-44d0-831c-0aa42892650c"),
             cancellationToken);
 
-        logger.LogInformation("Room access permission with id {Id} revoked.", command.Id);
+        logger.LogInformation("Room access permission with id {Id} revoked.", command.PermissionId);
 
         return Result.Success();
     }

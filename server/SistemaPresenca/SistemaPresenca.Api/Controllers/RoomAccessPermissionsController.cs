@@ -37,9 +37,12 @@ public class RoomAccessPermissionsController(ICommandMediator commandMediator) :
     [ProducesResponseType(typeof(void), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(Error), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
-    public async Task<IActionResult> RevokeAccessAsync([FromRoute] Guid permissionId, CancellationToken cancellationToken)
+    public async Task<IActionResult> RevokeAccessAsync(
+        [FromRoute] Guid roomId,
+        [FromRoute] Guid permissionId, 
+        CancellationToken cancellationToken)
     {
-        var result = await commandMediator.SendAsync(new RevokeRoomAccessCommand(permissionId), cancellationToken);
+        var result = await commandMediator.SendAsync(new RevokeRoomAccessCommand(roomId, permissionId), cancellationToken);
 
         if (result.IsFailure)
         {
@@ -54,9 +57,12 @@ public class RoomAccessPermissionsController(ICommandMediator commandMediator) :
     [ProducesResponseType(typeof(void), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(Error), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
-    public async Task<IActionResult> ActivateAccessAsync([FromRoute] Guid permissionId, CancellationToken cancellationToken)
+    public async Task<IActionResult> ActivateAccessAsync(
+        [FromRoute] Guid roomId,
+        [FromRoute] Guid permissionId,
+        CancellationToken cancellationToken)
     {
-        var result = await commandMediator.SendAsync(new ActivateRoomAccessCommand(permissionId), cancellationToken);
+        var result = await commandMediator.SendAsync(new ActivateRoomAccessCommand(roomId, permissionId), cancellationToken);
 
         if (result.IsFailure)
         {
@@ -71,9 +77,12 @@ public class RoomAccessPermissionsController(ICommandMediator commandMediator) :
     [ProducesResponseType(typeof(void), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(Error), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
-    public async Task<IActionResult> DeactivateAccessAsync([FromRoute] Guid permissionId, CancellationToken cancellationToken)
+    public async Task<IActionResult> DeactivateAccessAsync(
+        [FromRoute] Guid roomId,
+        [FromRoute] Guid permissionId,
+        CancellationToken cancellationToken)
     {
-        var result = await commandMediator.SendAsync(new DeactivateRoomAccessCommand(permissionId), cancellationToken);
+        var result = await commandMediator.SendAsync(new DeactivateRoomAccessCommand(roomId, permissionId), cancellationToken);
 
         if (result.IsFailure)
         {

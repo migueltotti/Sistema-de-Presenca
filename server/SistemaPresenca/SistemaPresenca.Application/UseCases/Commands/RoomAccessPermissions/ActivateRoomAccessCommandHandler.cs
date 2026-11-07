@@ -13,19 +13,19 @@ public sealed class ActivateRoomAccessCommandHandler(
     public async Task<Result> HandleAsync(ActivateRoomAccessCommand command, CancellationToken cancellationToken = default)
     {
         var permission = await roomAccessPermissionRepository.GetOneAsync(
-            permission => permission.Id == command.Id,
+            permission => permission.Id == command.PermissionId && permission.RoomId == command.RoomId,
             cancellationToken);
 
         if (permission is null)
         {
-            logger.LogError("Room access permission with id {Id} not found.", command.Id);
+            logger.LogError("Room access permission with id {Id} not found.", command.PermissionId);
             return Result.Failure(RoomAccessPermissionErrors.NotFound);
         }
 
         permission.Active = true;
         await roomAccessPermissionRepository.UpdateAsync(permission, cancellationToken);
 
-        logger.LogInformation("Room access permission with id {Id} activated.", command.Id);
+        logger.LogInformation("Room access permission with id {Id} activated.", command.PermissionId);
 
         return Result.Success();
     }
