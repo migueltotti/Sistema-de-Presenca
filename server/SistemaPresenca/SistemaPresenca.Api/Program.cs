@@ -20,6 +20,7 @@ builder.Services
     .AddServices()
     .AddMediator()
     .AddValidators()
+    .AddMqtt(applicationSettings.MqttSettings)
     .AddApiSpecification()
     .AddEndpointsApiExplorer();
 
