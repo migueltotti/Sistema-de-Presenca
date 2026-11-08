@@ -1,8 +1,6 @@
-﻿using SistemaPresenca.Application.Requests.Subjects;
-using SistemaPresenca.Application.Requests.Users;
+﻿using SistemaPresenca.Application.Requests.Users;
 using SistemaPresenca.Application.Responses.Users;
 using SistemaPresenca.Domain.Entities;
-using System.Runtime.CompilerServices;
 
 namespace SistemaPresenca.Application.Mappers;
 
@@ -44,5 +42,10 @@ public static class UserMappers
             user.Cpf,
             user.TagId,
             user.Role);
+    }
+
+    public static LoginResponse ToLoginResponse(this string accessToken)
+    {
+        return new LoginResponse(accessToken);
     }
 }

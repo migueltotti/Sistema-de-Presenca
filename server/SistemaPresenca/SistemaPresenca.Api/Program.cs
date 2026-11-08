@@ -16,6 +16,7 @@ builder.Services
     .AddExceptionHandler<GlobalExceptionHandler>()
     .AddProblemDetails()
     .AddDatabase(applicationSettings.PostgresSettings)
+    .ConfigureAuthentication(applicationSettings.JwtSettings)
     .AddRepositories()
     .AddServices()
     .AddMediator()
@@ -31,6 +32,7 @@ app.UseSpecification();
 
 app
     //.UseHttpsRedirection()
+    .UseAuthentication()
     .UseAuthorization();
 
 app.MapControllers();
