@@ -1,10 +1,5 @@
 #pragma once
-// ============================================================================
-// display_task.h
-// Tudo que a displayTask precisa: estado, funções auxiliares e a própria task.
-// Pré-requisito: tipos.h (Lado, DisplayMsg, MSG_LEN) e a fila displayQueue
-// criada no setup() ANTES de a task iniciar.
-// ============================================================================
+
 #include <Arduino.h>
 #include <Wire.h>
 #include <LiquidCrystal_I2C.h>
@@ -15,26 +10,17 @@ extern QueueHandle_t displayQueue;   // definida no .ino principal
 // ----------------------------------------------------------------------------
 // Configuração
 // ----------------------------------------------------------------------------
-constexpr uint8_t LCD_ADDR = 0x27;
+constexpr uint8_t LCD_ADDR_INTERNO = 0x26;
+constexpr uint8_t LCD_ADDR_EXTERNO = 0x27;
 constexpr uint8_t LCD_COLS = 16;
 constexpr uint8_t LCD_ROWS = 2;
 
-constexpr uint8_t PIN_SDA_EXTERNO = 21;   // Wire  (barramento 0)
-constexpr uint8_t PIN_SCL_EXTERNO = 22;
-constexpr uint8_t PIN_SDA_INTERNO = 16;   // Wire1 (barramento 1)
-constexpr uint8_t PIN_SCL_INTERNO = 17;
+constexpr uint8_t PIN_SDA = 16; // RX2
+constexpr uint8_t PIN_SCL = 17; // TX2
 
-// ----------------------------------------------------------------------------
-// ÚNICO trecho dependente da biblioteca de LCD.
-// Os dois LCDs têm o mesmo endereço, mas ficam em barramentos diferentes,
-// então a biblioteca precisa permitir escolher o TwoWire (Wire / Wire1).
-// Ajuste o construtor e o método de inicialização (init() ou begin())
-// conforme a biblioteca que vocês usarem.
-// ----------------------------------------------------------------------------
-static LiquidCrystal_I2C lcdInterno(LCD_ADDR, LCD_COLS, LCD_ROWS);
-//static LiquidCrystal_I2C lcdExterno(&Wire,  LCD_ADDR, LCD_COLS, LCD_ROWS);
+static LiquidCrystal_I2C lcdInterno(LCD_ADDR_INTERNO, LCD_COLS, LCD_ROWS);
+//static LiquidCrystal_I2C lcdExterno(LCD_ADDR_EXTERNO, LCD_COLS, LCD_ROWS);
 
-// Índice = valor do enum Lado (LADO_INTERNO = 0, LADO_EXTERNO = 1)
 static LiquidCrystal_I2C* const lcds[1] = { &lcdInterno, /*&lcdExterno*/ };
 
 // ----------------------------------------------------------------------------
@@ -54,8 +40,7 @@ static EstadoLado estado[2] = {};
 // Inicialização do hardware (chamar no setup(), antes de criar as tasks)
 // ----------------------------------------------------------------------------
 static void displayInit() {
-  //Wire.begin(PIN_SDA_EXTERNO, PIN_SCL_EXTERNO);
-  Wire.begin(PIN_SDA_INTERNO, PIN_SCL_INTERNO);
+  Wire.begin(PIN_SDA, PIN_SCL);
 
   for (uint8_t i = 0; i < 1; i++) {
     lcds[i]->init();
@@ -68,8 +53,6 @@ static void displayInit() {
 // Desenho
 // ----------------------------------------------------------------------------
 
-// Escreve uma linha completa (preenche com espaços até o fim).
-// Isso evita lcd.clear() a cada mensagem, que causa "piscada" no display.
 static void escreverLinha(LiquidCrystal_I2C& lcd, uint8_t linha, const char* texto) {
   char buf[LCD_COLS + 1];
   snprintf(buf, sizeof(buf), "%-*.*s", LCD_COLS, LCD_COLS, texto);
