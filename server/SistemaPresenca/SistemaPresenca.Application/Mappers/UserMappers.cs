@@ -6,7 +6,7 @@ namespace SistemaPresenca.Application.Mappers;
 
 public static class UserMappers
 {
-    public static User ToEntity(this CreateUserRequest request)
+    public static User ToEntity(this CreateUserRequest request, Guid createdByAdminId)
     {
         return new User(
             request.Name,
@@ -14,7 +14,7 @@ public static class UserMappers
             request.RegistrationId,
             request.Cpf,
             request.Role,
-            Guid.Parse("95934e86-cda1-44d0-831c-0aa42892650c"));
+            createdByAdminId);
     }
 
     public static UpdateUserRequest ToUpdateRequest(this User user)

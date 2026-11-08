@@ -1,6 +1,7 @@
 ﻿using LiteBus.Commands.Abstractions;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
+using SistemaPresenca.Application.Interfaces;
 using SistemaPresenca.Application.Mappers;
 using SistemaPresenca.Domain.Entities;
 using SistemaPresenca.Domain.Errors;
@@ -10,6 +11,7 @@ using SistemaPresenca.Domain.Models;
 namespace SistemaPresenca.Application.UseCases.Commands.Users;
 
 public class CreateUserCommandHandler(
+    IUserContextProvider userContextProvider,
     IUserRepository userRepository,
     IPasswordHasher<User> passwordHasher,
     ILogger<CreateUserCommandHandler> logger) : ICommandHandler<CreateUserCommand, Result>
@@ -27,7 +29,7 @@ public class CreateUserCommandHandler(
             return Result.Failure(UserErrors.EmailOrCpfAlreadyExists);
         }
 
-        var user = command.Request.ToEntity();
+        var user = command.Request.ToEntity(userContextProvider.UserId);
 
         var hashedPassword = passwordHasher.HashPassword(user, command.Request.Password);
 

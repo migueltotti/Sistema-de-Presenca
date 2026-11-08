@@ -6,13 +6,13 @@ namespace SistemaPresenca.Application.Mappers;
 
 public static class RoomMapper
 {
-    public static Room ToEntity(this CreateRoomRequest request)
+    public static Room ToEntity(this CreateRoomRequest request, Guid createdByAdminId)
     {
         return new Room(
             request.Name,
             request.Location,
             request.MicrocontrollerId,
-            Guid.Parse("95934e86-cda1-44d0-831c-0aa42892650c") 
+            createdByAdminId
         );
     }
 

@@ -1,5 +1,6 @@
 ﻿using LiteBus.Commands.Abstractions;
 using Microsoft.Extensions.Logging;
+using SistemaPresenca.Application.Interfaces;
 using SistemaPresenca.Domain.Errors;
 using SistemaPresenca.Domain.Interfaces.Repositories;
 using SistemaPresenca.Domain.Models;
@@ -7,6 +8,7 @@ using SistemaPresenca.Domain.Models;
 namespace SistemaPresenca.Application.UseCases.Commands.Subjects;
 
 public sealed class DeleteSubjectCommandHandler(
+    IUserContextProvider userContextProvider,
     ISubjectRepository subjectRepository,
     ILogger<DeleteSubjectCommandHandler> logger) : ICommandHandler<DeleteSubjectCommand, Result>
 {
@@ -20,7 +22,7 @@ public sealed class DeleteSubjectCommandHandler(
             return Result.Failure(SubjectErrors.NotFound);
         }
 
-        await subjectRepository.DeleteAsync(subject, Guid.Parse("95934e86-cda1-44d0-831c-0aa42892650c"), cancellationToken);
+        await subjectRepository.DeleteAsync(subject, userContextProvider.UserId, cancellationToken);
 
         logger.LogInformation("Subject with id {Id} deleted successfully.", command.Id);
 

@@ -1,5 +1,6 @@
 ﻿using LiteBus.Commands.Abstractions;
 using Microsoft.Extensions.Logging;
+using SistemaPresenca.Application.Interfaces;
 using SistemaPresenca.Domain.Errors;
 using SistemaPresenca.Domain.Interfaces.Repositories;
 using SistemaPresenca.Domain.Models;
@@ -7,6 +8,7 @@ using SistemaPresenca.Domain.Models;
 namespace SistemaPresenca.Application.UseCases.Commands.Majors;
 
 public sealed class DeleteMajorCommandHandler(
+    IUserContextProvider userContextProvider,
     IMajorRepository majorRepoitory,
     ILogger<DeleteMajorCommandHandler> logger) : ICommandHandler<DeleteMajorCommand, Result>
 {
@@ -20,7 +22,7 @@ public sealed class DeleteMajorCommandHandler(
             return Result.Failure(MajorErrors.NotFound);
         }
 
-        await majorRepoitory.DeleteAsync(major, Guid.Parse("95934e86-cda1-44d0-831c-0aa42892650c"), cancellationToken);
+        await majorRepoitory.DeleteAsync(major, userContextProvider.UserId, cancellationToken);
 
         logger.LogInformation("Major with id {Id} deleted successfully.", command.Id);
 

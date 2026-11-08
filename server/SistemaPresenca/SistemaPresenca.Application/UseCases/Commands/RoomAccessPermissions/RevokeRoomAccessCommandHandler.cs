@@ -1,5 +1,6 @@
 using LiteBus.Commands.Abstractions;
 using Microsoft.Extensions.Logging;
+using SistemaPresenca.Application.Interfaces;
 using SistemaPresenca.Domain.Errors;
 using SistemaPresenca.Domain.Interfaces.Repositories;
 using SistemaPresenca.Domain.Models;
@@ -7,6 +8,7 @@ using SistemaPresenca.Domain.Models;
 namespace SistemaPresenca.Application.UseCases.Commands.RoomAccessPermissions;
 
 public sealed class RevokeRoomAccessCommandHandler(
+    IUserContextProvider userContextProvider,
     IRoomAccessPermissionRepository roomAccessPermissionRepository,
     ILogger<RevokeRoomAccessCommandHandler> logger) : ICommandHandler<RevokeRoomAccessCommand, Result>
 {
@@ -24,7 +26,7 @@ public sealed class RevokeRoomAccessCommandHandler(
 
         await roomAccessPermissionRepository.DeleteAsync(
             permission,
-            Guid.Parse("95934e86-cda1-44d0-831c-0aa42892650c"),
+            userContextProvider.UserId,
             cancellationToken);
 
         logger.LogInformation("Room access permission with id {Id} revoked.", command.PermissionId);

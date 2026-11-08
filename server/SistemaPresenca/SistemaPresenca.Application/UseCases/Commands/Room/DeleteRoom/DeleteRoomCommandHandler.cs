@@ -1,5 +1,6 @@
 using LiteBus.Commands.Abstractions;
 using Microsoft.Extensions.Logging;
+using SistemaPresenca.Application.Interfaces;
 using SistemaPresenca.Domain.Errors;
 using SistemaPresenca.Domain.Interfaces.Repositories;
 using SistemaPresenca.Domain.Models;
@@ -7,7 +8,8 @@ using SistemaPresenca.Domain.Models;
 namespace SistemaPresenca.Application.UseCases.Commands.Rooms;
 
 public sealed class DeleteRoomCommandHandler(
-	IRoomRepository roomRepository,
+    IUserContextProvider userContextProvider,
+    IRoomRepository roomRepository,
 	ILogger<DeleteRoomCommandHandler> logger) : ICommandHandler<DeleteRoomCommand, Result>
 {
 	public async Task<Result> HandleAsync(DeleteRoomCommand command, CancellationToken cancellationToken = default)
@@ -20,7 +22,7 @@ public sealed class DeleteRoomCommandHandler(
 			return Result.Failure(RoomErrors.NotFound);
 		}
 
-		await roomRepository.DeleteAsync(room, Guid.Parse("95934e86-cda1-44d0-831c-0aa42892650c"), cancellationToken);
+		await roomRepository.DeleteAsync(room, userContextProvider.UserId, cancellationToken);
 
 		logger.LogInformation("Room with id {Id} deleted successfully.", command.Id);
 

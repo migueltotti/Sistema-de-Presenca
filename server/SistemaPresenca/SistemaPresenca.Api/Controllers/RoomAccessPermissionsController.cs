@@ -21,9 +21,7 @@ public class RoomAccessPermissionsController(ICommandMediator commandMediator) :
         [FromBody] RoomAccessRequest request,
         CancellationToken cancellationToken)
     {
-        var result = await commandMediator.SendAsync(
-            new GrantRoomAccessCommand(request.UserId, roomId, null),
-            cancellationToken);
+        var result = await commandMediator.SendAsync(new GrantRoomAccessCommand(request.UserId, roomId), cancellationToken);
 
         if (result.IsFailure)
         {

@@ -1,5 +1,6 @@
 ﻿using LiteBus.Commands.Abstractions;
 using Microsoft.Extensions.Logging;
+using SistemaPresenca.Application.Interfaces;
 using SistemaPresenca.Application.Mappers;
 using SistemaPresenca.Domain.Errors;
 using SistemaPresenca.Domain.Interfaces.Repositories;
@@ -8,6 +9,7 @@ using SistemaPresenca.Domain.Models;
 namespace SistemaPresenca.Application.UseCases.Commands.Subjects;
 
 public sealed class CreateSubjectCommandHandler(
+    IUserContextProvider userContextProvider,
     IMajorRepository majorRepository,
     ISubjectRepository subjectRepository,
     ILogger<CreateSubjectCommandHandler> logger) : ICommandHandler<CreateSubjectCommand, Result>
@@ -30,7 +32,7 @@ public sealed class CreateSubjectCommandHandler(
             return Result.Failure(SubjectErrors.CodeAlreadyExists);
         }
 
-        var newSubject = command.Request.ToEntity();
+        var newSubject = command.Request.ToEntity(userContextProvider.UserId);
 
         await subjectRepository.AddAsync(newSubject, cancellationToken);
 

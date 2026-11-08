@@ -1,15 +1,17 @@
 ﻿using LiteBus.Commands.Abstractions;
-using SistemaPresenca.Domain.Models;
 using Microsoft.Extensions.Logging;
+using SistemaPresenca.Application.Interfaces;
 using SistemaPresenca.Application.Responses.Session;
 using SistemaPresenca.Domain.Entities;
 using SistemaPresenca.Domain.Enums;
 using SistemaPresenca.Domain.Errors;
 using SistemaPresenca.Domain.Interfaces.Repositories;
+using SistemaPresenca.Domain.Models;
 
 namespace SistemaPresenca.Application.UseCases.Commands.Sessions;
 
 public class StartSessionCommandHandler(
+    IUserContextProvider userContextProvider,
     ISessionRepository sessionRepository,
     ISubjectRepository subjectRepository,
     IRoomRepository roomRepository,
@@ -51,7 +53,7 @@ public class StartSessionCommandHandler(
             subject.Id,
             room.Id,
             professor.Id,
-            null
+            userContextProvider.UserId
         );
 
         foreach (var student in subject.Students)

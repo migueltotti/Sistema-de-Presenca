@@ -1,5 +1,6 @@
 ﻿using LiteBus.Commands.Abstractions;
 using Microsoft.Extensions.Logging;
+using SistemaPresenca.Application.Interfaces;
 using SistemaPresenca.Domain.Errors;
 using SistemaPresenca.Domain.Interfaces.Repositories;
 using SistemaPresenca.Domain.Models;
@@ -7,6 +8,7 @@ using SistemaPresenca.Domain.Models;
 namespace SistemaPresenca.Application.UseCases.Commands.Users;
 
 public class DeleteUserCommandHandler(
+    IUserContextProvider userContextProvider,
     IUserRepository userRepository,
     ILogger<DeleteUserCommandHandler> logger) : ICommandHandler<DeleteUserCommand, Result>
 {
@@ -20,7 +22,7 @@ public class DeleteUserCommandHandler(
             return Result.Failure(UserErrors.NotFound);
         }
 
-        await userRepository.DeleteAsync(user, Guid.Parse("95934e86-cda1-44d0-831c-0aa42892650c"), cancellationToken);
+        await userRepository.DeleteAsync(user, userContextProvider.UserId, cancellationToken);
 
         logger.LogInformation("User with id {Id} deleted successfully.", command.Id);
 

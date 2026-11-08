@@ -6,12 +6,12 @@ namespace SistemaPresenca.Application.Mappers;
 
 public static class MajorMappers
 {
-    public static Major ToEntity(this CreateMajorRequest request)
+    public static Major ToEntity(this CreateMajorRequest request, Guid createdByAdminId)
     {
         return new Major(
             request.Name,
             request.Code,
-            Guid.Parse("95934e86-cda1-44d0-831c-0aa42892650c")
+            createdByAdminId
         );
     }
 

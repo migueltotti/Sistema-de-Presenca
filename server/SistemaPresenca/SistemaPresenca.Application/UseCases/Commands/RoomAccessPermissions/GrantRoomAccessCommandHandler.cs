@@ -1,5 +1,7 @@
 using LiteBus.Commands.Abstractions;
 using Microsoft.Extensions.Logging;
+using SistemaPresenca.Application.Interfaces;
+using SistemaPresenca.Application.Mappers;
 using SistemaPresenca.Domain.Entities;
 using SistemaPresenca.Domain.Errors;
 using SistemaPresenca.Domain.Interfaces.Repositories;
@@ -8,6 +10,7 @@ using SistemaPresenca.Domain.Models;
 namespace SistemaPresenca.Application.UseCases.Commands.RoomAccessPermissions;
 
 public sealed class GrantRoomAccessCommandHandler(
+    IUserContextProvider userContextProvider,
     IUserRepository userRepository,
     IRoomRepository roomRepository,
     IRoomAccessPermissionRepository roomAccessPermissionRepository,
@@ -41,7 +44,7 @@ public sealed class GrantRoomAccessCommandHandler(
             return Result.Failure(RoomAccessPermissionErrors.AlreadyExists);
         }
 
-        var permission = new RoomAccessPermission(command.UserId, command.RoomId, command.GrantedByAdminId);
+        var permission = command.ToEntity(userContextProvider.UserId);
 
         await roomAccessPermissionRepository.AddAsync(permission, cancellationToken);
 

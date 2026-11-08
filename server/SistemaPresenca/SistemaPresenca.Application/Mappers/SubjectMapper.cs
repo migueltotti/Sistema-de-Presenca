@@ -6,14 +6,14 @@ namespace SistemaPresenca.Application.Mappers;
 
 public static class SubjectMapper
 {
-    public static Subject ToEntity(this CreateSubjectRequest request)
+    public static Subject ToEntity(this CreateSubjectRequest request, Guid createdByAdminId)
     {
         return new Subject(
             request.Name,
             request.Code,
             request.TotalClasses,
             request.MajorId,
-            Guid.Parse("95934e86-cda1-44d0-831c-0aa42892650c")
+            createdByAdminId
         );
     }
 

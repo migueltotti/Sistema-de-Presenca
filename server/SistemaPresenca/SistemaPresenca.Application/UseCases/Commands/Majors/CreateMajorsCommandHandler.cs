@@ -1,5 +1,6 @@
 ﻿using LiteBus.Commands.Abstractions;
 using Microsoft.Extensions.Logging;
+using SistemaPresenca.Application.Interfaces;
 using SistemaPresenca.Application.Mappers;
 using SistemaPresenca.Domain.Errors;
 using SistemaPresenca.Domain.Interfaces.Repositories;
@@ -8,6 +9,7 @@ using SistemaPresenca.Domain.Models;
 namespace SistemaPresenca.Application.UseCases.Commands.Majors;
 
 public sealed class CreateMajorsCommandHandler(
+    IUserContextProvider userContextProvider,
     IMajorRepository majorRepository,
     ILogger<CreateMajorsCommandHandler> logger) : ICommandHandler<CreateMajorsCommand, Result>
 {
@@ -21,7 +23,7 @@ public sealed class CreateMajorsCommandHandler(
             return Result.Failure(MajorErrors.CodeAlreadyExists);
         }
 
-        var newMajor = command.Request.ToEntity();
+        var newMajor = command.Request.ToEntity(userContextProvider.UserId);
 
         await majorRepository.AddAsync(newMajor, cancellationToken);
 
