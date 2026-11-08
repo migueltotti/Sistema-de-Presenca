@@ -1,5 +1,6 @@
 using SistemaPresenca.Api.Extensions;
 using SistemaPresenca.Api.Handlers;
+using SistemaPresenca.Api.Middlewares;
 using SistemaPresenca.CrossCutting.Extensions;
 using SistemaPresenca.CrossCutting.Models;
 
@@ -33,7 +34,9 @@ app.UseSpecification();
 app
     //.UseHttpsRedirection()
     .UseAuthentication()
-    .UseAuthorization();
+    .UseAuthorization()
+    .UseMiddleware<UserContextMiddleware>()
+    .UseExceptionHandler();
 
 app.MapControllers();
 
