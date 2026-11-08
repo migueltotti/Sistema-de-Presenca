@@ -38,7 +38,7 @@ void controllerTask(void*) {
         case EVT_BTN_CANCELA:
           break;
 
-        case EVT_AULA_INICIOU:
+        case EVT_INICIAR_REGISTRO_AULA:
           if (aulaAtiva) {
             Serial.printf("[ctrl] evento de aula iniciada recebido, mas já havia aula ativa (ativa: %s, recebida: %s).\n", aulaId, ev.aula.aulaId);
             break;
@@ -53,7 +53,7 @@ void controllerTask(void*) {
           Serial.printf("[ctrl] aula com id %s iniciada para o professor com tag %s.\n", ev.aula.aulaId, ev.aula.professorTagId);
           break;
 
-        case EVT_AULA_FINALIZOU:
+        case EVT_FINALIZAR_REGISTRO_AULA:
           if (!aulaAtiva) {
             Serial.println("[ctrl] evento de aula finalizada recebido, mas não havia aula ativa.");
             break;
@@ -61,11 +61,6 @@ void controllerTask(void*) {
 
           if (strcmp(aulaId, ev.aula.aulaId) != 0) {
             Serial.printf("[ctrl] evento de aula finalizada recebido, mas o id da aula não corresponde à aula ativa (ativa: %s, recebida: %s).\n", aulaId, ev.aula.aulaId);
-            break;
-          }
-
-          if (strcmp(professorTagId, ev.aula.professorTagId) != 0) {
-            Serial.printf("[ctrl] evento de aula finalizada recebido, mas o id da tag do professor não corresponde ao professor que iniciou a aula (ativa: %s, recebida: %s).\n", professorTagId, ev.aula.professorTagId);
             break;
           }
           

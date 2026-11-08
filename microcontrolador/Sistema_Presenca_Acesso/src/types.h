@@ -40,8 +40,8 @@ enum EventType : uint8_t {
   EVT_TAG,
   EVT_BTN_CONFIRMA,
   EVT_BTN_CANCELA,
-  EVT_AULA_INICIOU,
-  EVT_AULA_FINALIZOU,
+  EVT_INICIAR_REGISTRO_AULA,
+  EVT_FINALIZAR_REGISTRO_AULA,
   EVT_HTTP_RESULTADO,
   EVT_TIMEOUT                    // disparado por um software timer
 };
@@ -50,7 +50,7 @@ struct AppEvent {
   EventType type;
   union {                        // só um é válido, conforme o type
     struct { Lado lado; char uid[UID_LEN]; }                tag;   // EVT_TAG
-    struct { char aulaId[GUID_LEN]; char professorTagId[UID_LEN]; } aula;  // EVT_AULA_INICIOU e EVT_AULA_FINALIZOU
+    struct { char aulaId[GUID_LEN]; char professorTagId[UID_LEN]; } aula;  // EVT_INICIAR_REGISTRO_AULA e EVT_FINALIZAR_REGISTRO_AULA 
     HttpResultado                                           http;  // EVT_HTTP_RESULTADO
   };
 };

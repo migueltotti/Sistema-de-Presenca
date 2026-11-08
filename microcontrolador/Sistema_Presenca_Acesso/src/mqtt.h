@@ -26,11 +26,11 @@ const int mqtt_port = 1883;
 String client_id = "esp32-client-";
 
 static bool parseEventType(const char* value, EventType& type) {
-  if (strcmp(value, "EVT_AULA_INICIOU") == 0) {
-    type = EVT_AULA_INICIOU;
+  if (strcmp(value, "EVT_INICIAR_REGISTRO_AULA") == 0) {
+    type = EVT_INICIAR_REGISTRO_AULA;
   }
-  else if (strcmp(value, "EVT_AULA_FINALIZOU") == 0) {
-    type = EVT_AULA_FINALIZOU;
+  else if (strcmp(value, "EVT_FINALIZAR_REGISTRO_AULA") == 0) {
+    type = EVT_FINALIZAR_REGISTRO_AULA;
   }
   else {
     return false;
@@ -64,7 +64,7 @@ void callback(char *topic, byte *payload, unsigned int length) {
     return;
   }
 
-  if (ev.type == EVT_AULA_INICIOU || ev.type == EVT_AULA_FINALIZOU) {
+  if (ev.type == EVT_INICIAR_REGISTRO_AULA || ev.type == EVT_FINALIZAR_REGISTRO_AULA) {
     const char* aulaId = doc["aulaId"];
     const char* professorTagId = doc["professorId"];
 
