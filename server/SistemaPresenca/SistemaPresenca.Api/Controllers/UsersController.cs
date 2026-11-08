@@ -27,10 +27,11 @@ public class UsersController(ICommandMediator commandMediator, IQueryMediator qu
     }
 
     [HttpPost]
+    [Authorize("Admin")]
     [ProducesResponseType(typeof(void), StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(Error), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
-    public async Task<IActionResult> CreateSubjectAsync([FromBody] CreateUserRequest request, CancellationToken cancellationToken)
+    public async Task<IActionResult> CreateUserAsync([FromBody] CreateUserRequest request, CancellationToken cancellationToken)
     {
         var result = await commandMediator.SendAsync(new CreateUserCommand(request), cancellationToken);
 
@@ -60,6 +61,7 @@ public class UsersController(ICommandMediator commandMediator, IQueryMediator qu
     }
 
     [HttpDelete("{id:guid}")]
+    [Authorize("Admin")]
     [ProducesResponseType(typeof(void), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(Error), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]

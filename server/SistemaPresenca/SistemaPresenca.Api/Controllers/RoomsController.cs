@@ -1,5 +1,6 @@
 using LiteBus.Commands.Abstractions;
 using LiteBus.Queries.Abstractions;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.JsonPatch.SystemTextJson;
 using Microsoft.AspNetCore.Mvc;
 using SistemaPresenca.Application.Requests.RoomAccessPermissions;
@@ -17,8 +18,8 @@ namespace SistemaPresenca.Api.Controllers;
 [Route("api/v1/rooms")]
 public class RoomsController(ICommandMediator commandMediator, IQueryMediator queryMediator) : ControllerBase
 {
-    // TODO: restringir este endpoint a usuários com Role == UserRole.Admin quando a autenticação for implementada.
     [HttpGet]
+    [Authorize("AdminOrProfessor")]
     [ProducesResponseType(typeof(IEnumerable<GetRoomResponse>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> GetRoomsAsync([FromQuery] GetRoomsRequest request, CancellationToken cancellationToken)
@@ -28,8 +29,8 @@ public class RoomsController(ICommandMediator commandMediator, IQueryMediator qu
         return Ok(result);
     }
 
-    // TODO: restringir este endpoint a usuários com Role == UserRole.Admin quando a autenticação for implementada.
     [HttpPost]
+    [Authorize("Admin")]
     [ProducesResponseType(typeof(void), StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(Error), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
@@ -45,8 +46,8 @@ public class RoomsController(ICommandMediator commandMediator, IQueryMediator qu
         return Created();
     }
 
-    // TODO: restringir este endpoint a usuários com Role == UserRole.Admin quando a autenticação for implementada.
     [HttpPatch("{id:guid}")]
+    [Authorize("Admin")]
     [ProducesResponseType(typeof(void), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(Error), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
@@ -63,8 +64,8 @@ public class RoomsController(ICommandMediator commandMediator, IQueryMediator qu
         return Ok();
     }
 
-    // TODO: restringir este endpoint a usuários com Role == UserRole.Admin quando a autenticação for implementada.
     [HttpDelete("{id:guid}")]
+    [Authorize("Admin")]
     [ProducesResponseType(typeof(void), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(Error), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
@@ -81,6 +82,7 @@ public class RoomsController(ICommandMediator commandMediator, IQueryMediator qu
     }
 
     [HttpPost("{roomId:guid}/open")]
+    [Authorize("AdminOrProfessor")]
     [ProducesResponseType(typeof(void), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(Error), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
@@ -100,6 +102,7 @@ public class RoomsController(ICommandMediator commandMediator, IQueryMediator qu
     }
 
     [HttpPost("{roomId:guid}/close")]
+    [Authorize("AdminOrProfessor")]
     [ProducesResponseType(typeof(void), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(Error), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]

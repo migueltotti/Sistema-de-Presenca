@@ -1,5 +1,6 @@
 ﻿using LiteBus.Commands.Abstractions;
 using LiteBus.Queries.Abstractions;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.JsonPatch.SystemTextJson;
 using Microsoft.AspNetCore.Mvc;
 using SistemaPresenca.Application.Requests.Majors;
@@ -26,6 +27,7 @@ public sealed class MajorsController(ICommandMediator commandMediator, IQueryMed
     }
 
     [HttpPost]
+    [Authorize("Admin")]
     [ProducesResponseType(typeof(void), StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(Error), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
@@ -42,6 +44,7 @@ public sealed class MajorsController(ICommandMediator commandMediator, IQueryMed
     }
 
     [HttpPatch("{id:guid}")]
+    [Authorize("Admin")]
     [ProducesResponseType(typeof(void), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(Error), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
@@ -59,6 +62,7 @@ public sealed class MajorsController(ICommandMediator commandMediator, IQueryMed
     }
 
     [HttpDelete("{id:guid}")]
+    [Authorize("Admin")]
     [ProducesResponseType(typeof(void), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(Error), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]

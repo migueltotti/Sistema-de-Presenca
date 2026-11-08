@@ -1,4 +1,5 @@
 using LiteBus.Commands.Abstractions;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SistemaPresenca.Application.Requests.RoomAccessPermissions;
 using SistemaPresenca.Application.UseCases.Commands.RoomAccessPermissions;
@@ -10,8 +11,8 @@ namespace SistemaPresenca.Api.Controllers;
 [Route("api/v1/rooms/{roomId:guid}/access-permissions")]
 public class RoomAccessPermissionsController(ICommandMediator commandMediator) : ControllerBase
 {
-    // TODO: restringir este endpoint a usuários com Role == UserRole.Admin quando a autenticação for implementada.
     [HttpPost]
+    [Authorize("Admin")]
     [ProducesResponseType(typeof(void), StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(Error), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
@@ -32,8 +33,8 @@ public class RoomAccessPermissionsController(ICommandMediator commandMediator) :
         return Created();
     }
 
-    // TODO: restringir este endpoint a usuários com Role == UserRole.Admin quando a autenticação for implementada.
     [HttpDelete("{permissionId:guid}")]
+    [Authorize("Admin")]
     [ProducesResponseType(typeof(void), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(Error), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
@@ -52,8 +53,8 @@ public class RoomAccessPermissionsController(ICommandMediator commandMediator) :
         return Ok();
     }
 
-    // TODO: restringir este endpoint a usuários com Role == UserRole.Admin quando a autenticação for implementada.
     [HttpPatch("{permissionId:guid}/activate")]
+    [Authorize("Admin")]
     [ProducesResponseType(typeof(void), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(Error), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
@@ -72,8 +73,8 @@ public class RoomAccessPermissionsController(ICommandMediator commandMediator) :
         return Ok();
     }
 
-    // TODO: restringir este endpoint a usuários com Role == UserRole.Admin quando a autenticação for implementada.
     [HttpPatch("{permissionId:guid}/deactivate")]
+    [Authorize("Admin")]
     [ProducesResponseType(typeof(void), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(Error), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
