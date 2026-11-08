@@ -17,6 +17,7 @@ namespace SistemaPresenca.Api.Controllers;
 public sealed class MajorsController(ICommandMediator commandMediator, IQueryMediator queryMediator) : ControllerBase
 {
     [HttpGet]
+    [Authorize]
     [ProducesResponseType(typeof(IEnumerable<GetMajorsResponse>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> GetMajorsAsync([FromQuery] GetMajorsRequest request, CancellationToken cancellationToken)

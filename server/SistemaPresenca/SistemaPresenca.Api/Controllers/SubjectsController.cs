@@ -16,6 +16,7 @@ namespace SistemaPresenca.Api.Controllers;
 public class SubjectsController(ICommandMediator commandMediator, IQueryMediator queryMediator) : ControllerBase
 {
     [HttpGet]
+    [Authorize]
     [ProducesResponseType(typeof(IEnumerable<GetSubjectResponse>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> GetSubjectsAsync([FromQuery] GetSubjectsRequest request, CancellationToken cancellationToken)

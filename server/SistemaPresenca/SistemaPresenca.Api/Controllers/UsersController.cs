@@ -17,6 +17,7 @@ namespace SistemaPresenca.Api.Controllers;
 public class UsersController(ICommandMediator commandMediator, IQueryMediator queryMediator) : ControllerBase
 {
     [HttpGet]
+    [Authorize]
     [ProducesResponseType(typeof(IEnumerable<GetUserResponse>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> GetUsersAsync([FromQuery] GetUsersRequest request, CancellationToken cancellationToken)
@@ -44,6 +45,7 @@ public class UsersController(ICommandMediator commandMediator, IQueryMediator qu
     }
 
     [HttpPatch("{id:guid}")]
+    [Authorize]
     [ProducesResponseType(typeof(void), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(Error), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
