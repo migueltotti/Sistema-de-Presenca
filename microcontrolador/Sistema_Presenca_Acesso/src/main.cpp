@@ -90,7 +90,7 @@ void setup() {
   
   eventQueue    = xQueueCreate(16, sizeof(AppEvent));
   displayQueue  = xQueueCreate(8,  sizeof(DisplayMsg));
-  httpQueue     = xQueueCreate(8,  sizeof(HttpRequest));
+  //httpQueue     = xQueueCreate(8,  sizeof(HttpRequest));
 
   displayInit();
   readersInit();
@@ -98,10 +98,12 @@ void setup() {
   connectToWiFi();
   mqttInit();
 
-  xTaskCreatePinnedToCore(readerTask,     "reader",   4096, nullptr, 3, nullptr, 1);
-  xTaskCreatePinnedToCore(displayTask,    "display",  4096, nullptr, 1, nullptr, 1);
+  xTaskCreatePinnedToCore(readerTask,     "reader",   4096, nullptr, 3, &readerTaskHandle, 1);
+  //xTaskCreatePinnedToCore(displayTask,    "display",  4096, nullptr, 1, nullptr, 1);
   xTaskCreatePinnedToCore(controllerTask, "ctrl",     4096, nullptr, 2, nullptr, 1);
   xTaskCreatePinnedToCore(mqttTask,       "mqtt",     4096, nullptr, 2, nullptr, 0);
+
+  configureReadersIRQs();
 
   mostrar(LADO_INTERNO, "Sistema de", "Presenca pronto", 3000);  // permanente
   //mostrar(LADO_EXTERNO, "Sistema de", "Presenca pronto", 3000);  // permanente
