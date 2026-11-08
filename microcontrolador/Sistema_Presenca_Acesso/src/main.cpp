@@ -9,8 +9,8 @@ QueueHandle_t eventQueue, displayQueue, httpQueue;
 
 void controllerTask(void*) {
   bool aulaAtiva = false;
-  char *aulaId = nullptr;
-  char *professorId = nullptr;
+  char aulaId[GUID_LEN] = {""};
+  char professorTagId[UID_LEN] = {""};
 
   mostrar(LADO_INTERNO, "Nenhuma aula",  "em andamento");          // permanente
 
@@ -45,12 +45,12 @@ void controllerTask(void*) {
           }
 
           aulaAtiva = true;
-          aulaId = ev.aula.aulaId;
-          professorId = ev.aula.professorId;
+          strlcpy(aulaId, ev.aula.aulaId, sizeof(ev.aula.aulaId));
+          strlcpy(professorTagId, ev.aula.professorTagId, sizeof(ev.aula.professorTagId));
 
           mostrar(LADO_INTERNO, "Aula iniciada", "", 3000);               // temporaria
           mostrar(LADO_INTERNO, "Aproxime uma tag", ">>            <<");  // permanente
-          Serial.printf("[ctrl] aula com id %s iniciada para o professor %s.\n", ev.aula.aulaId, ev.aula.professorId);
+          Serial.printf("[ctrl] aula com id %s iniciada para o professor com tag %s.\n", ev.aula.aulaId, ev.aula.professorTagId);
           break;
 
         case EVT_AULA_FINALIZOU:
@@ -59,18 +59,23 @@ void controllerTask(void*) {
             break;
           }
 
-          if (aulaId != nullptr && strcmp(aulaId, ev.aula.aulaId) != 0) {
+          if (strcmp(aulaId, ev.aula.aulaId) != 0) {
             Serial.printf("[ctrl] evento de aula finalizada recebido, mas o id da aula não corresponde à aula ativa (ativa: %s, recebida: %s).\n", aulaId, ev.aula.aulaId);
+            break;
+          }
+
+          if (strcmp(professorTagId, ev.aula.professorTagId) != 0) {
+            Serial.printf("[ctrl] evento de aula finalizada recebido, mas o id da tag do professor não corresponde ao professor que iniciou a aula (ativa: %s, recebida: %s).\n", professorTagId, ev.aula.professorTagId);
             break;
           }
           
           aulaAtiva = false;
-          aulaId = nullptr;
-          professorId = nullptr;
+          strlcpy(aulaId, "", sizeof(aulaId));
+          strlcpy(professorTagId, "", sizeof(professorTagId));
 
           mostrar(LADO_INTERNO, "Aula finalizada", "Obrigado!", 3000);     // temporaria
           mostrar(LADO_INTERNO, "Nenhuma aula",  "em andamento");          // permanente
-          Serial.printf("[ctrl] aula com id %s finalizada para o professor %s.\n", ev.aula.aulaId, ev.aula.professorId);
+          Serial.printf("[ctrl] aula com id %s finalizada pelo professor com tag %s.\n", ev.aula.aulaId, ev.aula.professorTagId);
           break;
 
         case EVT_HTTP_RESULTADO:

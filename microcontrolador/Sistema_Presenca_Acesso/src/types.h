@@ -5,7 +5,7 @@
 
 constexpr size_t UID_LEN = 21;   // UID do MFRC522: até 10 bytes -> 20 hex + '\0'
 constexpr size_t MSG_LEN = 17;   // LCD 16 colunas + '\0'
-constexpr size_t GUID_LEN = 17;   // GUID: 16 bytes -> 32 hex + '\0'
+constexpr size_t GUID_LEN = 37;   // GUID: 37 bytes -> 37 digitos + '\0'
 
 // Leitor e display andam em pares (interno/externo), então um enum serve aos dois.
 enum Lado : uint8_t { LADO_INTERNO, LADO_EXTERNO };
@@ -50,7 +50,7 @@ struct AppEvent {
   EventType type;
   union {                        // só um é válido, conforme o type
     struct { Lado lado; char uid[UID_LEN]; }                tag;   // EVT_TAG
-    struct { char aulaId[GUID_LEN]; char professorId[UID_LEN]; } aula;  // EVT_AULA_INICIOU e EVT_AULA_FINALIZOU
+    struct { char aulaId[GUID_LEN]; char professorTagId[UID_LEN]; } aula;  // EVT_AULA_INICIOU e EVT_AULA_FINALIZOU
     HttpResultado                                           http;  // EVT_HTTP_RESULTADO
   };
 };

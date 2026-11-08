@@ -17,7 +17,7 @@ extern WiFiClient espClient;       // definida no wifi_connection.h
 static PubSubClient client(espClient);
 
 // MQTT Broker
-const char *mqtt_broker = "172.20.10.8";
+const char *mqtt_broker = "192.168.15.3";
 const char *topic = "esp-room-b102";
 const char *mqtt_username = "esp32";
 const char *mqtt_password = "1234";
@@ -66,20 +66,20 @@ void callback(char *topic, byte *payload, unsigned int length) {
 
   if (ev.type == EVT_AULA_INICIOU || ev.type == EVT_AULA_FINALIZOU) {
     const char* aulaId = doc["aulaId"];
-    const char* professorId = doc["professorId"];
+    const char* professorTagId = doc["professorId"];
 
     if (aulaId == nullptr) {
       Serial.println("aulaId não informado.");
       return;
     }
 
-    if (professorId == nullptr) {
+    if (professorTagId == nullptr) {
       Serial.println("professorId não informado.");
       return;
     }
 
     strlcpy(ev.aula.aulaId, aulaId, sizeof(ev.aula.aulaId));
-    strlcpy(ev.aula.professorId, professorId, sizeof(ev.aula.professorId));
+    strlcpy(ev.aula.professorTagId, professorTagId, sizeof(ev.aula.professorTagId));
   }
 
   if (xQueueSend(eventQueue, &ev, 0) != pdTRUE) {
