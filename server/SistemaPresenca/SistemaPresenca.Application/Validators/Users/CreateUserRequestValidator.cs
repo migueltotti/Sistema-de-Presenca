@@ -31,10 +31,5 @@ public class CreateUserRequestValidator : AbstractValidator<CreateUserRequest>
             .NotEmpty()
             .MaximumLength(11)
             .WithMessage("Cpf is required and must not exceed 10 characters.");
-
-        RuleFor(x => x.Role)
-            .NotEmpty()
-            .IsInEnum()
-            .WithMessage("Role is required and must be Admin, Professor or Student");
     }
 }
