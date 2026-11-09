@@ -83,7 +83,7 @@ static bool publicarTag(MFRC522& leitor, Lado lado) {
 
 void readerTask(void*) {
   armReceiver(rfidInterno);
-  //armReceiver(rfidExterno);
+  armReceiver(rfidExterno);
 
   for (;;) {
     uint32_t bits = 0;
@@ -97,33 +97,36 @@ void readerTask(void*) {
     xTaskNotifyWait(0, UINT32_MAX, &descarte, 0);   // zera bits pendentes, sem bloquear
 
     armReceiver(rfidInterno);   // REQA + Transceive
-    //armReceiver(rfidExterno);
+    armReceiver(rfidExterno);
   }
 }
 
 static void readersInit() {
+  pinMode(SS_INTERNO_PIN, OUTPUT);  digitalWrite(SS_INTERNO_PIN, HIGH);
+  pinMode(SS_EXTERNO_PIN, OUTPUT);  digitalWrite(SS_EXTERNO_PIN, HIGH);
+
   SPI.begin(SCK_PIN, MISO_PIN, MOSI_PIN);         // Init SPI bus
   
   rfidInterno.PCD_Init();
+  rfidExterno.PCD_Init();
+  
   rfidInterno.PCD_DumpVersionToSerial();
-
-  // rfidExterno.PCD_Init();
-  // rfidExterno.PCD_DumpVersionToSerial();
+  rfidExterno.PCD_DumpVersionToSerial();
   
   // ComIEnReg: bit7 (IRqInv) = 1 -> pino IRQ ativo em nível baixo
   //            bit5 (RxIEn)  = 1 -> interrupção de recepção habilitada
   rfidInterno.PCD_WriteRegister(MFRC522::ComIEnReg, 0xA0);
-  // rfidExterno.PCD_WriteRegister(MFRC522::ComIEnReg, 0xA0);
+  rfidExterno.PCD_WriteRegister(MFRC522::ComIEnReg, 0xA0);
 
   clearIrq(rfidInterno);
-  //clearIrq(rfidExterno);
+  clearIrq(rfidExterno);
 }
 
 static void configureReadersIRQs() {
   pinMode(PIN_IRQ_INTERNO, INPUT_PULLUP);
-  //pinMode(PIN_IRQ_EXTERNO, INPUT_PULLUP);
+  pinMode(PIN_IRQ_EXTERNO, INPUT_PULLUP);
   attachInterrupt(digitalPinToInterrupt(PIN_IRQ_INTERNO), internalISR, FALLING);
-  //attachInterrupt(digitalPinToInterrupt(PIN_IRQ_EXTERNO), externalISR, FALLING);
+  attachInterrupt(digitalPinToInterrupt(PIN_IRQ_EXTERNO), externalISR, FALLING);
 }
 
 #endif

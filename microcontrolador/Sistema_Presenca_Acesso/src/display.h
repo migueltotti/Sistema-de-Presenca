@@ -19,13 +19,10 @@ constexpr uint8_t PIN_SDA = 16; // RX2
 constexpr uint8_t PIN_SCL = 17; // TX2
 
 static LiquidCrystal_I2C lcdInterno(LCD_ADDR_INTERNO, LCD_COLS, LCD_ROWS);
-//static LiquidCrystal_I2C lcdExterno(LCD_ADDR_EXTERNO, LCD_COLS, LCD_ROWS);
+static LiquidCrystal_I2C lcdExterno(LCD_ADDR_EXTERNO, LCD_COLS, LCD_ROWS);
 
-static LiquidCrystal_I2C* const lcds[1] = { &lcdInterno, /*&lcdExterno*/ };
+static LiquidCrystal_I2C* const lcds[2] = { &lcdInterno, &lcdExterno };
 
-// ----------------------------------------------------------------------------
-// Estado (acessado SOMENTE pela displayTask, por isso não precisa de mutex)
-// ----------------------------------------------------------------------------
 struct EstadoLado {
   DisplayMsg permanente;        // estado de repouso (ex.: "Aproxime a tag")
   bool       temPermanente;     // já recebeu alguma permanente?
@@ -42,7 +39,7 @@ static EstadoLado estado[2] = {};
 static void displayInit() {
   Wire.begin(PIN_SDA, PIN_SCL);
 
-  for (uint8_t i = 0; i < 1; i++) {
+  for (uint8_t i = 0; i < 2; i++) {
     lcds[i]->init();
     lcds[i]->backlight();
     lcds[i]->clear();
@@ -122,7 +119,7 @@ static TickType_t tempoAteProximaExpiracao() {
 static void expirarTemporarias() {
   const uint32_t agora = millis();
 
-  for (uint8_t i = 0; i < 1; i++) {
+  for (uint8_t i = 0; i < 2; i++) {
     if (!estado[i].temporariaAtiva) continue;
     if (!((int32_t)(estado[i].expiraEmMs - agora) <= 0)) continue;
 
@@ -164,9 +161,6 @@ void displayTask(void*) {
   }
 }
 
-// ----------------------------------------------------------------------------
-// API para as OUTRAS tasks (usada principalmente pela controllerTask)
-// ----------------------------------------------------------------------------
 static void mostrar(Lado lado, const char* l1, const char* l2, uint16_t duracaoMs = 0) {
   DisplayMsg m{};
   m.lado = lado;
@@ -177,18 +171,3 @@ static void mostrar(Lado lado, const char* l1, const char* l2, uint16_t duracaoM
     Serial.println("[display] displayQueue cheia, mensagem descartada");
   }
 }
-
-// ----------------------------------------------------------------------------
-// Roteiro de teste (cole no setup(), depois de criar a displayTask):
-//
-//   displayInit();                                         // antes das tasks
-//   displayQueue = xQueueCreate(8, sizeof(DisplayMsg));    // antes das tasks
-//   xTaskCreatePinnedToCore(displayTask, "display", 4096, nullptr, 1, nullptr, 1);
-//
-//   mostrar(LADO_INTERNO, "Nenhuma aula",  "em andamento");          // permanente
-//   delay(2000);
-//   mostrar(LADO_INTERNO, "Aula iniciada", "Aproxime a tag");        // permanente
-//   delay(2000);
-//   mostrar(LADO_INTERNO, "Presenca OK",   "Maria Silva", 2000);     // volta sozinho
-//   mostrar(LADO_EXTERNO, "Porta trancada","Aproxime a tag");        // outro display
-// ----------------------------------------------------------------------------
