@@ -81,6 +81,155 @@ namespace SistemaPresenca.Infrastructure.Migrations
                     b.ToTable("Majors", (string)null);
                 });
 
+            modelBuilder.Entity("SistemaPresenca.Domain.Entities.Room", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid?>("CreatedByAdminId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid?>("DeletedByAdminId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Location")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<string>("MicrocontrollerId")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreatedByAdminId");
+
+                    b.HasIndex("DeletedByAdminId");
+
+                    b.HasIndex("MicrocontrollerId")
+                        .IsUnique()
+                        .HasFilter("\"DeletedAt\" IS NULL");
+
+                    b.HasIndex("Name")
+                        .IsUnique()
+                        .HasFilter("\"DeletedAt\" IS NULL");
+
+                    b.ToTable("Rooms", (string)null);
+                });
+
+            modelBuilder.Entity("SistemaPresenca.Domain.Entities.RoomAccessPermission", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<bool>("Active")
+                        .HasColumnType("boolean");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid?>("CreatedByAdminId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid?>("DeletedByAdminId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("GrantedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("RoomId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreatedByAdminId");
+
+                    b.HasIndex("DeletedByAdminId");
+
+                    b.HasIndex("RoomId");
+
+                    b.HasIndex("UserId", "RoomId")
+                        .IsUnique()
+                        .HasFilter("\"DeletedAt\" IS NULL");
+
+                    b.ToTable("RoomAccessPermissions", (string)null);
+                });
+
+            modelBuilder.Entity("SistemaPresenca.Domain.Entities.RoomBooking", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid?>("CreatedByAdminId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid?>("DeletedByAdminId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("EndsAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("ProfessorId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("RoomId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("StartsAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("integer");
+
+                    b.Property<Guid>("SubjectId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreatedByAdminId");
+
+                    b.HasIndex("DeletedByAdminId");
+
+                    b.HasIndex("ProfessorId");
+
+                    b.HasIndex("SubjectId");
+
+                    b.HasIndex("RoomId", "StartsAt", "EndsAt");
+
+                    b.ToTable("RoomBookings", (string)null);
+                });
+
             modelBuilder.Entity("SistemaPresenca.Domain.Entities.Session", b =>
                 {
                     b.Property<Guid>("Id")
@@ -108,6 +257,9 @@ namespace SistemaPresenca.Infrastructure.Migrations
                     b.Property<Guid>("ProfessorId")
                         .HasColumnType("uuid");
 
+                    b.Property<Guid>("RoomId")
+                        .HasColumnType("uuid");
+
                     b.Property<Guid>("SubjectId")
                         .HasColumnType("uuid");
 
@@ -121,6 +273,8 @@ namespace SistemaPresenca.Infrastructure.Migrations
                     b.HasIndex("DeletedByAdminId");
 
                     b.HasIndex("ProfessorId");
+
+                    b.HasIndex("RoomId");
 
                     b.HasIndex("SubjectId");
 
@@ -318,6 +472,97 @@ namespace SistemaPresenca.Infrastructure.Migrations
                     b.Navigation("DeletedByAdmin");
                 });
 
+            modelBuilder.Entity("SistemaPresenca.Domain.Entities.Room", b =>
+                {
+                    b.HasOne("SistemaPresenca.Domain.Entities.User", "CreatedByAdmin")
+                        .WithMany()
+                        .HasForeignKey("CreatedByAdminId")
+                        .OnDelete(DeleteBehavior.ClientNoAction);
+
+                    b.HasOne("SistemaPresenca.Domain.Entities.User", "DeletedByAdmin")
+                        .WithMany()
+                        .HasForeignKey("DeletedByAdminId")
+                        .OnDelete(DeleteBehavior.ClientNoAction);
+
+                    b.Navigation("CreatedByAdmin");
+
+                    b.Navigation("DeletedByAdmin");
+                });
+
+            modelBuilder.Entity("SistemaPresenca.Domain.Entities.RoomAccessPermission", b =>
+                {
+                    b.HasOne("SistemaPresenca.Domain.Entities.User", "CreatedByAdmin")
+                        .WithMany()
+                        .HasForeignKey("CreatedByAdminId")
+                        .OnDelete(DeleteBehavior.ClientNoAction);
+
+                    b.HasOne("SistemaPresenca.Domain.Entities.User", "DeletedByAdmin")
+                        .WithMany()
+                        .HasForeignKey("DeletedByAdminId")
+                        .OnDelete(DeleteBehavior.ClientNoAction);
+
+                    b.HasOne("SistemaPresenca.Domain.Entities.Room", "Room")
+                        .WithMany("RoomAccessPermissions")
+                        .HasForeignKey("RoomId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("SistemaPresenca.Domain.Entities.User", "User")
+                        .WithMany("RoomAccessPermissions")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("CreatedByAdmin");
+
+                    b.Navigation("DeletedByAdmin");
+
+                    b.Navigation("Room");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("SistemaPresenca.Domain.Entities.RoomBooking", b =>
+                {
+                    b.HasOne("SistemaPresenca.Domain.Entities.User", "CreatedByAdmin")
+                        .WithMany()
+                        .HasForeignKey("CreatedByAdminId")
+                        .OnDelete(DeleteBehavior.ClientNoAction);
+
+                    b.HasOne("SistemaPresenca.Domain.Entities.User", "DeletedByAdmin")
+                        .WithMany()
+                        .HasForeignKey("DeletedByAdminId")
+                        .OnDelete(DeleteBehavior.ClientNoAction);
+
+                    b.HasOne("SistemaPresenca.Domain.Entities.User", "Professor")
+                        .WithMany()
+                        .HasForeignKey("ProfessorId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("SistemaPresenca.Domain.Entities.Room", "Room")
+                        .WithMany()
+                        .HasForeignKey("RoomId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("SistemaPresenca.Domain.Entities.Subject", "Subject")
+                        .WithMany()
+                        .HasForeignKey("SubjectId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("CreatedByAdmin");
+
+                    b.Navigation("DeletedByAdmin");
+
+                    b.Navigation("Professor");
+
+                    b.Navigation("Room");
+
+                    b.Navigation("Subject");
+                });
+
             modelBuilder.Entity("SistemaPresenca.Domain.Entities.Session", b =>
                 {
                     b.HasOne("SistemaPresenca.Domain.Entities.User", "CreatedByAdmin")
@@ -336,6 +581,12 @@ namespace SistemaPresenca.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("SistemaPresenca.Domain.Entities.Room", "Room")
+                        .WithMany("Sessions")
+                        .HasForeignKey("RoomId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
                     b.HasOne("SistemaPresenca.Domain.Entities.Subject", "Subject")
                         .WithMany()
                         .HasForeignKey("SubjectId")
@@ -347,6 +598,8 @@ namespace SistemaPresenca.Infrastructure.Migrations
                     b.Navigation("DeletedByAdmin");
 
                     b.Navigation("Professor");
+
+                    b.Navigation("Room");
 
                     b.Navigation("Subject");
                 });
@@ -428,9 +681,21 @@ namespace SistemaPresenca.Infrastructure.Migrations
                     b.Navigation("Subjects");
                 });
 
+            modelBuilder.Entity("SistemaPresenca.Domain.Entities.Room", b =>
+                {
+                    b.Navigation("RoomAccessPermissions");
+
+                    b.Navigation("Sessions");
+                });
+
             modelBuilder.Entity("SistemaPresenca.Domain.Entities.Session", b =>
                 {
                     b.Navigation("Attendances");
+                });
+
+            modelBuilder.Entity("SistemaPresenca.Domain.Entities.User", b =>
+                {
+                    b.Navigation("RoomAccessPermissions");
                 });
 #pragma warning restore 612, 618
         }
