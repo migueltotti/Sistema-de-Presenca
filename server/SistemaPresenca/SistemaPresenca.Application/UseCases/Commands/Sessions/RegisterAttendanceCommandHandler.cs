@@ -41,17 +41,23 @@ public sealed class RegisterAttendanceCommandHandler(
             return Result.Failure(SessionErrors.StudentNotFound);
         }
 
-        if (studentAttendance.RegisteredAt is not null)
+        if (studentAttendance.CheckOut is not null)
         {
             logger.LogError("Student with tagId {StudentTagId} already has attendance registered for session {SessionId}", command.StudentTagId, command.SessionId);
             return Result.Failure(SessionErrors.StudentAttendanceAlreadyRegistered);
         }
 
-        studentAttendance.RegisteredAt = DateTime.UtcNow;
+        if (studentAttendance.CheckIn is null)
+            studentAttendance.CheckIn = DateTime.UtcNow;
+        else
+            studentAttendance.CheckOut = DateTime.UtcNow;
 
         await sessionRepository.UpdateAsync(session, cancellationToken);
 
-        logger.LogInformation("Attendance registered for student with tagId {StudentTagId} in session {SessionId}", command.StudentTagId, command.SessionId);
+        logger.LogInformation(
+            "Attendance" + studentAttendance.CheckOut is null ? "check-in" : "check-out" + " registered for student with tagId {StudentTagId} in session {SessionId}",
+            command.StudentTagId,
+            command.SessionId);
 
         return Result.Success();
     }

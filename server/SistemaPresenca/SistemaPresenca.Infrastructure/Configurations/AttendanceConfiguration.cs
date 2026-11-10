@@ -13,7 +13,10 @@ public class AttendanceConfiguration : IEntityTypeConfiguration<Attendance>
         builder.HasKey(a => new {a.StudentId, a.SessionId});
 
 
-        builder.Property(a => a.RegisteredAt)
+        builder.Property(a => a.CheckIn)
+            .IsRequired(false);
+
+        builder.Property(a => a.CheckOut)
             .IsRequired(false);
 
         builder.HasOne(a => a.Student)

@@ -30,7 +30,10 @@ namespace SistemaPresenca.Infrastructure.Migrations
                     b.Property<Guid>("SessionId")
                         .HasColumnType("uuid");
 
-                    b.Property<DateTime?>("RegisteredAt")
+                    b.Property<DateTime?>("CheckIn")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime?>("CheckOut")
                         .HasColumnType("timestamp with time zone");
 
                     b.HasKey("StudentId", "SessionId");
