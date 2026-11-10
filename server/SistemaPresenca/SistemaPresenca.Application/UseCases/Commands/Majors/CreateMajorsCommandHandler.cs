@@ -15,7 +15,7 @@ public sealed class CreateMajorsCommandHandler(
 {
     public async Task<Result> HandleAsync(CreateMajorsCommand command, CancellationToken cancellationToken = default)
     {
-        var existingMajor = await majorRepository.GetOneAsync(x => x.Code == command.Request.Code, cancellationToken);
+        var existingMajor = await majorRepository.GetOneAsync(x => x.Code == command.Request.Code, cancellationToken: cancellationToken);
 
         if (existingMajor is not null)
         {

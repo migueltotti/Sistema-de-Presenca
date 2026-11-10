@@ -14,9 +14,10 @@ public sealed class RevokeRoomAccessCommandHandler(
 {
     public async Task<Result> HandleAsync(RevokeRoomAccessCommand command, CancellationToken cancellationToken = default)
     {
-        var permission = await roomAccessPermissionRepository.GetOneAsync(
-            permission => permission.Id == command.PermissionId && permission.RoomId == command.RoomId,
-            cancellationToken);
+        var permission = await roomAccessPermissionRepository.GetOneAsync(permission => 
+            permission.Id == command.PermissionId && 
+            permission.RoomId == command.RoomId,
+            cancellationToken: cancellationToken);
 
         if (permission is null)
         {

@@ -14,7 +14,7 @@ public sealed class DeleteMajorCommandHandler(
 {
     public async Task<Result> HandleAsync(DeleteMajorCommand command, CancellationToken cancellationToken = default)
     {
-        var major = await majorRepoitory.GetOneAsync(x => x.Id == command.Id, cancellationToken);
+        var major = await majorRepoitory.GetOneAsync(x => x.Id == command.Id, cancellationToken: cancellationToken);
 
         if (major is null)
         {

@@ -14,7 +14,7 @@ public sealed class DeleteRoomCommandHandler(
 {
 	public async Task<Result> HandleAsync(DeleteRoomCommand command, CancellationToken cancellationToken = default)
 	{
-		var room = await roomRepository.GetOneAsync(x => x.Id == command.Id, cancellationToken);
+		var room = await roomRepository.GetOneAsync(x => x.Id == command.Id, cancellationToken: cancellationToken);
 
 		if (room is null)
 		{

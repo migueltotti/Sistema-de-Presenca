@@ -21,7 +21,7 @@ public class CreateUserCommandHandler(
         var existingUser = await userRepository.GetOneAsync(x =>
             x.Cpf == command.Request.Cpf ||
             x.Email == command.Request.Email,
-            cancellationToken);
+            cancellationToken: cancellationToken);
 
         if (existingUser is not null)
         {

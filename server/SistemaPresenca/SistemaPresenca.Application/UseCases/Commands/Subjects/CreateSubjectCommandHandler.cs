@@ -16,7 +16,7 @@ public sealed class CreateSubjectCommandHandler(
 {
     public async Task<Result> HandleAsync(CreateSubjectCommand command, CancellationToken cancellationToken = default)
     {
-        var major = await majorRepository.GetOneAsync(x => x.Id == command.Request.MajorId, cancellationToken);
+        var major = await majorRepository.GetOneAsync(x => x.Id == command.Request.MajorId, cancellationToken: cancellationToken);
 
         if (major is null)
         {
@@ -24,7 +24,7 @@ public sealed class CreateSubjectCommandHandler(
             return Result.Failure(MajorErrors.NotFound);
         }
 
-        var subjectWithSameCode = await subjectRepository.GetOneAsync(x => x.Code == command.Request.Code, cancellationToken);
+        var subjectWithSameCode = await subjectRepository.GetOneAsync(x => x.Code == command.Request.Code, cancellationToken: cancellationToken);
 
         if (subjectWithSameCode is not null)
         {

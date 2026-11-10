@@ -14,7 +14,7 @@ public sealed class ActivateRoomAccessCommandHandler(
     {
         var permission = await roomAccessPermissionRepository.GetOneAsync(
             permission => permission.Id == command.PermissionId && permission.RoomId == command.RoomId,
-            cancellationToken);
+            cancellationToken: cancellationToken);
 
         if (permission is null)
         {

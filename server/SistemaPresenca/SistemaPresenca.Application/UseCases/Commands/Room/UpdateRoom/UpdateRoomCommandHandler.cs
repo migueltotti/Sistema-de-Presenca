@@ -16,7 +16,7 @@ public sealed class UpdateRoomCommandHandler(
 {
 	public async Task<Result> HandleAsync(UpdateRoomCommand command, CancellationToken cancellationToken = default)
 	{
-		var room = await roomRepository.GetOneAsync(x => x.Id == command.Id, cancellationToken);
+		var room = await roomRepository.GetOneAsync(x => x.Id == command.Id, cancellationToken: cancellationToken);
 
 		if (room is null)
 		{
@@ -38,7 +38,7 @@ public sealed class UpdateRoomCommandHandler(
 		roomUpdateRequest.UpdatedEntity(room);
 
 		var roomWithSameName = await roomRepository.GetOneAsync(
-			x => x.Name == roomUpdateRequest.Name && x.Id != command.Id, cancellationToken);
+			x => x.Name == roomUpdateRequest.Name && x.Id != command.Id, cancellationToken: cancellationToken);
 
 		if (roomWithSameName is not null)
 		{
@@ -47,7 +47,7 @@ public sealed class UpdateRoomCommandHandler(
 		}
 
 		var roomWithSameMicrocontrollerId = await roomRepository.GetOneAsync(
-			x => x.MicrocontrollerId == roomUpdateRequest.MicrocontrollerId && x.Id != command.Id, cancellationToken);
+			x => x.MicrocontrollerId == roomUpdateRequest.MicrocontrollerId && x.Id != command.Id, cancellationToken: cancellationToken);
 
 		if (roomWithSameMicrocontrollerId is not null)
 		{

@@ -16,7 +16,7 @@ public class UpdateUserCommandHandler(
 {
     public async Task<Result> HandleAsync(UpdateUserCommand command, CancellationToken cancellationToken = default)
     {
-        var user = await userRepository.GetOneAsync(x => x.Id == command.Id, cancellationToken);
+        var user = await userRepository.GetOneAsync(x => x.Id == command.Id, cancellationToken: cancellationToken);
 
         if (user is null)
         {
@@ -39,11 +39,11 @@ public class UpdateUserCommandHandler(
 
         userUpdateRequest.UpdatedEntity(user);
 
-        var subjectWithSameEmailOrTagId = await userRepository.GetOneAsync(x => 
+        var userWithSameEmailOrTagId = await userRepository.GetOneAsync(x => 
             (x.Email == userUpdateRequest.Email || (x.TagId == userUpdateRequest.TagId && x.TagId != null))
-            && x.Id != command.Id, cancellationToken);
+            && x.Id != command.Id, cancellationToken: cancellationToken);
 
-        if (subjectWithSameEmailOrTagId is not null)
+        if (userWithSameEmailOrTagId is not null)
         {
             logger.LogError("User with Email {Email} or TagId {TagId} already exists.", userUpdateRequest.Email, userUpdateRequest.TagId);
             return Result.Failure(UserErrors.EmailOrTagIdAlreadyExists);

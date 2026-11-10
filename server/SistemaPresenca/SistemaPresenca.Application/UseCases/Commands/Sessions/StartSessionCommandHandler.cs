@@ -20,21 +20,21 @@ public class StartSessionCommandHandler(
 {
     public async Task<Result<StartSessionResponse>> HandleAsync(StartSessionCommand command, CancellationToken cancellationToken = default)
     {
-        var subject = await subjectRepository.GetOneAsync(x => x.Id == command.Request.SubjectId, cancellationToken);
+        var subject = await subjectRepository.GetOneAsync(x => x.Id == command.Request.SubjectId, cancellationToken: cancellationToken);
         if (subject is null)
         {
             logger.LogError("Subject with id {SubjectId} - not found", command.Request.SubjectId);
             return Result<StartSessionResponse>.Failure(SubjectErrors.NotFound);
         }
 
-        var room = await roomRepository.GetOneAsync(x => x.Id == command.Request.RoomId, cancellationToken);
+        var room = await roomRepository.GetOneAsync(x => x.Id == command.Request.RoomId, cancellationToken: cancellationToken);
         if (room is null)
         {
             logger.LogError("Room with id {RoomId} - not found", command.Request.RoomId);
             return Result<StartSessionResponse>.Failure(RoomErrors.NotFound);
         }
 
-        var professor = await userRepository.GetOneAsync(x => x.TagId == command.Request.ProfessorTagId && x.Role == UserRole.Professor, cancellationToken);
+        var professor = await userRepository.GetOneAsync(x => x.TagId == command.Request.ProfessorTagId && x.Role == UserRole.Professor, cancellationToken: cancellationToken);
         if (professor is null)
         {
             logger.LogError("Professor with tagId {ProfessorTagId} - not found", command.Request.ProfessorTagId);
@@ -56,7 +56,7 @@ public class StartSessionCommandHandler(
             userContextProvider.User.Id
         );
 
-        foreach (var student in subject.Students)
+        foreach (var student in subject.Students ?? [])
         {
             newSession.Attendances.Add(
                 new Attendance(

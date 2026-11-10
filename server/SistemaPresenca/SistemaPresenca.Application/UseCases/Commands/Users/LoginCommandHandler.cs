@@ -17,7 +17,7 @@ public class LoginCommandHandler(
 {
     public async Task<Result<LoginResponse>> HandleAsync(LoginCommand command, CancellationToken cancellationToken = default)
     {
-        var user = await userRepository.GetOneAsync(x => x.Email == command.Request.Email, cancellationToken);
+        var user = await userRepository.GetOneAsync(x => x.Email == command.Request.Email, cancellationToken: cancellationToken);
 
         if (user is null)
         {

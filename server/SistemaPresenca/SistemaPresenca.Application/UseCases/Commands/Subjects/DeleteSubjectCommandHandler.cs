@@ -14,7 +14,7 @@ public sealed class DeleteSubjectCommandHandler(
 {
     public async Task<Result> HandleAsync(DeleteSubjectCommand command, CancellationToken cancellationToken = default)
     {
-        var subject = await subjectRepository.GetOneAsync(x => x.Id == command.Id, cancellationToken);
+        var subject = await subjectRepository.GetOneAsync(x => x.Id == command.Id, cancellationToken: cancellationToken);
 
         if (subject is null)
         {

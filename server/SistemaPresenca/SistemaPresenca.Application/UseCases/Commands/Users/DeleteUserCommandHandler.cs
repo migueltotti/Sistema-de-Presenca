@@ -14,7 +14,7 @@ public class DeleteUserCommandHandler(
 {
     public async Task<Result> HandleAsync(DeleteUserCommand command, CancellationToken cancellationToken = default)
     {
-        var user = await userRepository.GetOneAsync(x => x.Id == command.Id, cancellationToken);
+        var user = await userRepository.GetOneAsync(x => x.Id == command.Id, cancellationToken: cancellationToken);
 
         if (user is null)
         {

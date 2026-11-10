@@ -53,9 +53,9 @@ public class SessionsController(ICommandMediator commandMediator) : ControllerBa
     [ProducesResponseType(typeof(void), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(Error), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
-    public async Task<ActionResult> EndSessionAsync([FromRoute] Guid id, [FromBody] EndSessionRequest request, CancellationToken cancellationToken)
+    public async Task<ActionResult> EndSessionAsync([FromRoute] Guid id, CancellationToken cancellationToken)
     {
-        var result = await commandMediator.SendAsync(new EndSessionCommand(id, request.ProfessorTagId), cancellationToken);
+        var result = await commandMediator.SendAsync(new EndSessionCommand(id), cancellationToken);
 
         if (result.IsFailure)
         {

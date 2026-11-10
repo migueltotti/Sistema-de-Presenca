@@ -16,7 +16,7 @@ public sealed class CreateRoomCommandHandler(
 {
     public async Task<Result> HandleAsync(CreateRoomCommand command, CancellationToken cancellationToken = default)
     {
-        var roomWithSameName = await roomRepository.GetOneAsync(x => x.Name == command.Request.Name, cancellationToken);
+        var roomWithSameName = await roomRepository.GetOneAsync(x => x.Name == command.Request.Name, cancellationToken: cancellationToken);
 
         if (roomWithSameName is not null)
         {
@@ -25,7 +25,7 @@ public sealed class CreateRoomCommandHandler(
         }
 
         var roomWithSameMicrocontrollerId = await roomRepository.GetOneAsync(
-            x => x.MicrocontrollerId == command.Request.MicrocontrollerId, cancellationToken);
+            x => x.MicrocontrollerId == command.Request.MicrocontrollerId, cancellationToken: cancellationToken);
 
         if (roomWithSameMicrocontrollerId is not null)
         {

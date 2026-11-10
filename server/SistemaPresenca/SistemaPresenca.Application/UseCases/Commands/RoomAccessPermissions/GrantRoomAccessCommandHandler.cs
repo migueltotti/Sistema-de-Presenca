@@ -18,7 +18,7 @@ public sealed class GrantRoomAccessCommandHandler(
 {
     public async Task<Result> HandleAsync(GrantRoomAccessCommand command, CancellationToken cancellationToken = default)
     {
-        var user = await userRepository.GetOneAsync(user => user.Id == command.UserId, cancellationToken);
+        var user = await userRepository.GetOneAsync(user => user.Id == command.UserId, cancellationToken: cancellationToken);
 
         if (user is null)
         {
@@ -26,7 +26,7 @@ public sealed class GrantRoomAccessCommandHandler(
             return Result.Failure(RoomAccessPermissionErrors.UserNotFound);
         }
 
-        var room = await roomRepository.GetOneAsync(room => room.Id == command.RoomId, cancellationToken);
+        var room = await roomRepository.GetOneAsync(room => room.Id == command.RoomId, cancellationToken: cancellationToken);
 
         if (room is null)
         {
@@ -34,9 +34,10 @@ public sealed class GrantRoomAccessCommandHandler(
             return Result.Failure(RoomAccessPermissionErrors.RoomNotFound);
         }
 
-        var existingPermission = await roomAccessPermissionRepository.GetOneAsync(
-            permission => permission.UserId == command.UserId && permission.RoomId == command.RoomId,
-            cancellationToken);
+        var existingPermission = await roomAccessPermissionRepository.GetOneAsync(permission =>
+            permission.UserId == command.UserId && 
+            permission.RoomId == command.RoomId,
+            cancellationToken: cancellationToken);
 
         if (existingPermission is not null)
         {

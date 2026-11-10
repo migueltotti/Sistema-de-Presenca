@@ -10,10 +10,12 @@ namespace SistemaPresenca.Infrastructure.Repositories;
 public class BaseRepository<T>(SistemaPresencaDbContext context)
     : IBaseRepository<T> where T : BaseEntity
 {
-    public async Task<T?> GetOneAsync(Expression<Func<T, bool>> expression, CancellationToken cancellationToken = default)
+    public async Task<T?> GetOneAsync(Expression<Func<T, bool>> expression, IEnumerable<string>? includes = null, CancellationToken cancellationToken = default)
     {
         return await context.Set<T>()
+            .AsQueryable()
             .AsNoTracking()
+            .ApplyIncludesFilter(includes)
             .ApplyOnlyActiveEntitiesFilter()
             .FirstOrDefaultAsync(expression, cancellationToken);
     }

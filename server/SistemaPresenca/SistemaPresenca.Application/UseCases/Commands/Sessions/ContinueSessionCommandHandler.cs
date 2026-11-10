@@ -14,14 +14,15 @@ public sealed class ContinueSessionCommandHandler(
 {
     public async Task<Result> HandleAsync(ContinueSessionCommand command, CancellationToken cancellationToken = default)
     {
-        var session = await sessionRepository.GetOneAsync(x => x.Id == command.SessionId, cancellationToken);
+        // TODO MODIFICAR PARA ADEQUAR AO CASO DE USO "INICIAR REGISTRO DE PRESENÇA MANUAL"
+        var session = await sessionRepository.GetOneAsync(x => x.Id == command.SessionId, cancellationToken: cancellationToken);
         if (session is null)
         {
             logger.LogError("Session with id {SessionId} - not found", command.SessionId);
             return Result.Failure(SessionErrors.NotFound);
         }
 
-        var professor = await userRepository.GetOneAsync(x => x.TagId == command.ProfessorTagId && x.Role == UserRole.Professor, cancellationToken);
+        var professor = await userRepository.GetOneAsync(x => x.TagId == command.ProfessorTagId && x.Role == UserRole.Professor, cancellationToken: cancellationToken);
         if (professor is null)
         {
             logger.LogError("Professor with tagId {ProfessorTagId} - not found", command.ProfessorTagId);

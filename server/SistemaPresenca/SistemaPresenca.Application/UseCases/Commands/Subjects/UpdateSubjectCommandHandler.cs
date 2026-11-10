@@ -16,7 +16,7 @@ public class UpdateSubjectCommandHandler(
 {
     public async Task<Result> HandleAsync(UpdateSubjectCommand command, CancellationToken cancellationToken = default)
     {
-        var subject = await subjectRepository.GetOneAsync(x => x.Id == command.Id, cancellationToken);
+        var subject = await subjectRepository.GetOneAsync(x => x.Id == command.Id, cancellationToken: cancellationToken);
 
         if (subject is null)
         {
@@ -39,7 +39,7 @@ public class UpdateSubjectCommandHandler(
 
         subjectUpdateRequest.UpdatedEntity(subject);
 
-        var subjectWithSameCode = await subjectRepository.GetOneAsync(x => x.Code == subjectUpdateRequest.Code && x.Id != command.Id, cancellationToken);
+        var subjectWithSameCode = await subjectRepository.GetOneAsync(x => x.Code == subjectUpdateRequest.Code && x.Id != command.Id, cancellationToken: cancellationToken);
 
         if (subjectWithSameCode is not null)
         {

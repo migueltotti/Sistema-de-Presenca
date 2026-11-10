@@ -15,7 +15,7 @@ public sealed class OpenRoomCommandHandler(
 {
     public async Task<Result> HandleAsync(OpenRoomCommand command, CancellationToken cancellationToken = default)
     {
-        var room = await roomRepository.GetOneAsync(room => room.Id == command.RoomId, cancellationToken);
+        var room = await roomRepository.GetOneAsync(room => room.Id == command.RoomId, cancellationToken: cancellationToken);
 
         if (room is null)
         {

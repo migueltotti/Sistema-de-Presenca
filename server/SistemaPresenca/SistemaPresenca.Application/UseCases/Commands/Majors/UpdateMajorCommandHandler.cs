@@ -16,7 +16,7 @@ public class UpdateMajorCommandHandler(
 {
     public async Task<Result> HandleAsync(UpdateMajorCommand command, CancellationToken cancellationToken = default)
     {
-        var major = await majorRepoitory.GetOneAsync(x => x.Id == command.Id, cancellationToken);
+        var major = await majorRepoitory.GetOneAsync(x => x.Id == command.Id, cancellationToken: cancellationToken);
 
         if (major is null)
         {
@@ -42,7 +42,7 @@ public class UpdateMajorCommandHandler(
         var majorWithSameCode = await majorRepoitory.GetOneAsync(x =>
             x.Code == majorUpdateRequest.Code &&
             x.Id != major.Id,
-            cancellationToken);
+            cancellationToken: cancellationToken);
 
         if (majorWithSameCode is not null)
         {
