@@ -6,8 +6,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using SistemaPresenca.Application.Interfaces;
+using SistemaPresenca.Application.Providers;
 using SistemaPresenca.Infrastructure.Models;
-using SistemaPresenca.Infrastructure.Providers;
 using System.Text;
 using System.Text.Json;
 
@@ -18,6 +18,7 @@ public static class AuthenticationExtension
     public static IServiceCollection ConfigureAuthentication(this IServiceCollection services, JwtSettings jwtSettings)
     {
         services.AddSingleton(Options.Create(jwtSettings));
+        services.AddHttpContextAccessor();
         services.AddScoped<IUserContextProvider, UserContextProvider>();
 
         services.AddAuthentication(options =>
