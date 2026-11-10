@@ -10,7 +10,7 @@ public class Session : BaseEntity
     public Guid RoomId { get; set; }
     public Room Room { get; set; }
     public Guid ProfessorId { get; set; }
-    public User Professor { get; set; }
+    public User Professor { get; set; } // TODO: Remover essa propriedade e utilizar a lista de professores dentro de Subject
     public List<Attendance> Attendances { get; set; }
 
     private Session() : base()
