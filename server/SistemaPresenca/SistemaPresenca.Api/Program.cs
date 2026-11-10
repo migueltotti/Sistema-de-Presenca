@@ -16,7 +16,7 @@ builder.Services
     .AddExceptionHandler<GlobalExceptionHandler>()
     .AddProblemDetails()
     .AddDatabase(applicationSettings.PostgresSettings)
-    .ConfigureAuthentication(applicationSettings.JwtSettings)
+    .ConfigureAuthentication(applicationSettings.JwtSettings, applicationSettings.ApiKeySettings)
     .AddRepositories()
     .AddServices()
     .AddMediator()
