@@ -113,6 +113,7 @@ void controllerTask(void*) {
         break;
 
       case EVT_BTN_CONFIRMA:
+        // aguardando desenvolvimento da buttonTask para testar
         // TODO: modificar depois para o caso de uso de abrir a porta
         if (fluxo == FLUXO_CONFIRMA_FECHAR) {
           if (aulaAtiva) {
@@ -130,6 +131,7 @@ void controllerTask(void*) {
         break;
 
       case EVT_BTN_CANCELA:
+        // aguardando desenvolvimento da buttonTask para testar
         // TODO: modificar depois para o caso de uso de abrir a porta
         if (fluxo == FLUXO_CONFIRMA_FECHAR) {
           mostrar(LADO_EXTERNO, "Cancelado", "", 2000);
@@ -176,6 +178,7 @@ void controllerTask(void*) {
         break;
 
       case EVT_HTTP_RESULTADO:
+        // aguardando desenvolvimento da httpTask para testar
         // TODO: modificar depois para o caso de uso de abrir a porta
         // Ignora resultado atrasado/de outra requisição (ex.: já estourou o timeout)
         if (fluxo != FLUXO_TRANCAR_AGUARDA_HTTP || ev.http.requestId != requestPendente) {
