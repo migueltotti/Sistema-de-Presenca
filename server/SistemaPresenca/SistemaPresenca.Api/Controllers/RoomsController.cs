@@ -1,8 +1,10 @@
+using AspNetCore.Authentication.ApiKey;
 using LiteBus.Commands.Abstractions;
 using LiteBus.Queries.Abstractions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.JsonPatch.SystemTextJson;
 using Microsoft.AspNetCore.Mvc;
+using SistemaPresenca.Application.Requests.Room;
 using SistemaPresenca.Application.Requests.RoomAccessPermissions;
 using SistemaPresenca.Application.Requests.Rooms;
 using SistemaPresenca.Application.Responses.Rooms;
@@ -112,6 +114,27 @@ public class RoomsController(ICommandMediator commandMediator, IQueryMediator qu
         CancellationToken cancellationToken)
     {
         var result = await commandMediator.SendAsync(new CloseRoomCommand(roomId, request.UserId), cancellationToken);
+
+        if (result.IsFailure)
+        {
+            return BadRequest(result.Error);
+        }
+
+        return Ok();
+    }
+
+    [HttpPost("/microcontroller/{microcontrollerId}/close/tag-id/{tagId}")]
+    [Authorize(AuthenticationSchemes = ApiKeyDefaults.AuthenticationScheme)] // TODO: Trocar para ApiKey schema
+    [ProducesResponseType(typeof(void), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(Error), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
+    public async Task<IActionResult> CloseRoomByTagIdAsync(
+        [FromRoute] string microcontrollerId,
+        [FromRoute] string tagId,
+        [FromBody] CloseRoomSessionRequest sessionRequest,
+        CancellationToken cancellationToken)
+    {
+        var result = await commandMediator.SendAsync(new CloseRoomByTagIdCommand(microcontrollerId, tagId, sessionRequest), cancellationToken);
 
         if (result.IsFailure)
         {
