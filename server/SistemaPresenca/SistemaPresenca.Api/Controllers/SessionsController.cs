@@ -29,6 +29,7 @@ public class SessionsController(ICommandMediator commandMediator) : ControllerBa
         return Ok(result.Data);
     }
 
+    // TODO: Modificar esse endpoint para ele ser o "INICIAR REGISTRO DE PRESENÇA MANUAL"
     [HttpPost("{id:guid}/continue")]
     [Authorize("AdminOrProfessor")]
     [ProducesResponseType(typeof(void), StatusCodes.Status200OK)]
@@ -46,6 +47,7 @@ public class SessionsController(ICommandMediator commandMediator) : ControllerBa
         return Ok();
     }
 
+    // Esse endpoint só será chamado pela interface web, para finalizar a aula ao fechar a porta o endpoint é o /api/v1/rooms//microcontroller/{microcontrollerId}/close/tag-id/{tagId}
     [HttpPost("{id:guid}/end")]
     [Authorize("AdminOrProfessor")]
     [ProducesResponseType(typeof(void), StatusCodes.Status200OK)]
@@ -63,6 +65,8 @@ public class SessionsController(ICommandMediator commandMediator) : ControllerBa
         return Ok();
     }
 
+    // TODO: modificar esse endpoint para passar o id do usuário/aluno na rota e criar outro endpoint passando o tagId do aluno no body ou na rota.
+    // Vamos separar as rotinas de registrar presença pelo esp e pela interface web.
     [HttpPost("{id:guid}/attendance")]
     [ProducesResponseType(typeof(void), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(Error), StatusCodes.Status400BadRequest)]
