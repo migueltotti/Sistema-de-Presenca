@@ -65,20 +65,20 @@ void callback(char *topic, byte *payload, unsigned int length) {
   }
 
   if (ev.type == EVT_INICIAR_REGISTRO_AULA || ev.type == EVT_FINALIZAR_REGISTRO_AULA) {
-    const char* aulaId = doc["aulaId"];
-    const char* professorTagId = doc["professorId"];
+    const char* sessionId = doc["sessionId"];
+    const char* professorTagId = doc["professorTagId"];
 
-    if (aulaId == nullptr) {
-      Serial.println("aulaId não informado.");
+    if (sessionId == nullptr) {
+      Serial.println("sessionId não informado.");
       return;
     }
 
     if (professorTagId == nullptr) {
-      Serial.println("professorId não informado.");
+      Serial.println("professorTagId não informado.");
       return;
     }
 
-    strlcpy(ev.aula.aulaId, aulaId, sizeof(ev.aula.aulaId));
+    strlcpy(ev.aula.sessionId, sessionId, sizeof(ev.aula.sessionId));
     strlcpy(ev.aula.professorTagId, professorTagId, sizeof(ev.aula.professorTagId));
   }
 
@@ -140,7 +140,7 @@ static void mqttInit() {
   }
 
   // Publish and subscribe
-  client.publish(topic, "Hi, I'm ESP32 ^^");
+  //client.publish(topic, "Hi, I'm ESP32 ^^");
   client.subscribe(topic);
 }
 

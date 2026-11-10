@@ -3,9 +3,12 @@
 
 #include <Arduino.h>
 
-constexpr size_t UID_LEN = 21;   // UID do MFRC522: até 10 bytes -> 20 hex + '\0'
-constexpr size_t MSG_LEN = 17;   // LCD 16 colunas + '\0'
+constexpr size_t UID_LEN  = 21;   // UID do MFRC522: até 10 bytes -> 20 hex + '\0'
+constexpr size_t MSG_LEN  = 17;   // LCD 16 colunas + '\0'
 constexpr size_t GUID_LEN = 37;   // GUID: 37 bytes -> 37 digitos + '\0'
+
+static const uint32_t TIMEOUT_CONFIRMACAO_MS = 10000;  // tempo para apertar um botão
+static const uint32_t TIMEOUT_HTTP_MS        = 15000;  // tempo para o servidor responder
 
 // Leitor e display andam em pares (interno/externo), então um enum serve aos dois.
 enum Lado : uint8_t { LADO_INTERNO, LADO_EXTERNO };
@@ -19,10 +22,10 @@ enum HttpAction : uint8_t {
 };
 
 struct HttpRequest {
-  uint32_t   requestId;          // gerado pelo controller, ecoado na resposta
+  uint32_t   requestId;           // gerado pelo controller, ecoado na resposta
   HttpAction action;
   char       uid[UID_LEN];
-  uint32_t   aulaId;             // só usado em HTTP_REGISTRAR_PRESENCA
+  char       sessionId[GUID_LEN];
 };
 
 // ---------- HTTP: httpTask -> controller (vai dentro do AppEvent) ----------
@@ -31,7 +34,7 @@ struct HttpResultado {
   HttpAction action;             // ecoa a ação, para o controller conferir
   bool       falhaDeRede;        // timeout, sem WiFi, DNS... (diferente de "negado")
   int16_t    httpStatus;         // 200, 403, 500... (0 se falhaDeRede)
-  bool       autorizado;         // campo do JSON de resposta
+  char       motivo[MSG_LEN];     // texto curto para o display (ex.: "Sem permissao")
   char       mensagem[MSG_LEN];  // texto curto para o display (ex.: "Sem permissao")
 };
 
@@ -49,9 +52,9 @@ enum EventType : uint8_t {
 struct AppEvent {
   EventType type;
   union {                        // só um é válido, conforme o type
-    struct { Lado lado; char uid[UID_LEN]; }                tag;   // EVT_TAG
-    struct { char aulaId[GUID_LEN]; char professorTagId[UID_LEN]; } aula;  // EVT_INICIAR_REGISTRO_AULA e EVT_FINALIZAR_REGISTRO_AULA 
-    HttpResultado                                           http;  // EVT_HTTP_RESULTADO
+    struct { Lado lado; char uid[UID_LEN]; } tag;                             // EVT_TAG
+    struct { char sessionId[GUID_LEN]; char professorTagId[UID_LEN]; } aula;  // EVT_INICIAR_REGISTRO_AULA e EVT_FINALIZAR_REGISTRO_AULA 
+    HttpResultado http;                                                       // EVT_HTTP_RESULTADO
   };
 };
 
@@ -61,6 +64,16 @@ struct DisplayMsg {
   char     linha1[MSG_LEN];
   char     linha2[MSG_LEN];
   uint16_t duracaoMs;            // 0 = permanente; >0 = temporária
+};
+
+// ---------------------------------------------------------------------------
+// Fluxo de trancar a porta (lado externo)
+// ---------------------------------------------------------------------------
+enum Fluxo : uint8_t {
+  FLUXO_OCIOSO,
+  FLUXO_CONFIRMA_FECHAR, 
+  FLUXO_CONFIRMA_FINALIZAR,
+  FLUXO_TRANCAR_AGUARDA_HTTP
 };
 
 static_assert(sizeof(AppEvent) <= 64, "AppEvent grande demais para a fila");

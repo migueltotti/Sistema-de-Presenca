@@ -9,8 +9,8 @@
 // ----------------------------------------------------------------------------
 WiFiClient espClient;
 
-const char *ssid = "MIGUEL"; // Enter your WiFi name
-const char *password = "miguel2005";  // Enter WiFi password
+const char *ssid = "iPhone de Miguel "; // Enter your WiFi name
+const char *password = "987654321";  // Enter WiFi password
 
 static void connectToWiFi() {
   Serial.print("Connecting to WiFi..");
