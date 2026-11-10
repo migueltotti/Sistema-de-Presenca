@@ -22,6 +22,7 @@ public static class SettingsExtension
             settings.JwtSettings.TokenValidityInMinutes = int.Parse(GetEnvOrDefault("Jwt_TokenValidityInMinutes", settings.JwtSettings.TokenValidityInMinutes.ToString()));
             settings.JwtSettings.Issuer = GetEnvOrDefault("Jwt_Issuer", settings.JwtSettings.Issuer);
             settings.JwtSettings.Audience = GetEnvOrDefault("Jwt_Audience", settings.JwtSettings.Audience);
+            settings.ApiKeySettings.ApiKeys = [GetEnvOrDefault("ApiKey_Key", settings.ApiKeySettings.ApiKeys.FirstOrDefault())];
         }
 
         return settings!;

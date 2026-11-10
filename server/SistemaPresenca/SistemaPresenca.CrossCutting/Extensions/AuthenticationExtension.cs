@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authentication;
+﻿using AspNetCore.Authentication.ApiKey;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -7,6 +8,7 @@ using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using SistemaPresenca.Application.Interfaces;
 using SistemaPresenca.Application.Providers;
+using SistemaPresenca.Infrastructure.Authentication;
 using SistemaPresenca.Infrastructure.Models;
 using System.Text;
 using System.Text.Json;
@@ -15,10 +17,13 @@ namespace SistemaPresenca.CrossCutting.Extensions;
 
 public static class AuthenticationExtension
 {
-    public static IServiceCollection ConfigureAuthentication(this IServiceCollection services, JwtSettings jwtSettings)
+    public static IServiceCollection ConfigureAuthentication(this IServiceCollection services, JwtSettings jwtSettings, ApiKeySettings apiKeySettings)
     {
         services.AddSingleton(Options.Create(jwtSettings));
+        services.AddSingleton(Options.Create(apiKeySettings));
+
         services.AddHttpContextAccessor();
+        services.AddScoped<IApiKeyProvider, ApiKeyProvider>();
         services.AddScoped<IUserContextProvider, UserContextProvider>();
 
         services.AddAuthentication(options =>
@@ -26,7 +31,8 @@ public static class AuthenticationExtension
             options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
             options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
         })
-        .AddJwtBearerAuthentication(jwtSettings);
+        .AddJwtBearerAuthentication(jwtSettings)
+        .AddApiKeyAuthentication();
 
         services.AddRoleAuthorization();
 
@@ -68,6 +74,30 @@ public static class AuthenticationExtension
                     };
 
                     await WriteUnauthorizedAsync(context.HttpContext, JwtBearerDefaults.AuthenticationScheme, detail);
+                }
+            };
+        });
+    }
+
+    private static AuthenticationBuilder AddApiKeyAuthentication(this AuthenticationBuilder builder)
+    {
+        return builder.AddApiKeyInHeaderOrQueryParams<ApiKeyProvider>(options =>
+        {
+            options.Realm = "SistemaPresenca.Api";
+            options.KeyName = "X-Api-Key";
+
+            options.Events = new ApiKeyEvents
+            {
+                OnHandleChallenge = async context =>
+                {
+                    var keyProvided = context.Request.Headers.ContainsKey(options.KeyName);
+                    var detail = keyProvided
+                        ? "Invalid API Key."
+                        : $"You must provide the header {options.KeyName} to access this action.";
+
+                    await WriteUnauthorizedAsync(context.HttpContext, ApiKeyDefaults.AuthenticationScheme, detail);
+
+                    context.Handled();
                 }
             };
         });
