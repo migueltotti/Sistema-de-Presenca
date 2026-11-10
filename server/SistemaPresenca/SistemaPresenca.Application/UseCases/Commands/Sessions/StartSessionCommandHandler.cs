@@ -53,7 +53,7 @@ public class StartSessionCommandHandler(
             subject.Id,
             room.Id,
             professor.Id,
-            userContextProvider.UserId
+            userContextProvider.User.Id
         );
 
         foreach (var student in subject.Students)

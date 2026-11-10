@@ -22,7 +22,7 @@ public class DeleteUserCommandHandler(
             return Result.Failure(UserErrors.NotFound);
         }
 
-        await userRepository.DeleteAsync(user, userContextProvider.UserId, cancellationToken);
+        await userRepository.DeleteAsync(user, userContextProvider.User.Id, cancellationToken);
 
         logger.LogInformation("User with id {Id} deleted successfully.", command.Id);
 

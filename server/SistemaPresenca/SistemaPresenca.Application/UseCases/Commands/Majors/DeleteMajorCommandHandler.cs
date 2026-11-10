@@ -22,7 +22,7 @@ public sealed class DeleteMajorCommandHandler(
             return Result.Failure(MajorErrors.NotFound);
         }
 
-        await majorRepoitory.DeleteAsync(major, userContextProvider.UserId, cancellationToken);
+        await majorRepoitory.DeleteAsync(major, userContextProvider.User.Id, cancellationToken);
 
         logger.LogInformation("Major with id {Id} deleted successfully.", command.Id);
 

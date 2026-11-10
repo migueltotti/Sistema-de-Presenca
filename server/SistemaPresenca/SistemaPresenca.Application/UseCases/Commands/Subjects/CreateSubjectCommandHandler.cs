@@ -32,7 +32,7 @@ public sealed class CreateSubjectCommandHandler(
             return Result.Failure(SubjectErrors.CodeAlreadyExists);
         }
 
-        var newSubject = command.Request.ToEntity(userContextProvider.UserId);
+        var newSubject = command.Request.ToEntity(userContextProvider.User.Id);
 
         await subjectRepository.AddAsync(newSubject, cancellationToken);
 

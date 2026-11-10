@@ -22,7 +22,7 @@ public sealed class DeleteSubjectCommandHandler(
             return Result.Failure(SubjectErrors.NotFound);
         }
 
-        await subjectRepository.DeleteAsync(subject, userContextProvider.UserId, cancellationToken);
+        await subjectRepository.DeleteAsync(subject, userContextProvider.User.Id, cancellationToken);
 
         logger.LogInformation("Subject with id {Id} deleted successfully.", command.Id);
 

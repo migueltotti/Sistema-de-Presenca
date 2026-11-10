@@ -29,7 +29,7 @@ public class CreateUserCommandHandler(
             return Result.Failure(UserErrors.EmailOrCpfAlreadyExists);
         }
 
-        var user = command.Request.ToEntity(userContextProvider.UserId);
+        var user = command.Request.ToEntity(userContextProvider.User.Id);
 
         var hashedPassword = passwordHasher.HashPassword(user, command.Request.Password);
 

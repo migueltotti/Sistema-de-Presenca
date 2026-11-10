@@ -44,7 +44,7 @@ public sealed class GrantRoomAccessCommandHandler(
             return Result.Failure(RoomAccessPermissionErrors.AlreadyExists);
         }
 
-        var permission = command.ToEntity(userContextProvider.UserId);
+        var permission = command.ToEntity(userContextProvider.User.Id);
 
         await roomAccessPermissionRepository.AddAsync(permission, cancellationToken);
 

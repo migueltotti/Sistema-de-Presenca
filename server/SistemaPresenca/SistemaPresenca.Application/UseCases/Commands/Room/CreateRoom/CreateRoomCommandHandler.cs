@@ -2,11 +2,12 @@ using LiteBus.Commands.Abstractions;
 using Microsoft.Extensions.Logging;
 using SistemaPresenca.Application.Interfaces;
 using SistemaPresenca.Application.Mappers;
+using SistemaPresenca.Application.UseCases.Commands.Rooms;
 using SistemaPresenca.Domain.Errors;
 using SistemaPresenca.Domain.Interfaces.Repositories;
 using SistemaPresenca.Domain.Models;
 
-namespace SistemaPresenca.Application.UseCases.Commands.Rooms;
+namespace SistemaPresenca.Application.UseCases.Commands.Room.CreateRoom;
 
 public sealed class CreateRoomCommandHandler(
     IUserContextProvider userContextProvider,
@@ -32,7 +33,7 @@ public sealed class CreateRoomCommandHandler(
             return Result.Failure(RoomErrors.MicrocontrollerIdAlreadyExists);
         }
 
-        var newRoom = command.Request.ToEntity(userContextProvider.UserId);
+        var newRoom = command.Request.ToEntity(userContextProvider.User.Id);
 
         await roomRepository.AddAsync(newRoom, cancellationToken);
 

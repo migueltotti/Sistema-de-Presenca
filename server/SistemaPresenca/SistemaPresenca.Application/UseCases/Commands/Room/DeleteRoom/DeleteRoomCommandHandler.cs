@@ -22,7 +22,7 @@ public sealed class DeleteRoomCommandHandler(
 			return Result.Failure(RoomErrors.NotFound);
 		}
 
-		await roomRepository.DeleteAsync(room, userContextProvider.UserId, cancellationToken);
+		await roomRepository.DeleteAsync(room, userContextProvider.User.Id, cancellationToken);
 
 		logger.LogInformation("Room with id {Id} deleted successfully.", command.Id);
 

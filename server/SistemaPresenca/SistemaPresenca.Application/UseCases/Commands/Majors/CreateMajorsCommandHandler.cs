@@ -23,7 +23,7 @@ public sealed class CreateMajorsCommandHandler(
             return Result.Failure(MajorErrors.CodeAlreadyExists);
         }
 
-        var newMajor = command.Request.ToEntity(userContextProvider.UserId);
+        var newMajor = command.Request.ToEntity(userContextProvider.User.Id);
 
         await majorRepository.AddAsync(newMajor, cancellationToken);
 

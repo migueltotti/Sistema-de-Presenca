@@ -26,7 +26,7 @@ public sealed class RevokeRoomAccessCommandHandler(
 
         await roomAccessPermissionRepository.DeleteAsync(
             permission,
-            userContextProvider.UserId,
+            userContextProvider.User.Id,
             cancellationToken);
 
         logger.LogInformation("Room access permission with id {Id} revoked.", command.PermissionId);
