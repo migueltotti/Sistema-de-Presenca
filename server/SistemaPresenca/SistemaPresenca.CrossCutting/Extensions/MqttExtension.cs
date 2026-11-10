@@ -19,6 +19,7 @@ public static class MqttExtension
                 .WithTcpServer(settings.Host, settings.Port)
                 .WithCredentials(settings.Username, settings.Password)
                 .WithClientId(settings.ClientId)
+                .WithKeepAlivePeriod(TimeSpan.FromSeconds(60))
                 .Build();
 
             mqttClient.ConnectAsync(mqttClientOptions).GetAwaiter().GetResult();

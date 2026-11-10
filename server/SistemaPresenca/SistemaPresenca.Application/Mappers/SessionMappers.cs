@@ -1,4 +1,5 @@
-﻿using SistemaPresenca.Domain.Entities;
+﻿using SistemaPresenca.Application.Constants;
+using SistemaPresenca.Domain.Entities;
 using System.Text.Json;
 
 namespace SistemaPresenca.Application.Mappers;
@@ -14,6 +15,6 @@ public static class SessionMappers
             ProfessorTagId = session.Professor.TagId
         };
 
-        return JsonSerializer.Serialize(@event);
+        return JsonSerializer.Serialize(@event, SistemaPresencaConstants.SerializerOptions);
     }
 }
