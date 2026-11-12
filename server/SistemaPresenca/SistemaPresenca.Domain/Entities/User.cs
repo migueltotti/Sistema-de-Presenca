@@ -17,7 +17,7 @@ public class User : BaseEntity
     {
     }
 
-    public User(string name, string email, string registrationId, string cpf, UserRole role, Guid? createdByAdminId) : base(createdByAdminId)
+    public User(string name, string email, string registrationId, string cpf, UserRole role, Guid? createdById) : base(createdById)
     {
         Name = name;
         Email = email;

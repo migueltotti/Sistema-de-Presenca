@@ -18,7 +18,11 @@ public sealed class EndSessionCommandHandler(
 {
     public async Task<Result> HandleAsync(EndSessionCommand command, CancellationToken cancellationToken = default)
     {
-        var session = await sessionRepository.GetOneAsync(x => x.Id == command.SessionId, cancellationToken: cancellationToken);
+        var session = await sessionRepository.GetOneAsync(
+            x => x.Id == command.SessionId,
+            includes: ["Subject", "Room"],
+            cancellationToken: cancellationToken);
+
         if (session is null)
         {
             logger.LogError("Session with id {SessionId} - not found", command.SessionId);
@@ -36,7 +40,7 @@ public sealed class EndSessionCommandHandler(
                 return Result.Failure(UserErrors.ProfessorNotFound);
             }
 
-            if (!session.ProfessorId.Equals(professor.Id))
+            if (!session.Subject.ProfessorIds.Contains(userId))
             {
                 logger.LogError("Professor with id {UserId} is not assigned to session {SessionId}", userId, command.SessionId);
                 return Result.Failure(SessionErrors.ProfessorMismatch);

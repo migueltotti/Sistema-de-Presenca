@@ -18,7 +18,7 @@ public class RoomBooking : BaseEntity
     {
     }
 
-    public RoomBooking(Guid roomId, Guid professorId, Guid subjectId, DateTime startsAt, DateTime endsAt, Guid? createdByAdminId) : base(createdByAdminId)
+    public RoomBooking(Guid roomId, Guid professorId, Guid subjectId, DateTime startsAt, DateTime endsAt, Guid? createdById) : base(createdById)
     {
         RoomId = roomId;
         Room = default!;

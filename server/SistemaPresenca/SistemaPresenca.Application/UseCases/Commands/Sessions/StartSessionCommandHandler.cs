@@ -52,7 +52,7 @@ public class StartSessionCommandHandler(
             command.Request.NumberOfClasses,
             subject.Id,
             room.Id,
-            professor.Id,
+            //professor.Id,
             userContextProvider.User.Id
         );
 

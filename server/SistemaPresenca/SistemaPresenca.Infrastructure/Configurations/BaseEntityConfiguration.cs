@@ -13,7 +13,7 @@ public class BaseEntityConfiguration<T> : IEntityTypeConfiguration<T> where T : 
         builder.Property(x => x.CreatedAt)
             .IsRequired();
 
-        builder.Property(x => x.CreatedByAdminId)
+        builder.Property(x => x.CreatedById)
             .IsRequired(false);
 
         builder.Property(x => x.DeletedAt)
@@ -22,9 +22,9 @@ public class BaseEntityConfiguration<T> : IEntityTypeConfiguration<T> where T : 
         builder.Property(x => x.DeletedByAdminId)
             .IsRequired(false);
 
-        builder.HasOne(x => x.CreatedByAdmin)
+        builder.HasOne(x => x.CreatedBy)
             .WithMany()
-            .HasForeignKey(x => x.CreatedByAdminId)
+            .HasForeignKey(x => x.CreatedById)
             .OnDelete(DeleteBehavior.ClientNoAction);
 
         builder.HasOne(x => x.DeletedByAdmin)

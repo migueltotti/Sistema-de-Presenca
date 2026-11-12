@@ -22,7 +22,7 @@ public static class MajorMappers
             major.Name,
             major.Code,
             major.CreatedAt,
-            major.CreatedByAdminId
+            major.CreatedById
         );
     }
 

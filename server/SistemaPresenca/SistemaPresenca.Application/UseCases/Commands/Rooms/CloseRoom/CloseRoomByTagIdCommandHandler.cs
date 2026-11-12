@@ -46,7 +46,7 @@ public sealed class CloseRoomByTagIdCommandHandler(
                 var session = await sessionRepository.GetOneAsync(x => 
                     x.Id == command.SessionRequest.SessionId.Value &&
                     x.FinalizedAt == null,
-                    includes: ["Professor"],
+                    includes: ["Subject.Professors"],
                     cancellationToken: cancellationToken);
 
                 if (session is null)
@@ -61,7 +61,7 @@ public sealed class CloseRoomByTagIdCommandHandler(
                     return Result.Failure(SessionErrors.NotFound); // TOOD: Create a specific error for this case
                 }
 
-                if (session.Professor.TagId != command.TagId)
+                if (!session.Subject.Professors.Any(x => x.TagId == command.TagId))
                 {
                     logger.LogError("User with tag id {TagId} is not the professor for session {SessionId}.", command.TagId, command.SessionRequest.SessionId.Value);
                     return Result.Failure(SessionErrors.ProfessorMismatch);

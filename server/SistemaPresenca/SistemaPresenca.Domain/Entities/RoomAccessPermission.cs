@@ -13,7 +13,7 @@ public class RoomAccessPermission : BaseEntity
     {
     }
 
-    public RoomAccessPermission(Guid userId, Guid roomId, Guid? createdByAdminId) : base(createdByAdminId)
+    public RoomAccessPermission(Guid userId, Guid roomId, Guid? createdById) : base(createdById)
     {
         UserId = userId;
         RoomId = roomId;

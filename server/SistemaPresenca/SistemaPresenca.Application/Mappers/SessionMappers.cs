@@ -12,7 +12,11 @@ public static class SessionMappers
         {
             SessionEvent = "EVT_INICIAR_REGISTRO_AULA",
             SessionId = session.Id,
-            ProfessorTagId = session.Professor.TagId
+            ProfessorTagIds = session
+                .Subject
+                .Professors
+                .Where(x => !string.IsNullOrEmpty(x.TagId))
+                .Select(x => x.TagId)
         };
 
         return JsonSerializer.Serialize(@event, SistemaPresencaConstants.SerializerOptions);

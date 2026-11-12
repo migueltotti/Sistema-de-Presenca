@@ -15,7 +15,7 @@ public class Subject : BaseEntity
     {
     }
 
-    public Subject(string name, string code, int totalClasses, Guid majorId, Guid? createdByAdminId) : base(createdByAdminId)
+    public Subject(string name, string code, int totalClasses, Guid majorId, Guid? createdById) : base(createdById)
     {
         Name = name;
         Code = code;

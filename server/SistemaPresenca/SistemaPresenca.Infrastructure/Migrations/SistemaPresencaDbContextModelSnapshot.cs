@@ -57,7 +57,7 @@ namespace SistemaPresenca.Infrastructure.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<Guid?>("CreatedByAdminId")
+                    b.Property<Guid?>("CreatedById")
                         .HasColumnType("uuid");
 
                     b.Property<DateTime?>("DeletedAt")
@@ -77,7 +77,7 @@ namespace SistemaPresenca.Infrastructure.Migrations
                         .IsUnique()
                         .HasFilter("\"DeletedAt\" IS NULL");
 
-                    b.HasIndex("CreatedByAdminId");
+                    b.HasIndex("CreatedById");
 
                     b.HasIndex("DeletedByAdminId");
 
@@ -93,7 +93,7 @@ namespace SistemaPresenca.Infrastructure.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<Guid?>("CreatedByAdminId")
+                    b.Property<Guid?>("CreatedById")
                         .HasColumnType("uuid");
 
                     b.Property<DateTime?>("DeletedAt")
@@ -122,7 +122,7 @@ namespace SistemaPresenca.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("CreatedByAdminId");
+                    b.HasIndex("CreatedById");
 
                     b.HasIndex("DeletedByAdminId");
 
@@ -149,7 +149,7 @@ namespace SistemaPresenca.Infrastructure.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<Guid?>("CreatedByAdminId")
+                    b.Property<Guid?>("CreatedById")
                         .HasColumnType("uuid");
 
                     b.Property<DateTime?>("DeletedAt")
@@ -169,7 +169,7 @@ namespace SistemaPresenca.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("CreatedByAdminId");
+                    b.HasIndex("CreatedById");
 
                     b.HasIndex("DeletedByAdminId");
 
@@ -191,7 +191,7 @@ namespace SistemaPresenca.Infrastructure.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<Guid?>("CreatedByAdminId")
+                    b.Property<Guid?>("CreatedById")
                         .HasColumnType("uuid");
 
                     b.Property<DateTime?>("DeletedAt")
@@ -220,7 +220,7 @@ namespace SistemaPresenca.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("CreatedByAdminId");
+                    b.HasIndex("CreatedById");
 
                     b.HasIndex("DeletedByAdminId");
 
@@ -242,7 +242,7 @@ namespace SistemaPresenca.Infrastructure.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<Guid?>("CreatedByAdminId")
+                    b.Property<Guid?>("CreatedById")
                         .HasColumnType("uuid");
 
                     b.Property<DateTime?>("DeletedAt")
@@ -257,9 +257,6 @@ namespace SistemaPresenca.Infrastructure.Migrations
                     b.Property<DateTime>("InitiedAt")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<Guid>("ProfessorId")
-                        .HasColumnType("uuid");
-
                     b.Property<Guid>("RoomId")
                         .HasColumnType("uuid");
 
@@ -271,11 +268,9 @@ namespace SistemaPresenca.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("CreatedByAdminId");
+                    b.HasIndex("CreatedById");
 
                     b.HasIndex("DeletedByAdminId");
-
-                    b.HasIndex("ProfessorId");
 
                     b.HasIndex("RoomId");
 
@@ -298,7 +293,7 @@ namespace SistemaPresenca.Infrastructure.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<Guid?>("CreatedByAdminId")
+                    b.Property<Guid?>("CreatedById")
                         .HasColumnType("uuid");
 
                     b.Property<DateTime?>("DeletedAt")
@@ -328,7 +323,7 @@ namespace SistemaPresenca.Infrastructure.Migrations
                         .IsUnique()
                         .HasFilter("\"DeletedAt\" IS NULL");
 
-                    b.HasIndex("CreatedByAdminId");
+                    b.HasIndex("CreatedById");
 
                     b.HasIndex("DeletedByAdminId");
 
@@ -351,7 +346,7 @@ namespace SistemaPresenca.Infrastructure.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<Guid?>("CreatedByAdminId")
+                    b.Property<Guid?>("CreatedById")
                         .HasColumnType("uuid");
 
                     b.Property<DateTime?>("DeletedAt")
@@ -394,7 +389,7 @@ namespace SistemaPresenca.Infrastructure.Migrations
                         .IsUnique()
                         .HasFilter("\"DeletedAt\" IS NULL");
 
-                    b.HasIndex("CreatedByAdminId");
+                    b.HasIndex("CreatedById");
 
                     b.HasIndex("DeletedByAdminId");
 
@@ -460,9 +455,9 @@ namespace SistemaPresenca.Infrastructure.Migrations
 
             modelBuilder.Entity("SistemaPresenca.Domain.Entities.Major", b =>
                 {
-                    b.HasOne("SistemaPresenca.Domain.Entities.User", "CreatedByAdmin")
+                    b.HasOne("SistemaPresenca.Domain.Entities.User", "CreatedBy")
                         .WithMany()
-                        .HasForeignKey("CreatedByAdminId")
+                        .HasForeignKey("CreatedById")
                         .OnDelete(DeleteBehavior.ClientNoAction);
 
                     b.HasOne("SistemaPresenca.Domain.Entities.User", "DeletedByAdmin")
@@ -470,16 +465,16 @@ namespace SistemaPresenca.Infrastructure.Migrations
                         .HasForeignKey("DeletedByAdminId")
                         .OnDelete(DeleteBehavior.ClientNoAction);
 
-                    b.Navigation("CreatedByAdmin");
+                    b.Navigation("CreatedBy");
 
                     b.Navigation("DeletedByAdmin");
                 });
 
             modelBuilder.Entity("SistemaPresenca.Domain.Entities.Room", b =>
                 {
-                    b.HasOne("SistemaPresenca.Domain.Entities.User", "CreatedByAdmin")
+                    b.HasOne("SistemaPresenca.Domain.Entities.User", "CreatedBy")
                         .WithMany()
-                        .HasForeignKey("CreatedByAdminId")
+                        .HasForeignKey("CreatedById")
                         .OnDelete(DeleteBehavior.ClientNoAction);
 
                     b.HasOne("SistemaPresenca.Domain.Entities.User", "DeletedByAdmin")
@@ -487,16 +482,16 @@ namespace SistemaPresenca.Infrastructure.Migrations
                         .HasForeignKey("DeletedByAdminId")
                         .OnDelete(DeleteBehavior.ClientNoAction);
 
-                    b.Navigation("CreatedByAdmin");
+                    b.Navigation("CreatedBy");
 
                     b.Navigation("DeletedByAdmin");
                 });
 
             modelBuilder.Entity("SistemaPresenca.Domain.Entities.RoomAccessPermission", b =>
                 {
-                    b.HasOne("SistemaPresenca.Domain.Entities.User", "CreatedByAdmin")
+                    b.HasOne("SistemaPresenca.Domain.Entities.User", "CreatedBy")
                         .WithMany()
-                        .HasForeignKey("CreatedByAdminId")
+                        .HasForeignKey("CreatedById")
                         .OnDelete(DeleteBehavior.ClientNoAction);
 
                     b.HasOne("SistemaPresenca.Domain.Entities.User", "DeletedByAdmin")
@@ -516,7 +511,7 @@ namespace SistemaPresenca.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.Navigation("CreatedByAdmin");
+                    b.Navigation("CreatedBy");
 
                     b.Navigation("DeletedByAdmin");
 
@@ -527,9 +522,9 @@ namespace SistemaPresenca.Infrastructure.Migrations
 
             modelBuilder.Entity("SistemaPresenca.Domain.Entities.RoomBooking", b =>
                 {
-                    b.HasOne("SistemaPresenca.Domain.Entities.User", "CreatedByAdmin")
+                    b.HasOne("SistemaPresenca.Domain.Entities.User", "CreatedBy")
                         .WithMany()
-                        .HasForeignKey("CreatedByAdminId")
+                        .HasForeignKey("CreatedById")
                         .OnDelete(DeleteBehavior.ClientNoAction);
 
                     b.HasOne("SistemaPresenca.Domain.Entities.User", "DeletedByAdmin")
@@ -555,7 +550,7 @@ namespace SistemaPresenca.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.Navigation("CreatedByAdmin");
+                    b.Navigation("CreatedBy");
 
                     b.Navigation("DeletedByAdmin");
 
@@ -568,21 +563,15 @@ namespace SistemaPresenca.Infrastructure.Migrations
 
             modelBuilder.Entity("SistemaPresenca.Domain.Entities.Session", b =>
                 {
-                    b.HasOne("SistemaPresenca.Domain.Entities.User", "CreatedByAdmin")
+                    b.HasOne("SistemaPresenca.Domain.Entities.User", "CreatedBy")
                         .WithMany()
-                        .HasForeignKey("CreatedByAdminId")
+                        .HasForeignKey("CreatedById")
                         .OnDelete(DeleteBehavior.ClientNoAction);
 
                     b.HasOne("SistemaPresenca.Domain.Entities.User", "DeletedByAdmin")
                         .WithMany()
                         .HasForeignKey("DeletedByAdminId")
                         .OnDelete(DeleteBehavior.ClientNoAction);
-
-                    b.HasOne("SistemaPresenca.Domain.Entities.User", "Professor")
-                        .WithMany()
-                        .HasForeignKey("ProfessorId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
 
                     b.HasOne("SistemaPresenca.Domain.Entities.Room", "Room")
                         .WithMany("Sessions")
@@ -596,11 +585,9 @@ namespace SistemaPresenca.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("CreatedByAdmin");
+                    b.Navigation("CreatedBy");
 
                     b.Navigation("DeletedByAdmin");
-
-                    b.Navigation("Professor");
 
                     b.Navigation("Room");
 
@@ -609,9 +596,9 @@ namespace SistemaPresenca.Infrastructure.Migrations
 
             modelBuilder.Entity("SistemaPresenca.Domain.Entities.Subject", b =>
                 {
-                    b.HasOne("SistemaPresenca.Domain.Entities.User", "CreatedByAdmin")
+                    b.HasOne("SistemaPresenca.Domain.Entities.User", "CreatedBy")
                         .WithMany()
-                        .HasForeignKey("CreatedByAdminId")
+                        .HasForeignKey("CreatedById")
                         .OnDelete(DeleteBehavior.ClientNoAction);
 
                     b.HasOne("SistemaPresenca.Domain.Entities.User", "DeletedByAdmin")
@@ -625,7 +612,7 @@ namespace SistemaPresenca.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("CreatedByAdmin");
+                    b.Navigation("CreatedBy");
 
                     b.Navigation("DeletedByAdmin");
 
@@ -634,9 +621,9 @@ namespace SistemaPresenca.Infrastructure.Migrations
 
             modelBuilder.Entity("SistemaPresenca.Domain.Entities.User", b =>
                 {
-                    b.HasOne("SistemaPresenca.Domain.Entities.User", "CreatedByAdmin")
+                    b.HasOne("SistemaPresenca.Domain.Entities.User", "CreatedBy")
                         .WithMany()
-                        .HasForeignKey("CreatedByAdminId")
+                        .HasForeignKey("CreatedById")
                         .OnDelete(DeleteBehavior.ClientNoAction);
 
                     b.HasOne("SistemaPresenca.Domain.Entities.User", "DeletedByAdmin")
@@ -644,7 +631,7 @@ namespace SistemaPresenca.Infrastructure.Migrations
                         .HasForeignKey("DeletedByAdminId")
                         .OnDelete(DeleteBehavior.ClientNoAction);
 
-                    b.Navigation("CreatedByAdmin");
+                    b.Navigation("CreatedBy");
 
                     b.Navigation("DeletedByAdmin");
                 });

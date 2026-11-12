@@ -10,7 +10,7 @@ public class Major : BaseEntity
     {
     }
 
-    public Major(string name, string code, Guid? createdByAdminId) : base(createdByAdminId)
+    public Major(string name, string code, Guid? createdById) : base(createdById)
     {
         Name = name;
         Code = code;

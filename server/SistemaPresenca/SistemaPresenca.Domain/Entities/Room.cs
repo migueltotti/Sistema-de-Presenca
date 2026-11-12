@@ -15,7 +15,7 @@ public class Room : BaseEntity
     {
     }
 
-    public Room(string name, string location, string microcontrollerId, Guid? createdByAdminId) : base(createdByAdminId)
+    public Room(string name, string location, string microcontrollerId, Guid? createdById) : base(createdById)
     {
         Name = name;
         Location = location;
