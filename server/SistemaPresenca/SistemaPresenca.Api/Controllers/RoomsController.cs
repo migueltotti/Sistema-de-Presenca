@@ -128,6 +128,28 @@ public class RoomsController(ICommandMediator commandMediator, IQueryMediator qu
     [ProducesResponseType(typeof(void), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(Error), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
+    
+    [HttpPost("/microcontroller/{microcontrollerId}/open/tag-id/{tagId}")]
+    [Authorize(AuthenticationSchemes = ApiKeyDefaults.AuthenticationScheme)]
+    [ProducesResponseType(typeof(void), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(Error), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
+    public async Task<IActionResult> OpenRoomByTagIdAsync(
+        [FromRoute] string microcontrollerId,
+        [FromRoute] string tagId,
+        [FromBody] OpenRoomSessionRequest sessionRequest,
+        CancellationToken cancellationToken)
+    {
+        var result = await commandMediator.SendAsync(new OpenRoomByTagIdCommand(microcontrollerId, tagId, sessionRequest), cancellationToken);
+
+        if (result.IsFailure)
+        {
+            return BadRequest(result.Error);
+        }
+
+        return Ok();
+    }
+    
     public async Task<IActionResult> CloseRoomByTagIdAsync(
         [FromRoute] string microcontrollerId,
         [FromRoute] string tagId,
