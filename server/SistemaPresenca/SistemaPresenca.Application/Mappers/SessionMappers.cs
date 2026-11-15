@@ -10,7 +10,7 @@ public static class SessionMappers
     {
         var @event = new
         {
-            SessionEvent = "EVT_INICIAR_REGISTRO_AULA",
+            SessionEvent = "EVT_FINALIZAR_REGISTRO_AULA",
             SessionId = session.Id,
             ProfessorTagIds = session
                 .Subject
