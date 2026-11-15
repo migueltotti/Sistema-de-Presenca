@@ -21,15 +21,21 @@ public class SessionConfiguration : BaseEntityConfiguration<Session>
         builder.Property(s => s.TotalLessons)
             .IsRequired();
 
-        
+        builder.Property(s => s.RoomId)
+            .IsRequired(false);
+
+        builder.Property(s => s.RoomBookingId)
+            .IsRequired(false);
+
         builder.HasOne(s => s.Subject)
             .WithMany()
             .HasForeignKey(s => s.SubjectId)
             .OnDelete(DeleteBehavior.Cascade);
 
-        //builder.HasOne(s => s.Professor)
-        //    .WithMany()
-        //    .HasForeignKey(s => s.ProfessorId)
-        //    .OnDelete(DeleteBehavior.Cascade);
+        builder.HasOne(s => s.Room)
+            .WithMany()
+            .HasForeignKey(s => s.RoomId)
+            .IsRequired(false)
+            .OnDelete(DeleteBehavior.Restrict);
     }
 }
