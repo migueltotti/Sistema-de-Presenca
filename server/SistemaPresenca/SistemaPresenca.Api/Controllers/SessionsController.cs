@@ -29,7 +29,6 @@ public class SessionsController(ICommandMediator commandMediator) : ControllerBa
         return Ok(result.Data);
     }
 
-    // TODO: Modificar esse endpoint para ele ser o "INICIAR REGISTRO DE PRESENÇA MANUAL"
     [HttpPost("{id:guid}/continue")]
     [Authorize("AdminOrProfessor")]
     [ProducesResponseType(typeof(void), StatusCodes.Status200OK)]
@@ -37,7 +36,7 @@ public class SessionsController(ICommandMediator commandMediator) : ControllerBa
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
     public async Task<ActionResult> ContinueSessionAsync([FromRoute] Guid id, [FromBody] ContinueSessionRequest request, CancellationToken cancellationToken)
     {
-        var result = await commandMediator.SendAsync(new ContinueSessionCommand(id, request.ProfessorTagId), cancellationToken);
+        var result = await commandMediator.SendAsync(new ContinueSessionCommand(id, request.ProfessorTagId, request.RoomId), cancellationToken);
 
         if (result.IsFailure)
         {
