@@ -81,6 +81,7 @@ public sealed class ContinueSessionCommandHandler(
 
         var hasConflict = upcomingBookings.Any(b =>
             b.Id != session.RoomBookingId &&
+            b.ProfessorId != user.Id &&
             b.StartsAt < estimatedEnd &&
             b.EndsAt > now);
 
