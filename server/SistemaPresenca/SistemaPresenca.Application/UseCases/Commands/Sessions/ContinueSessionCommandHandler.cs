@@ -12,6 +12,7 @@ namespace SistemaPresenca.Application.UseCases.Commands.Sessions;
 public sealed class ContinueSessionCommandHandler(
     ISessionRepository sessionRepository,
     IRoomRepository roomRepository,
+    IRoomBookingRepository roomBookingRepository,
     IUserRepository userRepository,
     IMqttProducer mqttProducer,
     ILogger<ContinueSessionCommandHandler> logger) : ICommandHandler<ContinueSessionCommand, Result>
@@ -35,17 +36,17 @@ public sealed class ContinueSessionCommandHandler(
             return Result.Failure(SessionErrors.AlreadyFinished);
         }
 
-        var professor = await userRepository.GetOneAsync(
-            x => x.TagId == command.ProfessorTagId && x.Role == UserRole.Professor,
+        var user = await userRepository.GetOneAsync(
+            x => x.TagId == command.ProfessorTagId && (x.Role == UserRole.Professor || x.Role == UserRole.Admin),
             cancellationToken: cancellationToken);
 
-        if (professor is null)
+        if (user is null)
         {
-            logger.LogError("Professor with tagId {ProfessorTagId} - not found", command.ProfessorTagId);
+            logger.LogError("Professor or Admin with tagId {ProfessorTagId} - not found", command.ProfessorTagId);
             return Result.Failure(UserErrors.ProfessorNotFound);
         }
 
-        if (!session.Subject.Professors.Any(p => p.Id == professor.Id))
+        if (user.Role == UserRole.Professor && !session.Subject.Professors.Any(p => p.Id == user.Id))
         {
             logger.LogError("Professor with tagId {ProfessorTagId} is not assigned to session {SessionId}", command.ProfessorTagId, command.SessionId);
             return Result.Failure(SessionErrors.ProfessorMismatch);
@@ -55,7 +56,7 @@ public sealed class ContinueSessionCommandHandler(
         if (!targetRoomId.HasValue)
         {
             logger.LogError("Session {SessionId} has no associated room to start attendance.", command.SessionId);
-            return Result.Failure(RoomErrors.NotFound);
+            return Result.Failure(new Error("Session.RoomRequired", "É necessário registrar uma sala para iniciar a aula."));
         }
 
         var room = session.Room is not null && session.Room.Id == targetRoomId.Value
@@ -74,8 +75,23 @@ public sealed class ContinueSessionCommandHandler(
             return Result.Failure(RoomAccessPermissionErrors.RoomInactive);
         }
 
+        var now = DateTime.UtcNow;
+        var estimatedEnd = now.AddMinutes(session.TotalLessons * 50);
+        var upcomingBookings = await roomBookingRepository.GetUpcomingByRoomIdAsync(room.Id, now, cancellationToken);
+
+        var hasConflict = upcomingBookings.Any(b =>
+            b.Id != session.RoomBookingId &&
+            b.StartsAt < estimatedEnd &&
+            b.EndsAt > now);
+
+        if (hasConflict)
+        {
+            logger.LogWarning("Room {RoomId} already has a booking overlapping with manual session {SessionId}.", room.Id, session.Id);
+            return Result.Failure(new Error("Room.BookingConflict", "Já existe um agendamento registrado para esta sala nesse horário."));
+        }
+
         session.RoomId = room.Id;
-        session.InitiedAt = DateTime.UtcNow;
+        session.InitiedAt = now;
 
         await sessionRepository.UpdateAsync(session, cancellationToken);
 
