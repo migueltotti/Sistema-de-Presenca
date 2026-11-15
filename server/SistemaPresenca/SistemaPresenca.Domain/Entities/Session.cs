@@ -7,22 +7,24 @@ public class Session : BaseEntity
     public int TotalLessons { get; set; }
     public Guid SubjectId { get; set; }
     public Subject Subject { get; set; }
-    public Guid RoomId { get; set; }
-    public Room Room { get; set; }
+    public Guid? RoomId { get; set; }
+    public Room? Room { get; set; }
     public List<Attendance> Attendances { get; set; }
+    public Guid? RoomBookingId { get; set; }
+    public RoomBooking? RoomBooking { get; set; }
 
     private Session() : base()
     {
     }
 
-    public Session(DateTime initiedAt, int totalLessons, Guid subjectId, Guid roomId, Guid? createdById) : base(createdById)
+    public Session(DateTime initiedAt, int totalLessons, Guid subjectId, Guid? roomId, Guid? createdById, Guid? roomBookingId = null) : base(createdById)
     {
         InitiedAt = initiedAt;
         TotalLessons = totalLessons;
         SubjectId = subjectId;
         RoomId = roomId;
+        RoomBookingId = roomBookingId;
         Attendances = [];
         Subject = default!;
-        Room = default!;
     }
 }
