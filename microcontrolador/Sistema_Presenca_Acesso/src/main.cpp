@@ -1,4 +1,5 @@
 #include <Arduino.h>
+#include "button.h"
 #include "types.h" 
 #include "reader.h"
 #include "wifi_connection.h"
@@ -229,6 +230,7 @@ void setup() {
   //mqttInit();
 
   xTaskCreatePinnedToCore(readerTask,     "reader",   4096, nullptr, 3, &readerTaskHandle, 1);
+  xTaskCreatePinnedToCore(buttonTask, "button", 2048, nullptr, 2, nullptr, 1);
   xTaskCreatePinnedToCore(displayTask,    "display",  4096, nullptr, 1, nullptr, 1);
   xTaskCreatePinnedToCore(controllerTask, "ctrl",     4096, nullptr, 2, nullptr, 1);
   //xTaskCreatePinnedToCore(mqttTask,       "mqtt",     4096, nullptr, 2, nullptr, 0);
