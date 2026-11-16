@@ -13,14 +13,16 @@ bool aulaAtiva = false;
 char sessionId[GUID_LEN] = {""};
 char professorTagId[UID_LEN] = {""};
 
-bool portaFechada = false; 
+bool portaFechada = true; 
 
-Fluxo     fluxo = FLUXO_OCIOSO;
+Fluxo      fluxo = FLUXO_OCIOSO;
 TickType_t prazo = 0;                 // instante limite do passo atual
-char      tagPendente[UID_LEN] = {""};// passo 2: tag de quem iniciou
-bool      finalizarAula = false;      // passo 4: intenção de finalizar a aula
-int       requestId = 0;              // incrementa a cada requisição
-int       requestPendente = -1;       // requisição que estamos aguardando
+char       tagPendente[UID_LEN] = {""};// passo 2: tag de quem iniciou
+bool       finalizarAula = false;      // passo 4: intenção de finalizar a aula
+bool       abrirComAulaAtiva = false;
+char       sessionIdParaRequisicao[GUID_LEN] = {""};
+int        requestId = 0;              // incrementa a cada requisição
+int        requestPendente = -1;       // requisição que estamos aguardando
 
 void atualizarDisplayExterno() {
   mostrar(LADO_EXTERNO,
@@ -36,6 +38,8 @@ void voltarAoEstadoOcioso() {
   fluxo = FLUXO_OCIOSO;
   tagPendente[0] = '\0';
   finalizarAula = false;
+  abrirComAulaAtiva = false;
+  sessionIdParaRequisicao[0] = '\0';
   requestPendente = -1;
   atualizarDisplayExterno();
 };
@@ -43,6 +47,7 @@ void voltarAoEstadoOcioso() {
 void enviarRequisicaoTrancarPorta() {
   HttpRequest req = {};
   req.requestId = ++requestId;
+  req.action = HTTP_REGISTRAR_FECHAMENTO;
   strlcpy(req.uid, tagPendente, sizeof(req.uid));
 
   if (finalizarAula) {
@@ -57,6 +62,28 @@ void enviarRequisicaoTrancarPorta() {
 
   requestPendente = req.requestId;
   fluxo = FLUXO_TRANCAR_AGUARDA_HTTP;
+  armarPrazo(TIMEOUT_HTTP_MS);
+  mostrar(LADO_EXTERNO, "Validando...", "Aguarde");
+};
+
+void enviarRequisicaoAbrirPorta() {
+  HttpRequest req = {};
+  req.requestId = ++requestId;
+  req.action = HTTP_REGISTRAR_ABERTURA;
+  strlcpy(req.uid, tagPendente, sizeof(req.uid));
+
+  if (abrirComAulaAtiva && sessionIdParaRequisicao[0] != '\0') {
+    strlcpy(req.sessionId, sessionIdParaRequisicao, sizeof(req.sessionId));
+  }
+
+  if (xQueueSend(httpQueue, &req, 0) != pdTRUE) {
+    mostrar(LADO_EXTERNO, "Sistema ocupado", "Tente de novo", 2000);
+    voltarAoEstadoOcioso();
+    return;
+  }
+
+  requestPendente = req.requestId;
+  fluxo = FLUXO_ABRIR_AGUARDA_HTTP;
   armarPrazo(TIMEOUT_HTTP_MS);
   mostrar(LADO_EXTERNO, "Validando...", "Aguarde");
 };
@@ -79,7 +106,7 @@ void controllerTask(void*) {
 
     if (xQueueReceive(eventQueue, &ev, tempoEspera) != pdTRUE) {
       Serial.printf("[ctrl] timeout no fluxo (estado %d)\n", (int)fluxo);
-      if (fluxo == FLUXO_TRANCAR_AGUARDA_HTTP) {
+      if (fluxo == FLUXO_TRANCAR_AGUARDA_HTTP || fluxo == FLUXO_ABRIR_AGUARDA_HTTP) {
         mostrar(LADO_EXTERNO, "Sem resposta", "Tente de novo", 2000);
         voltarAoEstadoOcioso();
       } else {
@@ -102,7 +129,11 @@ void controllerTask(void*) {
           mostrar(LADO_INTERNO, "Presenca OK", "Maria Silva", 2000);
         } else if (ev.tag.lado == LADO_EXTERNO) {
           if (portaFechada) {
-            // TODO: fluxo de ABRIR a porta
+            strlcpy(tagPendente, ev.tag.uid, sizeof(tagPendente));
+
+            fluxo = FLUXO_CONFIRMA_ABRIR;
+            armarPrazo(TIMEOUT_CONFIRMACAO_MS);
+            mostrar(LADO_EXTERNO, "Abrir a sala?", "CONFIRMA/CANCELA");
           } else {
             strlcpy(tagPendente, ev.tag.uid, sizeof(tagPendente));
 
@@ -116,8 +147,23 @@ void controllerTask(void*) {
 
       case EVT_BTN_CONFIRMA:
         // aguardando desenvolvimento da buttonTask para testar
-        // TODO: modificar depois para o caso de uso de abrir a porta
-        if (fluxo == FLUXO_CONFIRMA_FECHAR) {
+        if (fluxo == FLUXO_CONFIRMA_ABRIR) {
+          if (aulaAtiva) {
+            if (strcmp(tagPendente, professorTagId) == 0) {
+              portaFechada = false;
+              mostrar(LADO_EXTERNO, "Sala destrancada", "", 2000);
+              voltarAoEstadoOcioso();
+            } else {
+              abrirComAulaAtiva = true;
+              strlcpy(sessionIdParaRequisicao, sessionId, sizeof(sessionIdParaRequisicao));
+              enviarRequisicaoAbrirPorta();
+            }
+          } else {
+            abrirComAulaAtiva = false;
+            sessionIdParaRequisicao[0] = '\0';
+            enviarRequisicaoAbrirPorta();
+          }
+        } else if (fluxo == FLUXO_CONFIRMA_FECHAR) {
           if (aulaAtiva) {
             fluxo = FLUXO_CONFIRMA_FINALIZAR;
             armarPrazo(TIMEOUT_CONFIRMACAO_MS);
@@ -134,8 +180,10 @@ void controllerTask(void*) {
 
       case EVT_BTN_CANCELA:
         // aguardando desenvolvimento da buttonTask para testar
-        // TODO: modificar depois para o caso de uso de abrir a porta
-        if (fluxo == FLUXO_CONFIRMA_FECHAR) {
+        if (fluxo == FLUXO_CONFIRMA_ABRIR) {
+          mostrar(LADO_EXTERNO, "Cancelado", "", 2000);
+          voltarAoEstadoOcioso();
+        } else if (fluxo == FLUXO_CONFIRMA_FECHAR) {
           mostrar(LADO_EXTERNO, "Cancelado", "", 2000);
           voltarAoEstadoOcioso();
         } else if (fluxo == FLUXO_CONFIRMA_FINALIZAR) {
@@ -156,6 +204,9 @@ void controllerTask(void*) {
 
         mostrar(LADO_INTERNO, "Aula iniciada", "", 3000);               // temporaria
         mostrar(LADO_INTERNO, "Aproxime uma tag", ">>            <<");  // permanente
+        if (fluxo == FLUXO_OCIOSO) {
+          atualizarDisplayExterno();
+        }
         Serial.printf("[ctrl] aula com id %s iniciada para o professor com tag %s.\n", ev.aula.sessionId, ev.aula.professorTagId);
         break;
 
@@ -176,14 +227,16 @@ void controllerTask(void*) {
 
         mostrar(LADO_INTERNO, "Aula finalizada", "Obrigado!", 3000);     // temporaria
         mostrar(LADO_INTERNO, "Nenhuma aula",  "em andamento");          // permanente
+        if (fluxo == FLUXO_OCIOSO) {
+          atualizarDisplayExterno();
+        }
         Serial.printf("[ctrl] aula com id %s finalizada pelo professor com tag %s.\n", ev.aula.sessionId, ev.aula.professorTagId);
         break;
 
       case EVT_HTTP_RESULTADO:
         // aguardando desenvolvimento da httpTask para testar
-        // TODO: modificar depois para o caso de uso de abrir a porta
         // Ignora resultado atrasado/de outra requisição (ex.: já estourou o timeout)
-        if (fluxo != FLUXO_TRANCAR_AGUARDA_HTTP || ev.http.requestId != requestPendente) {
+        if ((fluxo != FLUXO_TRANCAR_AGUARDA_HTTP && fluxo != FLUXO_ABRIR_AGUARDA_HTTP) || ev.http.requestId != requestPendente) {
           Serial.printf("[ctrl] resultado HTTP ignorado (id %d, esperado %d)\n", ev.http.requestId, requestPendente);
           break;
         }
@@ -231,10 +284,10 @@ void setup() {
   //mqttInit();
 
   xTaskCreatePinnedToCore(readerTask,     "reader",   4096, nullptr, 3, &readerTaskHandle, 1);
-  xTaskCreatePinnedToCore(buttonTask, "button", 2048, nullptr, 2, nullptr, 1);
+  xTaskCreatePinnedToCore(buttonTask,     "button",   2048, nullptr, 2, nullptr, 1);
   xTaskCreatePinnedToCore(displayTask,    "display",  4096, nullptr, 1, nullptr, 1);
   xTaskCreatePinnedToCore(controllerTask, "ctrl",     4096, nullptr, 2, nullptr, 1);
-  xTaskCreatePinnedToCore(httpTask, "http", 8192, nullptr, 2, nullptr, 0);
+  xTaskCreatePinnedToCore(httpTask,       "http",     8192, nullptr, 2, nullptr, 0);
   //xTaskCreatePinnedToCore(mqttTask,       "mqtt",     4096, nullptr, 2, nullptr, 0);
 
   configureReadersIRQs();

@@ -73,7 +73,9 @@ enum Fluxo : uint8_t {
   FLUXO_OCIOSO,
   FLUXO_CONFIRMA_FECHAR, 
   FLUXO_CONFIRMA_FINALIZAR,
-  FLUXO_TRANCAR_AGUARDA_HTTP
+  FLUXO_TRANCAR_AGUARDA_HTTP,
+  FLUXO_CONFIRMA_ABRIR,
+  FLUXO_ABRIR_AGUARDA_HTTP
 };
 
 static_assert(sizeof(AppEvent) <= 64, "AppEvent grande demais para a fila");
