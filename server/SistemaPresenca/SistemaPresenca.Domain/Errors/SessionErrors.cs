@@ -16,6 +16,10 @@ public static class SessionErrors
         "SessionErrors.AlreadyFinished",
         "Session with provided id is already finished.");
 
+    public static Error NotInProgress=> new(
+        "SessionErrors.NotInProgress",
+        "Session with provided id is has not started to be finalized.");
+
     public static Error StudentNotFound => new(
         "SessionErrors.StudentNotFound",
         "Student with provided tag id not found at session."

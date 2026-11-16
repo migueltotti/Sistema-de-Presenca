@@ -18,6 +18,7 @@ public class UserRepository(SistemaPresencaDbContext context) : BaseRepository<U
             .AsNoTracking()
             .ApplyOnlyActiveEntitiesFilter()
             .FilterUsers(filters)
+            .ApplyIncludesFilter(["RoomAccessPermissions"])
             .ToListAsync(cancellationToken: cancellationToken);
     }
 }

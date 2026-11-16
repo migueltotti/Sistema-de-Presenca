@@ -188,6 +188,9 @@ namespace SistemaPresenca.Infrastructure.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
+                    b.Property<bool>("AutoStartAttendance")
+                        .HasColumnType("boolean");
+
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
@@ -215,8 +218,11 @@ namespace SistemaPresenca.Infrastructure.Migrations
                     b.Property<int>("Status")
                         .HasColumnType("integer");
 
-                    b.Property<Guid>("SubjectId")
+                    b.Property<Guid?>("SubjectId")
                         .HasColumnType("uuid");
+
+                    b.Property<int>("Type")
+                        .HasColumnType("integer");
 
                     b.HasKey("Id");
 
@@ -245,6 +251,9 @@ namespace SistemaPresenca.Infrastructure.Migrations
                     b.Property<Guid?>("CreatedById")
                         .HasColumnType("uuid");
 
+                    b.Property<DateOnly>("Date")
+                        .HasColumnType("date");
+
                     b.Property<DateTime?>("DeletedAt")
                         .HasColumnType("timestamp with time zone");
 
@@ -254,7 +263,7 @@ namespace SistemaPresenca.Infrastructure.Migrations
                     b.Property<DateTime?>("FinalizedAt")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<DateTime>("InitiedAt")
+                    b.Property<DateTime?>("InitiedAt")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<Guid?>("RoomBookingId")
@@ -262,6 +271,18 @@ namespace SistemaPresenca.Infrastructure.Migrations
 
                     b.Property<Guid?>("RoomId")
                         .HasColumnType("uuid");
+
+                    b.Property<TimeOnly>("ScheduledEndTime")
+                        .HasColumnType("time without time zone");
+
+                    b.Property<TimeOnly>("ScheduledStartTime")
+                        .HasColumnType("time without time zone");
+
+                    b.Property<Guid?>("StartedById")
+                        .HasColumnType("uuid");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("integer");
 
                     b.Property<Guid>("SubjectId")
                         .HasColumnType("uuid");
@@ -275,9 +296,12 @@ namespace SistemaPresenca.Infrastructure.Migrations
 
                     b.HasIndex("DeletedByAdminId");
 
-                    b.HasIndex("RoomBookingId");
+                    b.HasIndex("RoomBookingId")
+                        .IsUnique();
 
                     b.HasIndex("RoomId");
+
+                    b.HasIndex("StartedById");
 
                     b.HasIndex("SubjectId");
 
@@ -314,10 +338,6 @@ namespace SistemaPresenca.Infrastructure.Migrations
                         .IsRequired()
                         .HasMaxLength(200)
                         .HasColumnType("character varying(200)");
-
-                    b.PrimitiveCollection<Guid[]>("ProfessorIds")
-                        .IsRequired()
-                        .HasColumnType("uuid[]");
 
                     b.Property<int>("TotalClasses")
                         .HasColumnType("integer");
@@ -552,8 +572,7 @@ namespace SistemaPresenca.Infrastructure.Migrations
                     b.HasOne("SistemaPresenca.Domain.Entities.Subject", "Subject")
                         .WithMany()
                         .HasForeignKey("SubjectId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("CreatedBy");
 
@@ -579,13 +598,18 @@ namespace SistemaPresenca.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.ClientNoAction);
 
                     b.HasOne("SistemaPresenca.Domain.Entities.RoomBooking", "RoomBooking")
-                        .WithMany()
-                        .HasForeignKey("RoomBookingId");
+                        .WithOne("Session")
+                        .HasForeignKey("SistemaPresenca.Domain.Entities.Session", "RoomBookingId")
+                        .OnDelete(DeleteBehavior.SetNull);
 
                     b.HasOne("SistemaPresenca.Domain.Entities.Room", "Room")
                         .WithMany("Sessions")
                         .HasForeignKey("RoomId")
                         .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("SistemaPresenca.Domain.Entities.User", "StartedBy")
+                        .WithMany()
+                        .HasForeignKey("StartedById");
 
                     b.HasOne("SistemaPresenca.Domain.Entities.Subject", "Subject")
                         .WithMany()
@@ -600,6 +624,8 @@ namespace SistemaPresenca.Infrastructure.Migrations
                     b.Navigation("Room");
 
                     b.Navigation("RoomBooking");
+
+                    b.Navigation("StartedBy");
 
                     b.Navigation("Subject");
                 });
@@ -686,6 +712,11 @@ namespace SistemaPresenca.Infrastructure.Migrations
                     b.Navigation("RoomAccessPermissions");
 
                     b.Navigation("Sessions");
+                });
+
+            modelBuilder.Entity("SistemaPresenca.Domain.Entities.RoomBooking", b =>
+                {
+                    b.Navigation("Session");
                 });
 
             modelBuilder.Entity("SistemaPresenca.Domain.Entities.Session", b =>

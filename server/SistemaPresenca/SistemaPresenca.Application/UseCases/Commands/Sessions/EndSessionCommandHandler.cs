@@ -20,13 +20,19 @@ public sealed class EndSessionCommandHandler(
     {
         var session = await sessionRepository.GetOneAsync(
             x => x.Id == command.SessionId,
-            includes: ["Subject", "Room"],
+            includes: ["Subject.Professors", "Room"],
             cancellationToken: cancellationToken);
 
         if (session is null)
         {
             logger.LogError("Session with id {SessionId} - not found", command.SessionId);
             return Result.Failure(SessionErrors.NotFound);
+        }
+
+        if (session.Status != SessionStatus.InProgress)
+        {
+            logger.LogError("Session with id {SessionId} is not in progress - Status: {SessionStatus}.", command.SessionId, session.Status);
+            return Result.Failure(SessionErrors.NotInProgress);
         }
 
         var userId = userContextProvider.User.Id;
@@ -40,14 +46,14 @@ public sealed class EndSessionCommandHandler(
                 return Result.Failure(UserErrors.ProfessorNotFound);
             }
 
-            if (!session.Subject.ProfessorIds.Contains(userId))
+            if (!session.Subject.Professors.Any(x => x.Id == userId))
             {
                 logger.LogError("Professor with id {UserId} is not assigned to session {SessionId}", userId, command.SessionId);
                 return Result.Failure(SessionErrors.ProfessorMismatch);
             }
         }
 
-        session.FinalizedAt = DateTime.UtcNow;
+        session.Finalize();
 
         await sessionRepository.UpdateAsync(session, cancellationToken);
 

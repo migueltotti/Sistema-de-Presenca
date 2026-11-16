@@ -1,4 +1,5 @@
-﻿using SistemaPresenca.Domain.Enums;
+﻿using SistemaPresenca.Domain.Entities;
+using SistemaPresenca.Domain.Enums;
 
 namespace SistemaPresenca.Application.Responses.Users;
 
@@ -9,5 +10,12 @@ public record GetUserResponse(
     string RegistrationId,
     string Cpf,
     string? TagId,
-    UserRole Role
+    UserRole Role,
+    IEnumerable<GetUserAccessResponse> AccessPermissions
+);
+
+public sealed record GetUserAccessResponse(
+    Guid RoomId,
+    DateTime GrantedAt,
+    bool Active
 );

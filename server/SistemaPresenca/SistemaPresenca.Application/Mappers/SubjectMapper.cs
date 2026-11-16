@@ -25,8 +25,18 @@ public static class SubjectMapper
             subject.Code,
             subject.TotalClasses,
             subject.MajorId,
-            subject.ProfessorIds
+            subject.Professors.Select(x => x.ToSubjectProfessorResponse())
         );  
+    }
+
+    public static GetSubjectProfessorResponse ToSubjectProfessorResponse(this User professor)
+    {
+        return new GetSubjectProfessorResponse(
+            professor.Id,
+            professor.Name,
+            professor.Email,
+            professor.RegistrationId,
+            professor.Cpf);
     }
 
     public static UpdateSubjectRequest ToUpdateRequest(this Subject subject)

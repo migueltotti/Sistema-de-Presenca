@@ -71,7 +71,7 @@ public static class SubjectFilterStage
         {
             foreach (var professorId in filter.ProfessorIds)
             {
-                pipeline = pipeline.Where(x => x.ProfessorIds.Contains(professorId));
+                pipeline = pipeline.Where(x => x.Professors.Any(x => x.Id == professorId));
             }
         }
 

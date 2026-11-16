@@ -7,7 +7,7 @@ public class Subject : BaseEntity
     public int TotalClasses { get; set; }
     public Guid MajorId { get; set; }
     public Major Major { get; set; }
-    public IEnumerable<Guid> ProfessorIds { get; set; }
+    //public IEnumerable<Guid> ProfessorIds { get; set; }
     public IEnumerable<User> Professors { get; set; }
     public IEnumerable<User> Students { get; set; }
 
@@ -22,7 +22,7 @@ public class Subject : BaseEntity
         TotalClasses = totalClasses;
         MajorId = majorId;
         Major = default!;
-        ProfessorIds = [];
+        //ProfessorIds = [];
         Professors = [];
         Students = [];
     }

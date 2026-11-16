@@ -1,4 +1,5 @@
 ﻿using SistemaPresenca.Application.Constants;
+using SistemaPresenca.Application.Requests.Session;
 using SistemaPresenca.Domain.Entities;
 using System.Text.Json;
 
@@ -6,6 +7,18 @@ namespace SistemaPresenca.Application.Mappers;
 
 public static class SessionMappers
 {
+    public static Session ToEntity(this CreateSessionRequest request, Guid createdById)
+    {
+        return new Session(
+            request.Date,
+            request.ScheduledStartTime,
+            request.ScheduledEndTime,
+            request.TotalLessons,
+            request.SubjectId,
+            request.RoomId,
+            createdById);
+    }
+
     public static string ToEndSessionEvent(this Session session)
     {
         var @event = new

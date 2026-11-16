@@ -16,6 +16,10 @@ public static class SubjectErrors
         "SubjectErrors.ProfessorMismatch",
         "Professor does not teach the provided subject.");
 
+    public static Error StudentsRequiredToCreateSession => new(
+        "SubjectErrors.StudentsRequiredToCreateSession",
+        "Subject must have at least one student to create a session.");
+
     public static Error InvalidUpdateRequest(string description) => new(
         "SubjectErrors.InvalidUpdateRequest",
         description);

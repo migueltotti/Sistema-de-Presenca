@@ -77,4 +77,10 @@ public class SubjectsController(ICommandMediator commandMediator, IQueryMediator
 
         return Ok();
     }
+
+    // TODO: Criar endpoint para inserir professor à disciplina
+
+    // TOOD: criar endpoint para inserir aluno na disciplina
+
+    // Podemos até criar um só endpoint para isso e diferenciar em qual lista o usuário vai (Students ou Professors) com base no tipo do usuário
 }

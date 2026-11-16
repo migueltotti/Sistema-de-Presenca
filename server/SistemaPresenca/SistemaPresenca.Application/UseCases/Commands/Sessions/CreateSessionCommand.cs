@@ -5,4 +5,4 @@ using SistemaPresenca.Application.Responses.Session;
 
 namespace SistemaPresenca.Application.UseCases.Commands.Sessions;
 
-public record StartSessionCommand(StartSessionRequest Request) : ICommand<Result<StartSessionResponse>>;
+public record CreateSessionCommand(CreateSessionRequest Request) : ICommand<Result<CreateSessionResponse>>;

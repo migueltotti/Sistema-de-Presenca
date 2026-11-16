@@ -1,9 +1,17 @@
-﻿namespace SistemaPresenca.Domain.Entities;
+﻿using SistemaPresenca.Domain.Enums;
+
+namespace SistemaPresenca.Domain.Entities;
 
 public class Session : BaseEntity
 {
-    public DateTime InitiedAt { get; set; }
+    public DateOnly Date { get; set; }
+    public TimeOnly ScheduledStartTime { get; set; }
+    public TimeOnly ScheduledEndTime { get; set; }
+    public Guid? StartedById { get; set; }
+    public User? StartedBy { get; set; }
+    public DateTime? InitiedAt { get; set; }
     public DateTime? FinalizedAt { get; set; }
+    public SessionStatus Status { get; set; }
     public int TotalLessons { get; set; }
     public Guid SubjectId { get; set; }
     public Subject Subject { get; set; }
@@ -17,14 +25,24 @@ public class Session : BaseEntity
     {
     }
 
-    public Session(DateTime initiedAt, int totalLessons, Guid subjectId, Guid? roomId, Guid? createdById, Guid? roomBookingId = null) : base(createdById)
+    public Session(DateOnly date, TimeOnly scheduledStartTime, TimeOnly scheduledEndTime, int totalLessons, Guid subjectId, Guid roomId, Guid? createdById, Guid? roomBookingId = null) : base(createdById)
     {
-        InitiedAt = initiedAt;
+        Date = date;
+        ScheduledStartTime = scheduledStartTime;
+        ScheduledEndTime = scheduledEndTime;
         TotalLessons = totalLessons;
         SubjectId = subjectId;
         RoomId = roomId;
+        Status = SessionStatus.Scheduled;
         RoomBookingId = roomBookingId;
         Attendances = [];
+
         Subject = default!;
+    }
+
+    public void Finalize()
+    {
+        FinalizedAt = DateTime.UtcNow;
+        Status = SessionStatus.Completed;
     }
 }
