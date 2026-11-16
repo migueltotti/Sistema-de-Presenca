@@ -13,16 +13,13 @@ public class SessionConfiguration : BaseEntityConfiguration<Session>
         builder.ToTable("Sessions");
 
         builder.Property(s => s.InitiedAt)
-            .IsRequired();
+            .IsRequired(false);
 
         builder.Property(s => s.FinalizedAt)
             .IsRequired(false);
 
         builder.Property(s => s.TotalLessons)
             .IsRequired();
-
-        builder.Property(s => s.RoomId)
-            .IsRequired(false);
 
         builder.Property(s => s.RoomBookingId)
             .IsRequired(false);
@@ -31,11 +28,5 @@ public class SessionConfiguration : BaseEntityConfiguration<Session>
             .WithMany()
             .HasForeignKey(s => s.SubjectId)
             .OnDelete(DeleteBehavior.Cascade);
-
-        builder.HasOne(s => s.Room)
-            .WithMany()
-            .HasForeignKey(s => s.RoomId)
-            .IsRequired(false)
-            .OnDelete(DeleteBehavior.Restrict);
     }
 }

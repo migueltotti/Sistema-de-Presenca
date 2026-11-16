@@ -17,9 +17,9 @@ public class SessionsController(ICommandMediator commandMediator) : ControllerBa
     [ProducesResponseType(typeof(void), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(Error), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
-    public async Task<ActionResult<StartSessionResponse>> StartSessionAsync([FromBody] StartSessionRequest request, CancellationToken cancellationToken)
+    public async Task<ActionResult> CreateSessionAsync([FromBody] CreateSessionRequest request, CancellationToken cancellationToken)
     {
-        var result = await commandMediator.SendAsync(new StartSessionCommand(request), cancellationToken);
+        var result = await commandMediator.SendAsync(new CreateSessionCommand(request), cancellationToken);
 
         if (result.IsFailure)
         {
@@ -46,7 +46,7 @@ public class SessionsController(ICommandMediator commandMediator) : ControllerBa
         return Ok();
     }
 
-    // Esse endpoint só será chamado pela interface web, para finalizar a aula ao fechar a porta o endpoint é o /api/v1/rooms//microcontroller/{microcontrollerId}/close/tag-id/{tagId}
+    // Esse endpoint só será chamado pela interface web, para finalizar a aula ao fechar a porta o endpoint é o /api/v1/rooms/microcontroller/{microcontrollerId}/close/tag-id/{tagId}
     [HttpPost("{id:guid}/end")]
     [Authorize("AdminOrProfessor")]
     [ProducesResponseType(typeof(void), StatusCodes.Status200OK)]

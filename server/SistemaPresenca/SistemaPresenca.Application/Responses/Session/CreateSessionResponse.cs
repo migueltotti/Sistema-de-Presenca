@@ -1,4 +1,4 @@
 ﻿namespace SistemaPresenca.Application.Responses.Session;
 
-public record StartSessionResponse(Guid SessionId);
+public record CreateSessionResponse(Guid SessionId);
 

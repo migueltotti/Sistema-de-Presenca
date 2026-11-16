@@ -122,7 +122,7 @@ public sealed class OpenRoomByTagIdCommandHandler(
         if (session is null && nextBooking.SubjectId.HasValue)
         {
             var totalLessons = Math.Max(1, (int)Math.Round((nextBooking.EndsAt - nextBooking.StartsAt).TotalMinutes / 50.0));
-            session = new Session(now, totalLessons, nextBooking.SubjectId.Value, room.Id, user.Id, nextBooking.Id);
+            session = new Session(DateOnly.FromDateTime(now), TimeOnly.FromDateTime(nextBooking.StartsAt), TimeOnly.FromDateTime(nextBooking.EndsAt), totalLessons, nextBooking.SubjectId.Value, room.Id, user.Id, nextBooking.Id);
             session.Subject = nextBooking.Subject!;
             await sessionRepository.AddAsync(session, cancellationToken);
         }

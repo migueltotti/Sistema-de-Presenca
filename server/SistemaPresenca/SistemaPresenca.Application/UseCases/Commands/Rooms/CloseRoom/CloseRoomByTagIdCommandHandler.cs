@@ -45,6 +45,7 @@ public sealed class CloseRoomByTagIdCommandHandler(
             {
                 var session = await sessionRepository.GetOneAsync(x => 
                     x.Id == command.SessionRequest.SessionId.Value &&
+                    x.Status == SessionStatus.InProgress &&
                     x.FinalizedAt == null,
                     includes: ["Subject.Professors"],
                     cancellationToken: cancellationToken);
@@ -67,7 +68,7 @@ public sealed class CloseRoomByTagIdCommandHandler(
                     return Result.Failure(SessionErrors.ProfessorMismatch);
                 }
 
-                session.FinalizedAt = DateTime.UtcNow;
+                session.Finalize();
 
                 await sessionRepository.UpdateAsync(session, cancellationToken);
 

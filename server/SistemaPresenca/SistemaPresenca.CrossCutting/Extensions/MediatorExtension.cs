@@ -17,7 +17,7 @@ public static class MediatorExtension
             config.AddMessaging(_ => { });
 
             config.AddCommands(module => module
-                .RegisterFromAssembly(typeof(StartSessionCommand).Assembly));
+                .RegisterFromAssembly(typeof(CreateSessionCommand).Assembly));
 
             config.AddQueries(module => module
                 .RegisterFromAssembly(typeof(GetSubjectsQuery).Assembly));
