@@ -3,4 +3,4 @@ using SistemaPresenca.Domain.Models;
 
 namespace SistemaPresenca.Application.UseCases.Commands.Sessions;
 
-public sealed record ContinueSessionCommand(Guid SessionId, string ProfessorTagId) : ICommand<Result>;
+public sealed record ContinueSessionCommand(Guid SessionId, string ProfessorTagId, Guid? RoomId = null) : ICommand<Result>;

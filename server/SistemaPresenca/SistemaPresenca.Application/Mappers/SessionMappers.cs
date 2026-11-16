@@ -10,6 +10,22 @@ public static class SessionMappers
     {
         var @event = new
         {
+            SessionEvent = "EVT_FINALIZAR_REGISTRO_AULA",
+            SessionId = session.Id,
+            ProfessorTagIds = session
+                .Subject
+                .Professors
+                .Where(x => !string.IsNullOrEmpty(x.TagId))
+                .Select(x => x.TagId)
+        };
+
+        return JsonSerializer.Serialize(@event, SistemaPresencaConstants.SerializerOptions);
+    }
+
+    public static string ToStartSessionEvent(this Session session)
+    {
+        var @event = new
+        {
             SessionEvent = "EVT_INICIAR_REGISTRO_AULA",
             SessionId = session.Id,
             ProfessorTagIds = session

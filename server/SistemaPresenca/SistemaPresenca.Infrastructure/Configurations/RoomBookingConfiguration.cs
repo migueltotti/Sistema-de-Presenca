@@ -12,6 +12,15 @@ public class RoomBookingConfiguration : BaseEntityConfiguration<RoomBooking>
 
         builder.ToTable("RoomBookings");
 
+        builder.Property(b => b.SubjectId)
+            .IsRequired(false);
+
+        builder.Property(b => b.Type)
+            .IsRequired();
+
+        builder.Property(b => b.AutoStartAttendance)
+            .IsRequired();
+
         builder.Property(b => b.StartsAt)
             .IsRequired();
 
@@ -34,7 +43,13 @@ public class RoomBookingConfiguration : BaseEntityConfiguration<RoomBooking>
         builder.HasOne(b => b.Subject)
             .WithMany()
             .HasForeignKey(b => b.SubjectId)
+            .IsRequired(false)
             .OnDelete(DeleteBehavior.Restrict);
+
+        builder.HasOne(b => b.Session)
+            .WithOne(s => s.RoomBooking)
+            .HasForeignKey<Session>(s => s.RoomBookingId)
+            .OnDelete(DeleteBehavior.SetNull);
 
         builder.HasIndex(b => new { b.RoomId, b.StartsAt, b.EndsAt });
     }
