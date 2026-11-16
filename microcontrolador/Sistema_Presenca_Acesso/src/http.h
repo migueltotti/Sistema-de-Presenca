@@ -11,7 +11,7 @@
 extern QueueHandle_t httpQueue;
 extern QueueHandle_t eventQueue;
 
-const char* API_BASE_URL       = "https://dizygotic-ethelene-elvishly.ngrok-free.dev";
+const char* API_BASE_URL       = "http://172.20.10.8:5247";
 const char* API_KEY            = "API_DA_SILVA_JR";
 const char* MICROCONTROLLER_ID = "esp-room-b102";
 
@@ -59,6 +59,12 @@ static void montarUrlEBody(const HttpRequest& req, char* urlOut, size_t urlSize,
 
   serializeJson(doc, bodyOut);
 }
+
+// static void obterMensagemErro(const HttpResultado& res){
+//   if (){
+//     strlcpy(res.mensagem, "Sem resposta", sizeof(res.mensagem));
+//   }
+// }
 
 static void executarRequisicaoHttp(const HttpRequest& req) {
   HttpResultado res{};

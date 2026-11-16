@@ -17,7 +17,7 @@ extern WiFiClient espClient;       // definida no wifi_connection.h
 static PubSubClient client(espClient);
 
 // MQTT Broker
-const char *mqtt_broker = "192.168.15.3";
+const char *mqtt_broker = "172.20.10.8";
 const char *topic = "esp-room-b102";
 const char *mqtt_username = "esp32";
 const char *mqtt_password = "1234";
