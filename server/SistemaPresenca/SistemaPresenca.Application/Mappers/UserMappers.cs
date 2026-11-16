@@ -1,4 +1,5 @@
 ﻿using SistemaPresenca.Application.Requests.Users;
+using SistemaPresenca.Application.Responses.Rooms;
 using SistemaPresenca.Application.Responses.Users;
 using SistemaPresenca.Domain.Entities;
 
@@ -41,7 +42,17 @@ public static class UserMappers
             user.RegistrationId,
             user.Cpf,
             user.TagId,
-            user.Role);
+            user.Role,
+            user.RoomAccessPermissions.Select(x => x.ToUserAccessResponse()));
+    }
+
+    public static GetUserAccessResponse ToUserAccessResponse(this RoomAccessPermission roomAccessPermission)
+    {
+        return new GetUserAccessResponse(
+            roomAccessPermission.RoomId,
+            roomAccessPermission.GrantedAt,
+            roomAccessPermission.Active
+        );
     }
 
     public static LoginResponse ToLoginResponse(this string accessToken)

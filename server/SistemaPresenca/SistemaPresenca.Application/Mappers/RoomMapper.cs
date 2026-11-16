@@ -23,7 +23,17 @@ public static class RoomMapper
             room.Name,
             room.Location,
             room.MicrocontrollerId,
-            room.Status
+            room.Status,
+            room.RoomAccessPermissions.Select(x => x.ToRoomAccessResponse())
+        );
+    }
+
+    public static GetRoomAccessResponse ToRoomAccessResponse(this RoomAccessPermission roomAccessPermission)
+    {
+        return new GetRoomAccessResponse(
+            roomAccessPermission.UserId,
+            roomAccessPermission.GrantedAt,
+            roomAccessPermission.Active
         );
     }
 
