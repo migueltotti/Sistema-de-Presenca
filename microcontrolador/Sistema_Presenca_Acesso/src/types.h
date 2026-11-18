@@ -6,6 +6,7 @@
 constexpr size_t UID_LEN  = 21;   // UID do MFRC522: até 10 bytes -> 20 hex + '\0'
 constexpr size_t MSG_LEN  = 17;   // LCD 16 colunas + '\0'
 constexpr size_t GUID_LEN = 37;   // GUID: 37 bytes -> 37 digitos + '\0'
+constexpr size_t MAX_PROFESSOR_TAGS = 5;
 
 static const uint32_t TIMEOUT_CONFIRMACAO_MS = 10000;  // tempo para apertar um botão
 static const uint32_t TIMEOUT_HTTP_MS        = 15000;  // tempo para o servidor responder
@@ -53,7 +54,11 @@ struct AppEvent {
   EventType type;
   union {                        // só um é válido, conforme o type
     struct { Lado lado; char uid[UID_LEN]; } tag;                             // EVT_TAG
-    struct { char sessionId[GUID_LEN]; char professorTagId[UID_LEN]; } aula;  // EVT_INICIAR_REGISTRO_AULA e EVT_FINALIZAR_REGISTRO_AULA 
+    struct {
+      char sessionId[GUID_LEN];
+      char professorTagIds[MAX_PROFESSOR_TAGS][UID_LEN];
+      uint8_t professorTagCount;
+    } aula;  // EVT_INICIAR_REGISTRO_AULA e EVT_FINALIZAR_REGISTRO_AULA
     HttpResultado http;                                                       // EVT_HTTP_RESULTADO
   };
 };
@@ -78,6 +83,6 @@ enum Fluxo : uint8_t {
   FLUXO_ABRIR_AGUARDA_HTTP
 };
 
-static_assert(sizeof(AppEvent) <= 64, "AppEvent grande demais para a fila");
+static_assert(sizeof(AppEvent) <= 160, "AppEvent grande demais para a fila");
 
 #endif

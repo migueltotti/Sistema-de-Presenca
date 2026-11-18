@@ -17,7 +17,7 @@ extern WiFiClient espClient;       // definida no wifi_connection.h
 static PubSubClient client(espClient);
 
 // MQTT Broker
-const char *mqtt_broker = "172.20.10.8";
+const char *mqtt_broker = "192.168.1.40";
 const char *topic = "esp-room-b102";
 const char *mqtt_username = "esp32";
 const char *mqtt_password = "1234";
@@ -66,20 +66,47 @@ void callback(char *topic, byte *payload, unsigned int length) {
 
   if (ev.type == EVT_INICIAR_REGISTRO_AULA || ev.type == EVT_FINALIZAR_REGISTRO_AULA) {
     const char* sessionId = doc["sessionId"];
-    const char* professorTagId = doc["professorTagId"];
 
     if (sessionId == nullptr) {
       Serial.println("sessionId não informado.");
       return;
     }
 
-    if (professorTagId == nullptr) {
-      Serial.println("professorTagId não informado.");
+    JsonVariant professorTagValue = doc["professorTagIds"];
+    if (!professorTagValue.is<JsonArray>()) {
+      Serial.println("[mqtt] professorTagIds deve ser uma lista de textos.");
       return;
     }
 
+    JsonArray professorTagIds = professorTagValue.as<JsonArray>();
+    if (professorTagIds.size() == 0 || professorTagIds.size() > MAX_PROFESSOR_TAGS) {
+      Serial.printf("[mqtt] professorTagIds deve conter entre 1 e %u tags.\n", (unsigned)MAX_PROFESSOR_TAGS);
+      return;
+    }
+
+    for (JsonVariant professorTag : professorTagIds) {
+      if (!professorTag.is<const char*>()) {
+        Serial.println("[mqtt] cada item de professorTagIds deve ser texto.");
+        return;
+      }
+
+      const char* tagId = professorTag.as<const char*>();
+      if (tagId == nullptr) {
+        Serial.println("[mqtt] professorTagIds não pode conter valor nulo.");
+        return;
+      }
+
+      size_t tagLength = strlen(tagId);
+      if (tagLength == 0 || tagLength >= UID_LEN) {
+        Serial.printf("[mqtt] professorTagIds contém tag inválida (máximo de %u caracteres).\n", (unsigned)(UID_LEN - 1));
+        return;
+      }
+
+      strlcpy(ev.aula.professorTagIds[ev.aula.professorTagCount], tagId, UID_LEN);
+      ev.aula.professorTagCount++;
+    }
+
     strlcpy(ev.aula.sessionId, sessionId, sizeof(ev.aula.sessionId));
-    strlcpy(ev.aula.professorTagId, professorTagId, sizeof(ev.aula.professorTagId));
   }
 
   if (xQueueSend(eventQueue, &ev, 0) != pdTRUE) {
