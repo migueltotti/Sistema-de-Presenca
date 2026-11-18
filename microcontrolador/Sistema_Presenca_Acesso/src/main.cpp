@@ -11,7 +11,8 @@ QueueHandle_t eventQueue, displayQueue, httpQueue;
 
 bool aulaAtiva = false;
 char sessionId[GUID_LEN] = {""};
-char professorTagId[UID_LEN] = {""};
+char professorTagIds[MAX_PROFESSOR_TAGS][UID_LEN] = {};
+uint8_t professorTagCount = 0;
 
 bool portaFechada = true; 
 
@@ -23,6 +24,15 @@ bool       abrirComAulaAtiva = false;
 char       sessionIdParaRequisicao[GUID_LEN] = {""};
 int        requestId = 0;              // incrementa a cada requisição
 int        requestPendente = -1;       // requisição que estamos aguardando
+
+bool tagProfessorAutorizada(const char* uid) {
+  for (uint8_t i = 0; i < professorTagCount; i++) {
+    if (strcmp(uid, professorTagIds[i]) == 0) {
+      return true;
+    }
+  }
+  return false;
+}
 
 void atualizarDisplayExterno() {
   mostrar(LADO_EXTERNO,
@@ -149,7 +159,7 @@ void controllerTask(void*) {
         // aguardando desenvolvimento da buttonTask para testar
         if (fluxo == FLUXO_CONFIRMA_ABRIR) {
           if (aulaAtiva) {
-            if (strcmp(tagPendente, professorTagId) == 0) {
+            if (tagProfessorAutorizada(tagPendente)) {
               portaFechada = false;
               mostrar(LADO_EXTERNO, "Sala destrancada", "", 2000);
               voltarAoEstadoOcioso();
@@ -200,14 +210,15 @@ void controllerTask(void*) {
 
         aulaAtiva = true;
         strlcpy(sessionId, ev.aula.sessionId, sizeof(ev.aula.sessionId));
-        strlcpy(professorTagId, ev.aula.professorTagId, sizeof(ev.aula.professorTagId));
+        memcpy(professorTagIds, ev.aula.professorTagIds, sizeof(professorTagIds));
+        professorTagCount = ev.aula.professorTagCount;
 
         mostrar(LADO_INTERNO, "Aula iniciada", "", 3000);               // temporaria
         mostrar(LADO_INTERNO, "Aproxime uma tag", ">>            <<");  // permanente
         if (fluxo == FLUXO_OCIOSO) {
           atualizarDisplayExterno();
         }
-        Serial.printf("[ctrl] aula com id %s iniciada para o professor com tag %s.\n", ev.aula.sessionId, ev.aula.professorTagId);
+        Serial.printf("[ctrl] aula com id %s iniciada para %u professor(es).\n", ev.aula.sessionId, (unsigned)professorTagCount);
         break;
 
       case EVT_FINALIZAR_REGISTRO_AULA:
@@ -223,14 +234,15 @@ void controllerTask(void*) {
         
         aulaAtiva = false;
         strlcpy(sessionId, "", sizeof(sessionId));
-        strlcpy(professorTagId, "", sizeof(professorTagId));
+        memset(professorTagIds, 0, sizeof(professorTagIds));
+        professorTagCount = 0;
 
         mostrar(LADO_INTERNO, "Aula finalizada", "Obrigado!", 3000);     // temporaria
         mostrar(LADO_INTERNO, "Nenhuma aula",  "em andamento");          // permanente
         if (fluxo == FLUXO_OCIOSO) {
           atualizarDisplayExterno();
         }
-        Serial.printf("[ctrl] aula com id %s finalizada pelo professor com tag %s.\n", ev.aula.sessionId, ev.aula.professorTagId);
+        Serial.printf("[ctrl] aula com id %s finalizada (%u professor(es) registrados).\n", ev.aula.sessionId, (unsigned)ev.aula.professorTagCount);
         break;
 
       case EVT_HTTP_RESULTADO:
