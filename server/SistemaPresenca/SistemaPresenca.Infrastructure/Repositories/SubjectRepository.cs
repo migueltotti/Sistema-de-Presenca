@@ -10,6 +10,7 @@ namespace SistemaPresenca.Infrastructure.Repositories;
 public class SubjectRepository(SistemaPresencaDbContext context) : BaseRepository<Subject>(context), ISubjectRepository
 {
     private readonly SistemaPresencaDbContext _context = context;
+
     public async Task<IEnumerable<Subject>> GetSubjectsAsync(SubjectFilters filters, CancellationToken cancellationToken = default)
     {
         return await _context.Subjects
@@ -17,6 +18,7 @@ public class SubjectRepository(SistemaPresencaDbContext context) : BaseRepositor
             .AsNoTracking()
             .ApplyOnlyActiveEntitiesFilter()
             .FilterSubjects(filters)
+            .ApplyIncludesFilter(["Professors"])
             .ToListAsync(cancellationToken: cancellationToken);
     }
 }

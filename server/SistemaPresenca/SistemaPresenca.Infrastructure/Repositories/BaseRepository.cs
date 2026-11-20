@@ -14,7 +14,6 @@ public class BaseRepository<T>(SistemaPresencaDbContext context)
     {
         return await context.Set<T>()
             .AsQueryable()
-            .AsNoTracking()
             .ApplyIncludesFilter(includes)
             .ApplyOnlyActiveEntitiesFilter()
             .FirstOrDefaultAsync(expression, cancellationToken);
@@ -41,10 +40,10 @@ public class BaseRepository<T>(SistemaPresencaDbContext context)
     {
         ArgumentNullException.ThrowIfNull(entity);
 
-        //context.Set<T>().Update(entity);
+        context.Set<T>().Update(entity);
 
-        var entry = context.Entry(entity);
-        entry.State = EntityState.Modified;
+        //var entry = context.Entry(entity);
+        //entry.State = EntityState.Modified;
 
         await context.SaveChangesAsync(cancellationToken);
     }

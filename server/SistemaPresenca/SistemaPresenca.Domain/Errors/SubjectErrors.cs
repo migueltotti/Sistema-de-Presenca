@@ -20,6 +20,10 @@ public static class SubjectErrors
         "SubjectErrors.StudentsRequiredToCreateSession",
         "Subject must have at least one student to create a session.");
 
+    public static Error UserAlreadyAssigned(string userRole) => new(
+        $"SubjectErrors.{userRole}AlreadyAssigned",
+        $"{userRole} is already assigned to Subject.");
+
     public static Error InvalidUpdateRequest(string description) => new(
         "SubjectErrors.InvalidUpdateRequest",
         description);

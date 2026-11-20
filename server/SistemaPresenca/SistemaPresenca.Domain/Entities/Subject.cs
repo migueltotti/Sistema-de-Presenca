@@ -8,8 +8,8 @@ public class Subject : BaseEntity
     public Guid MajorId { get; set; }
     public Major Major { get; set; }
     //public IEnumerable<Guid> ProfessorIds { get; set; }
-    public IEnumerable<User> Professors { get; set; }
-    public IEnumerable<User> Students { get; set; }
+    public List<User> Professors { get; set; }
+    public List<User> Students { get; set; }
 
     private Subject() : base()
     {

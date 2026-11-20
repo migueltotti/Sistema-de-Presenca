@@ -7,6 +7,7 @@ using SistemaPresenca.Application.Requests.Subjects;
 using SistemaPresenca.Application.Responses.Subjects;
 using SistemaPresenca.Application.UseCases.Commands.Subjects;
 using SistemaPresenca.Application.UseCases.Queries.Subjects;
+using SistemaPresenca.Domain.Enums;
 using SistemaPresenca.Domain.Models;
 
 namespace SistemaPresenca.Api.Controllers;
@@ -78,9 +79,49 @@ public class SubjectsController(ICommandMediator commandMediator, IQueryMediator
         return Ok();
     }
 
-    // TODO: Criar endpoint para inserir professor à disciplina
+    // TODO: Criar endpoint para inserir professor à disciplina.
+    [HttpPost("{id:guid}/professors/{professorId:guid}")]
+    [Authorize("Admin")]
+    [ProducesResponseType(typeof(void), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(Error), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
+    public async Task<IActionResult> AddSubjectProfessorAsync(
+        [FromRoute] Guid id,
+        [FromRoute] Guid professorId,
+        CancellationToken cancellationToken)
+    {
+        var result = await commandMediator.SendAsync(new AddSubjectMemberCommand(id, professorId, MemberRoleRequest.Professor), cancellationToken);
 
-    // TOOD: criar endpoint para inserir aluno na disciplina
+        if (result.IsFailure)
+        {
+            return BadRequest(result.Error);
+        }
 
-    // Podemos até criar um só endpoint para isso e diferenciar em qual lista o usuário vai (Students ou Professors) com base no tipo do usuário
+        return Ok();
+    }
+
+    // TOOD: criar endpoint para inserir aluno na disciplina.
+    [HttpPost("{id:guid}/students/{studentId:guid}")]
+    [Authorize("Admin")]
+    [ProducesResponseType(typeof(void), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(Error), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
+    public async Task<IActionResult> AddSubjectStudentAsync(
+        [FromRoute] Guid id,
+        [FromRoute] Guid studentId,
+        CancellationToken cancellationToken)
+    {
+        var result = await commandMediator.SendAsync(new AddSubjectMemberCommand(id, studentId, MemberRoleRequest.Student), cancellationToken);
+
+        if (result.IsFailure)
+        {
+            return BadRequest(result.Error);
+        }
+
+        return Ok();
+    }
+
+    // TOOD: criar endpoint para remover professor da disciplina.
+
+    // TOOD: criar endpoint para remover aluno da disciplina.    
 }
